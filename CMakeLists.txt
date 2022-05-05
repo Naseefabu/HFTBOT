@@ -7,7 +7,7 @@ find_package(Threads REQUIRED)
 
 # add_subdirectory(external/urlib)
 
-set(URLIB_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/external/urlib/include")
+set(URLIB_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/external/url/include")
 set(URLIB_HEADERS ${URLIB_DIRECTORY}/boost/url.hpp ${URLIB_DIRECTORY}/boost/url/src.hpp)
 set(SOURCES src/httpClient.cpp)
 

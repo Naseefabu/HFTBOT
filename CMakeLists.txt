@@ -9,7 +9,7 @@ find_package(Threads REQUIRED)
 
 set(URLIB_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/external/url/include")
 set(URLIB_HEADERS ${URLIB_DIRECTORY}/boost/url.hpp ${URLIB_DIRECTORY}/boost/url/src.hpp)
-set(SOURCES src/httpClient.cpp)
+set(SOURCES src/httpclient.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${URLIB_HEADERS})
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})

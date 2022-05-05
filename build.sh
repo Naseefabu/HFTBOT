@@ -1,3 +1,3 @@
 #! /bin/sh
 
-make -C build/
+cd build; make 

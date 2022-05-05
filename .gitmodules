@@ -1,0 +1,9 @@
+[submodule "external/boost-asio/asio"]
+	path = external/boost-asio/asio
+	url = https://github.com/boostorg/asio.git
+[submodule "external/asio"]
+	path = external/asio
+	url = https://github.com/boostorg/asio.git
+[submodule "external/url"]
+	path = external/url
+	url = https://github.com/CPPAlliance/url.git

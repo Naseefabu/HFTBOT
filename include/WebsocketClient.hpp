@@ -1,3 +1,6 @@
+#ifndef WEBSOCKET
+#define WEBSOCKET
+
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/beast.hpp>
@@ -35,16 +38,25 @@ class WebsocketClient : public std::enable_shared_from_this<WebsocketClient>
   public:
 
     explicit WebsocketClient(net::io_context& ioc, ssl::context& ctx);
+
     void run(char const* host, char const* port, Json::Value message);
+
     void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
+
     void on_connect(beast::error_code ec, [[maybe_unused]] tcp::resolver::results_type::endpoint_type ep);
+
     void on_ssl_handshake(beast::error_code ec);
+
     std::string Json_to_string(const Json::Value& json);
+
     void on_handshake(beast::error_code ec);
+
     void on_write(beast::error_code ec, std::size_t bytes_transferred);
+
     void on_read(beast::error_code ec, std::size_t bytes_transferred);
+
     void on_close(beast::error_code ec);
 
-
-
 };
+
+#endif

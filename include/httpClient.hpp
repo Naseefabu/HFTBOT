@@ -1,8 +1,11 @@
+#ifndef HTTP
+#define HTTP
+
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 #include <boost/beast/ssl.hpp>
-#include <boost/json.hpp>
-#include <boost/json/src.hpp>
+#include "boost/url/src.hpp"
+#include "boost/url.hpp"
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -13,10 +16,14 @@ namespace beast = boost::beast;
 namespace http  = beast::http;          
 namespace net   = boost::asio;          
 namespace ssl   = boost::asio::ssl;     
-namespace json  = boost::json;
 using tcp       = boost::asio::ip::tcp; 
 
 using executor = net::any_io_executor; 
+
+
+
+boost::url make_url(boost::url_view base_api, boost::url_view method);
+void fail_http(beast::error_code ec, char const* what);
 
 class httpClient : public std::enable_shared_from_this<httpClient>
 {
@@ -45,3 +52,5 @@ class httpClient : public std::enable_shared_from_this<httpClient>
 
     void on_shutdown(beast::error_code ec);
 };
+
+#endif

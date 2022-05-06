@@ -1,14 +1,10 @@
-#ifndef HTTP
-#define HTTP
+#pragma once
 
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 #include <boost/beast/ssl.hpp>
 #include "boost/url/src.hpp"
-#include "boost/url.hpp"
-#include <functional>
 #include <iostream>
-#include <memory>
 #include <string>
 
 
@@ -53,4 +49,3 @@ class httpClient : public std::enable_shared_from_this<httpClient>
     void on_shutdown(beast::error_code ec);
 };
 
-#endif

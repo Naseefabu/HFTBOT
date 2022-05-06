@@ -48,6 +48,7 @@ void WebsocketClient::on_resolve(beast::error_code ec, tcp::resolver::results_ty
     }
 
     // Set the timeout for the operation
+    // what is this ?
     get_lowest_layer(ws_).expires_after(30s);
 
 

@@ -1,5 +1,4 @@
-#ifndef WEBSOCKET
-#define WEBSOCKET
+#pragma once
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -59,4 +58,3 @@ class WebsocketClient : public std::enable_shared_from_this<WebsocketClient>
 
 };
 
-#endif

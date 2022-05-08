@@ -60,5 +60,7 @@ class httpClient : public std::enable_shared_from_this<httpClient>
     void get_server_time(net::io_context &ioc, ssl::context &ctx);
 
     void ping_binance(net::io_context &ioc, ssl::context &ctx);
+
+    void get_open_orders(net::io_context &ioc, ssl::context &ctx);
 };
 

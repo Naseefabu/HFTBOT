@@ -118,6 +118,7 @@ void httpClient::on_write(beast::error_code ec, std::size_t bytes_transferred)
         beast::bind_front_handler(
             &httpClient::on_read,
             shared_from_this()));
+            
 }
 
 void httpClient::on_read(beast::error_code ec, std::size_t bytes_transferred)
@@ -190,6 +191,15 @@ void httpClient::ping_binance(net::io_context &ioc, ssl::context &ctx)
 
 }
 
+void httpClient::get_open_orders(net::io_context &ioc, ssl::context &ctx)
+{
+
+	static boost::url_view const base_api{"https://api.binance.com/api/v3/openOrders"};
+
+	std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api);
+
+}
+
 
 
 int main()
@@ -203,10 +213,12 @@ int main()
     ctx.set_verify_mode(ssl::verify_peer);
     ctx.set_default_verify_paths();
 
-    client->get_latest_price("BTCUSDT",ioc,ctx);
-    client->get_exchange_info("BTCUSDT",ioc,ctx);
-    client->get_server_time(ioc,ctx);
-    client->ping_binance(ioc,ctx);
+    // client->get_latest_price("BTCUSDT",ioc,ctx);
+    // client->get_exchange_info("BTCUSDT",ioc,ctx);
+    // client->get_server_time(ioc,ctx);
+    // client->ping_binance(ioc,ctx);
+    client->get_open_orders(ioc,ctx);
+
 
     ioc.run();
 }

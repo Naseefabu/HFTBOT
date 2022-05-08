@@ -62,6 +62,9 @@
         "typeindex": "cpp",
         "typeinfo": "cpp",
         "variant": "cpp",
-        "bit": "cpp"
+        "bit": "cpp",
+        "*.ipp": "cpp",
+        "any": "cpp",
+        "source_location": "cpp"
     }
 }

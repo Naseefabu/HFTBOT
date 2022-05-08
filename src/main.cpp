@@ -1,6 +1,7 @@
 #include <iostream>
-#include "httpClient.hpp"
-
+#include "WebsocketClient.hpp"
+#include "httpClient.hpp" // can only be included in one source file
+using namespace std;
 
 
 boost::url make_url(boost::url_view base_api, boost::url_view method) {
@@ -23,6 +24,7 @@ void fail_http(beast::error_code ec, char const* what)
 httpClient::httpClient(executor ex, ssl::context& ctx)
     : resolver_(ex)
     , stream_(ex, ctx) {}
+
 
 // Start the asynchronous operation
 void httpClient::run(boost::url url) {
@@ -142,8 +144,6 @@ void httpClient::on_shutdown(beast::error_code ec)
 {
     if(ec == net::error::eof)
     {
-        // Rationale:
-        // http://stackoverflow.com/questions/25587403/boost-asio-ssl-async-shutdown-always-finishes-with-an-error
         ec = {};
     }
     if(ec)
@@ -151,31 +151,62 @@ void httpClient::on_shutdown(beast::error_code ec)
 
 }
 
+void httpClient::get_latest_price(std::string symbol, net::io_context &ioc, ssl::context &ctx)
+{
+	static boost::url_view const base_api{"wss://api.binance.com/api/v3/ticker/"};
+	boost::url method{"price"};
+	method.params().emplace_back("symbol",symbol);
+	std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method));
+
+}
+
+
+void httpClient::get_exchange_info(std::string symbol, net::io_context &ioc, ssl::context &ctx)
+{
+
+	static boost::url_view const base_api{"wss://api.binance.com/api/v3/"};
+	boost::url method{"exchangeInfo"};
+	method.params().emplace_back("symbol",symbol);
+	std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method));
+
+}
+
+void httpClient::get_server_time(net::io_context &ioc, ssl::context &ctx)
+{
+
+	static boost::url_view const base_api{"wss://api.binance.com/api/v3/time"};
+
+	std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api);
+
+}
+
+
+void httpClient::ping_binance(net::io_context &ioc, ssl::context &ctx)
+{
+
+	static boost::url_view const base_api{"wss://api.binance.com/api/v3/ping"};
+
+	std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api);
+
+}
+
+
 
 int main()
 {
-    // The io_context is required for all I/O
     net::io_context ioc;
+    httpClient* client;
 
     // The SSL context is required, and holds certificates
     ssl::context ctx{ssl::context::tlsv12_client};
-
     // Verify the remote server's certificate
     ctx.set_verify_mode(ssl::verify_peer);
     ctx.set_default_verify_paths();
 
-    static boost::url_view const base_api{"wss://api.binance.com/api/v3/"};
-    boost::url method{"depth"};
+    client->get_latest_price("BTCUSDT",ioc,ctx);
+    client->get_exchange_info("BTCUSDT",ioc,ctx);
+    client->get_server_time(ioc,ctx);
+    client->ping_binance(ioc,ctx);
 
-    // query paramters
-    method.params().emplace_back("symbol", "BTCUSDT");
-
-    // The session is constructed with a strand to
-    // ensure that handlers do not execute concurrently.
-    std::make_shared<httpClient>(net::make_strand(ioc), ctx)
-        ->run(make_url(base_api, method));
-
-    // Run the I/O service. The call will return when
-    // the get operation is complete.
     ioc.run();
 }

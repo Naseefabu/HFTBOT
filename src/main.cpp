@@ -32,7 +32,7 @@ void httpClient::run(boost::url url) {
     std::string const host(url.host());
     std::string const service = url.has_port() //
         ? url.port()
-        : (url.scheme_id() == boost::urls::scheme::wss) //
+        : (url.scheme_id() == boost::urls::scheme::https) //
             ? "https"
             : "http";
     url.remove_origin(); // becomes req_.target()
@@ -153,7 +153,7 @@ void httpClient::on_shutdown(beast::error_code ec)
 
 void httpClient::get_latest_price(std::string symbol, net::io_context &ioc, ssl::context &ctx)
 {
-	static boost::url_view const base_api{"wss://api.binance.com/api/v3/ticker/"};
+	static boost::url_view const base_api{"https://api.binance.com/api/v3/ticker/"};
 	boost::url method{"price"};
 	method.params().emplace_back("symbol",symbol);
 	std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method));
@@ -164,7 +164,7 @@ void httpClient::get_latest_price(std::string symbol, net::io_context &ioc, ssl:
 void httpClient::get_exchange_info(std::string symbol, net::io_context &ioc, ssl::context &ctx)
 {
 
-	static boost::url_view const base_api{"wss://api.binance.com/api/v3/"};
+	static boost::url_view const base_api{"https://api.binance.com/api/v3/"};
 	boost::url method{"exchangeInfo"};
 	method.params().emplace_back("symbol",symbol);
 	std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method));
@@ -174,7 +174,7 @@ void httpClient::get_exchange_info(std::string symbol, net::io_context &ioc, ssl
 void httpClient::get_server_time(net::io_context &ioc, ssl::context &ctx)
 {
 
-	static boost::url_view const base_api{"wss://api.binance.com/api/v3/time"};
+	static boost::url_view const base_api{"https://api.binance.com/api/v3/time"};
 
 	std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api);
 
@@ -184,7 +184,7 @@ void httpClient::get_server_time(net::io_context &ioc, ssl::context &ctx)
 void httpClient::ping_binance(net::io_context &ioc, ssl::context &ctx)
 {
 
-	static boost::url_view const base_api{"wss://api.binance.com/api/v3/ping"};
+	static boost::url_view const base_api{"https://api.binance.com/api/v3/ping"};
 
 	std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api);
 

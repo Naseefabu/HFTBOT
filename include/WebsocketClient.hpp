@@ -24,37 +24,41 @@ using tcp           = net::ip::tcp;
 using Stream = websocket::stream<beast::ssl_stream<beast::tcp_stream>>;
 using namespace std::chrono_literals;
 
+namespace binapi{
+  namespace ws{
 
-class WebsocketClient : public std::enable_shared_from_this<WebsocketClient>
-{
-    tcp::resolver resolver_;
-    Stream        ws_;
+    class WebsocketClient : public std::enable_shared_from_this<WebsocketClient>
+    {
+        tcp::resolver resolver_;
+        Stream        ws_;
 
-    beast::flat_buffer buffer_;
-    std::string        host_;
-    std::string        message_text_;
+        beast::flat_buffer buffer_;
+        std::string        host_;
+        std::string        message_text_;
 
-  public:
+      public:
 
-    explicit WebsocketClient(net::io_context& ioc, ssl::context& ctx);
+        explicit WebsocketClient(net::io_context& ioc, ssl::context& ctx);
 
-    void run(char const* host, char const* port, Json::Value message);
+        void run(char const* host, char const* port, Json::Value message);
 
-    void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
+        void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
 
-    void on_connect(beast::error_code ec, [[maybe_unused]] tcp::resolver::results_type::endpoint_type ep);
+        void on_connect(beast::error_code ec, [[maybe_unused]] tcp::resolver::results_type::endpoint_type ep);
 
-    void on_ssl_handshake(beast::error_code ec);
+        void on_ssl_handshake(beast::error_code ec);
 
-    std::string Json_to_string(const Json::Value& json);
+        std::string Json_to_string(const Json::Value& json);
 
-    void on_handshake(beast::error_code ec);
+        void on_handshake(beast::error_code ec);
 
-    void on_write(beast::error_code ec, std::size_t bytes_transferred);
+        void on_write(beast::error_code ec, std::size_t bytes_transferred);
 
-    void on_read(beast::error_code ec, std::size_t bytes_transferred);
+        void on_read(beast::error_code ec, std::size_t bytes_transferred);
 
-    void on_close(beast::error_code ec);
+        void on_close(beast::error_code ec);
 
-};
+    };
+  }
+}
 

@@ -31,7 +31,8 @@ namespace binapi{
 
 
         // Start the asynchronous operation
-        void httpClient::run(boost::url url) {
+        void httpClient::run(boost::url url, http::verb action) 
+        {
 
             std::string const host(url.host());
             std::string const service = url.has_port() //
@@ -51,7 +52,7 @@ namespace binapi{
 
             // Set up an HTTP GET request message
             // req_.version(version);
-            req_.method(http::verb::get);
+            req_.method(action);
             req_.target(url.c_str());
             req_.set(http::field::host, host);
             req_.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
@@ -161,7 +162,7 @@ namespace binapi{
             static boost::url_view const base_api{"https://api.binance.com/api/v3/ticker/"};
             boost::url method{"price"};
             method.params().emplace_back("symbol",symbol);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method));
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get);
 
         }
 
@@ -172,7 +173,7 @@ namespace binapi{
             static boost::url_view const base_api{"https://api.binance.com/api/v3/"};
             boost::url method{"exchangeInfo"};
             method.params().emplace_back("symbol",symbol);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method));
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get);
 
         }
 
@@ -181,7 +182,7 @@ namespace binapi{
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/time"};
 
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api,http::verb::get);
 
         }
 
@@ -191,7 +192,7 @@ namespace binapi{
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/ping"};
 
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api,http::verb::get);
 
         }
 
@@ -200,7 +201,7 @@ namespace binapi{
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/openOrders"};
 
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api,http::verb::get);
 
         }
 
@@ -213,7 +214,7 @@ namespace binapi{
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("limit",levels);
 
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method));
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get);
 
         }
 
@@ -226,7 +227,7 @@ namespace binapi{
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("limit",levels);
 
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method));
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get);
 
         }
 
@@ -239,7 +240,7 @@ namespace binapi{
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("interval",interval);
 
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method));
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get);
 
         }
 
@@ -251,11 +252,11 @@ namespace binapi{
             boost::url method{"avgPrice"};
             method.params().emplace_back("symbol",symbol);
 
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method));
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get);
 
         }
 
-        void httpClient::get_best_BAS(std::string symbol, net::io_context &ioc, ssl::context &ctx)
+        void httpClient::get_best_BA(std::string symbol, net::io_context &ioc, ssl::context &ctx)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/ticker"};
@@ -263,7 +264,7 @@ namespace binapi{
             boost::url method{"bookTicker"};
             method.params().emplace_back("symbol",symbol);
 
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method));
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get);
 
         }
     }

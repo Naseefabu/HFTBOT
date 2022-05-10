@@ -43,7 +43,7 @@ namespace binapi{
 
 
         // Start the asynchronous operation
-        void run(boost::url url);
+        void run(boost::url url, http::verb action);
 
         void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
 
@@ -75,7 +75,7 @@ namespace binapi{
 
         void get_avg_price(std::string symbol, net::io_context &ioc, ssl::context &ctx);
 
-        void get_best_BAS(std::string symbol, net::io_context &ioc, ssl::context &ctx);
+        void get_best_BA(std::string symbol, net::io_context &ioc, ssl::context &ctx);
     };
   }
 }

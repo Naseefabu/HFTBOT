@@ -1,7 +1,8 @@
 #include <iostream>
 #include <ctime>
+#include "boost/url/src.hpp" // can only be included in one source file
 #include "binance-ws.hpp"
-#include "binance-gateway.hpp" // can only be included in one source file
+#include "binance-gateway.hpp" 
 using namespace std;
 
 int main()

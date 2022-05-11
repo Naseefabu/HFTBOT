@@ -3,7 +3,6 @@
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 #include <boost/beast/ssl.hpp>
-#include "boost/url/src.hpp"
 #include <iostream>
 #include <string>
 
@@ -82,6 +81,7 @@ namespace binapi{
   }
 }
 
+
 namespace binapi
 {
     
@@ -143,9 +143,7 @@ namespace binapi
 
             // Look up the domain name
 
-            resolver_.async_resolve(host, service,
-                                    beast::bind_front_handler(&httpClient::on_resolve,
-                                                                shared_from_this()));
+            resolver_.async_resolve(host, service,beast::bind_front_handler(&httpClient::on_resolve,shared_from_this()));
         }
 
         void httpClient::on_resolve(beast::error_code ec, tcp::resolver::results_type results)
@@ -157,11 +155,7 @@ namespace binapi
             beast::get_lowest_layer(stream_).expires_after(std::chrono::seconds(30));
 
             // Make the connection on the IP address we get from a lookup
-            beast::get_lowest_layer(stream_).async_connect(
-                results,
-                beast::bind_front_handler(
-                    &httpClient::on_connect,
-                    shared_from_this()));
+            beast::get_lowest_layer(stream_).async_connect(results,beast::bind_front_handler(&httpClient::on_connect,shared_from_this()));
         }
 
         void httpClient::on_connect(beast::error_code ec, tcp::resolver::results_type::endpoint_type)
@@ -170,11 +164,7 @@ namespace binapi
                 return fail_http(ec, "connect");
 
             // Perform the SSL handshake
-            stream_.async_handshake(
-                ssl::stream_base::client,
-                beast::bind_front_handler(
-                    &httpClient::on_handshake,
-                    shared_from_this()));
+            stream_.async_handshake(ssl::stream_base::client,beast::bind_front_handler(&httpClient::on_handshake,shared_from_this()));
         }
 
         void httpClient::on_handshake(beast::error_code ec)
@@ -187,10 +177,7 @@ namespace binapi
 
             // Send the HTTP request to the remote host
             std::cout << "Sending " << req_ << std::endl;
-            http::async_write(stream_, req_,
-                beast::bind_front_handler(
-                    &httpClient::on_write,
-                    shared_from_this()));
+            http::async_write(stream_, req_, beast::bind_front_handler(&httpClient::on_write, shared_from_this()));
         }
 
         void httpClient::on_write(beast::error_code ec, std::size_t bytes_transferred)
@@ -201,10 +188,7 @@ namespace binapi
                 return fail_http(ec, "write");
 
             // Receive the HTTP response
-            http::async_read(stream_, buffer_, res_,
-                beast::bind_front_handler(
-                    &httpClient::on_read,
-                    shared_from_this()));
+            http::async_read(stream_, buffer_, res_,beast::bind_front_handler(&httpClient::on_read,shared_from_this()));
 
         }
 
@@ -222,10 +206,7 @@ namespace binapi
             beast::get_lowest_layer(stream_).expires_after(std::chrono::seconds(30));
 
             // Gracefully close the stream
-            stream_.async_shutdown(
-                beast::bind_front_handler(
-                    &httpClient::on_shutdown,
-                    shared_from_this()));
+            stream_.async_shutdown(beast::bind_front_handler(&httpClient::on_shutdown,shared_from_this()));
         }
 
         void httpClient::on_shutdown(beast::error_code ec)
@@ -364,4 +345,3 @@ namespace binapi
         }
     }
 }
-

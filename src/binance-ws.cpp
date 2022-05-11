@@ -1,4 +1,4 @@
-#include "WebsocketClient.hpp"
+#include "binance-ws.hpp"
 
 void fail_ws(beast::error_code ec, char const* what)
 {

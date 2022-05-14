@@ -8,7 +8,7 @@ using namespace std;
 int main()
 {
     net::io_context ioc;
-    binapi::rest::httpClient* client;
+    binapi::AsyncRest::httpClient* client;
 
     // The SSL context is required, and holds certificates
     ssl::context ctx{ssl::context::tlsv12_client};
@@ -19,7 +19,7 @@ int main()
 
     // client->get_latest_price("BTCUSDT",ioc,ctx);
     // client->get_exchange_info("BTCUSDT",ioc,ctx);
-    client->get_server_time(ioc,ctx);
+    binapi::AsyncRest::async_server_time(ioc,ctx);
     // client->ping_binance(ioc,ctx);
     // client->get_open_orders(ioc,ctx);
     // client->get_orderbook("BTCUSDT","3",ioc,ctx);

@@ -3,6 +3,8 @@
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 #include <boost/beast/ssl.hpp>
+#include <boost/json/src.hpp>
+#include <boost/json.hpp>
 #include <iostream>
 #include <string>
 
@@ -14,6 +16,7 @@ namespace ssl   = boost::asio::ssl;
 using tcp       = boost::asio::ip::tcp; 
 
 using executor = net::any_io_executor; 
+using namespace boost::json;
 
 
 
@@ -22,9 +25,9 @@ void fail_http(beast::error_code ec, char const* what);
 
 namespace binapi{
 
-  namespace rest{
+  namespace AsyncRest{
 
-    class httpClient : public std::enable_shared_from_this<httpClient> 
+    struct httpClient : public std::enable_shared_from_this<httpClient> 
     {
         tcp::resolver                        resolver_;
         beast::ssl_stream<beast::tcp_stream> stream_;
@@ -32,6 +35,7 @@ namespace binapi{
         http::request<http::string_body>  req_;
         http::response<http::string_body> res_;
         net::io_context ioc;
+        value json;
         
 
       public:
@@ -55,28 +59,6 @@ namespace binapi{
         void on_read(beast::error_code ec, std::size_t bytes_transferred);
 
         void on_shutdown(beast::error_code ec);
-
-        void get_latest_price(std::string symbol, net::io_context &ioc, ssl::context &ctx);
-
-        void get_exchange_info(std::string symbol, net::io_context &ioc, ssl::context &ctx);
-
-        void get_server_time(net::io_context &ioc, ssl::context &ctx);
-
-        void ping_binance(net::io_context &ioc, ssl::context &ctx);
-
-        void get_open_orders(net::io_context &ioc, ssl::context &ctx);
-
-        void get_orderbook(std::string symbol, std::string levels, net::io_context &ioc, ssl::context &ctx);
-
-        void get_recent_trades(std::string symbol, std::string levels, net::io_context &ioc, ssl::context &ctx);
-
-        void get_candlestick_data(std::string symbol,std::string interval, net::io_context &ioc, ssl::context &ctx);
-
-        void get_avg_price(std::string symbol, net::io_context &ioc, ssl::context &ctx);
-
-        void get_best_BA(std::string symbol, net::io_context &ioc, ssl::context &ctx);
-        
-        void get_curr_open_orders(std::string symbol, net::io_context &ioc, ssl::context &ctx);
     };
   }
 }
@@ -85,7 +67,7 @@ namespace binapi{
 namespace binapi
 {
     
-    namespace rest
+    namespace AsyncRest
     {
 
         boost::url make_url(boost::url_view base_api, boost::url_view method) {
@@ -188,7 +170,7 @@ namespace binapi
                 return fail_http(ec, "write");
 
             // Receive the HTTP response
-            http::async_read(stream_, buffer_, res_,beast::bind_front_handler(&httpClient::on_read,shared_from_this()));
+            http::async_read(stream_, buffer_, res_, beast::bind_front_handler(&httpClient::on_read,shared_from_this()));
 
         }
 
@@ -200,7 +182,11 @@ namespace binapi
                 return fail_http(ec, "read");
 
             // Write the message to standard out
-            std::cout << res_ << std::endl;
+            // std::cout << res_.body() << std::endl;
+
+            json = parse(res_.body()).at("serverTime").as_int64();
+
+            std::cout << json <<std::endl;
 
             // Set a timeout on the operation
             beast::get_lowest_layer(stream_).expires_after(std::chrono::seconds(30));
@@ -220,7 +206,7 @@ namespace binapi
 
         }
 
-        void httpClient::get_latest_price(std::string symbol, net::io_context &ioc, ssl::context &ctx)
+        static void async_latest_price(std::string symbol, net::io_context &ioc, ssl::context &ctx)
         {
             static boost::url_view const base_api{"https://api.binance.com/api/v3/ticker/"};
             boost::url method{"price"};
@@ -230,7 +216,7 @@ namespace binapi
         }
 
 
-        void httpClient::get_exchange_info(std::string symbol, net::io_context &ioc, ssl::context &ctx)
+        static void async_exchange_info(std::string symbol, net::io_context &ioc, ssl::context &ctx)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/"};
@@ -240,7 +226,7 @@ namespace binapi
 
         }
 
-        void httpClient::get_server_time(net::io_context &ioc, ssl::context &ctx)
+        static void async_server_time(net::io_context &ioc, ssl::context &ctx)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/time"};
@@ -250,7 +236,7 @@ namespace binapi
         }
 
 
-        void httpClient::ping_binance(net::io_context &ioc, ssl::context &ctx)
+        static void async_ping_binance(net::io_context &ioc, ssl::context &ctx)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/ping"};
@@ -259,7 +245,7 @@ namespace binapi
 
         }
 
-        void httpClient::get_open_orders(net::io_context &ioc, ssl::context &ctx)
+        static void async_open_orders(net::io_context &ioc, ssl::context &ctx)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/openOrders"};
@@ -268,7 +254,7 @@ namespace binapi
 
         }
 
-        void httpClient::get_orderbook(std::string symbol,std::string levels, net::io_context &ioc, ssl::context &ctx)
+        static void async_orderbook(std::string symbol,std::string levels, net::io_context &ioc, ssl::context &ctx)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/"};
@@ -281,7 +267,7 @@ namespace binapi
 
         }
 
-        void httpClient::get_recent_trades(std::string symbol,std::string levels, net::io_context &ioc, ssl::context &ctx)
+        static void async_recent_trades(std::string symbol,std::string levels, net::io_context &ioc, ssl::context &ctx)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/"};
@@ -294,7 +280,7 @@ namespace binapi
 
         }
 
-        void httpClient::get_candlestick_data(std::string symbol,std::string interval, net::io_context &ioc, ssl::context &ctx)
+        static void async_klines(std::string symbol,std::string interval, net::io_context &ioc, ssl::context &ctx)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/"};
@@ -307,7 +293,7 @@ namespace binapi
 
         }
 
-        void httpClient::get_avg_price(std::string symbol, net::io_context &ioc, ssl::context &ctx)
+        static void async_avg_price(std::string symbol, net::io_context &ioc, ssl::context &ctx)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/"};
@@ -319,7 +305,7 @@ namespace binapi
 
         }
 
-        void httpClient::get_best_BA(std::string symbol, net::io_context &ioc, ssl::context &ctx)
+        static void async_bidask(std::string symbol, net::io_context &ioc, ssl::context &ctx)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/ticker"};
@@ -331,17 +317,5 @@ namespace binapi
 
         }
 
-        void httpClient::get_curr_open_orders(std::string symbol, net::io_context &ioc, ssl::context &ctx)
-        {
-
-            static boost::url_view const base_api{"https://api.binance.com/api/v3/"};
-
-            boost::url method{"openOrders"};
-            method.params().emplace_back("timestamp",symbol);
-            method.params().emplace_back("signature",symbol);
-
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get);
-
-        }
     }
 }

@@ -120,12 +120,14 @@ namespace binapi
             req_.target(url.c_str());
             req_.set(http::field::host, host);
             req_.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+            req_.set("X-MBX-APIKEY", "Acz85W54qihZsUFVL0NtOw5szKysHSpx80c217qBrEYZJhUb15QRJBzMvUp1tFII");
             //req_.body() = serialize(json::object {{"symbol", "btcusdt"}});
             req_.prepare_payload(); // make HTTP 1.1 compliant
 
             // Look up the domain name
 
             resolver_.async_resolve(host, service,beast::bind_front_handler(&httpClient::on_resolve,shared_from_this()));
+
         }
 
         void httpClient::on_resolve(beast::error_code ec, tcp::resolver::results_type results)
@@ -204,6 +206,25 @@ namespace binapi
             if(ec)
                 return fail_http(ec, "shutdown");
 
+        }
+
+        std::string encryptWithHMAC(const char* key, const char* data) 
+        {
+            unsigned char *result;
+            static char res_hexstring[64];
+            int result_len = 32;
+            std::string signature;
+
+            result = HMAC(EVP_sha256(), key, strlen((char *)key), const_cast<unsigned char *>(reinterpret_cast<const unsigned char*>(data)), strlen((char *)data), NULL, NULL);
+            for (int i = 0; i < result_len; i++) {
+                sprintf(&(res_hexstring[i * 2]), "%02x", result[i]);
+            }
+
+            for (int i = 0; i < 64; i++) {
+                signature += res_hexstring[i];
+            }
+
+            return signature;
         }
 
         static void async_latest_price(std::string symbol, net::io_context &ioc, ssl::context &ctx)

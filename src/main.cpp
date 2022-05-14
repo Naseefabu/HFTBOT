@@ -20,6 +20,12 @@ int main()
     // client->get_latest_price("BTCUSDT",ioc,ctx);
     // client->get_exchange_info("BTCUSDT",ioc,ctx);
     binapi::AsyncRest::async_server_time(ioc,ctx);
+
+    std::string secret_key = "QblqlcBtuOrda7ksCRnQ2YiFF6VG6sMRDIVpIpXv9qFHOuMnbVpqzypSdBtIXIU8";
+    std::string query_params = "recvWindow=60000&timestamp=1652518379735";
+
+    std::string sign = binapi::AsyncRest::encryptWithHMAC(secret_key.c_str(),query_params.c_str());
+    std::cout << sign << std::endl;
     // client->ping_binance(ioc,ctx);
     // client->get_open_orders(ioc,ctx);
     // client->get_orderbook("BTCUSDT","3",ioc,ctx);

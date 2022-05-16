@@ -145,7 +145,7 @@ namespace binapi
 
                 // Receive the HTTP response
                 http::read(stream_, buffer_, res_);
-                // std::cout << "res body : "<<res_.body() << std::endl;
+                std::cout << "res body : "<<res_.body() << std::endl;
             }
         }
 
@@ -211,7 +211,7 @@ namespace binapi
             // Write the message to standard out
             // std::cout << "onread : "<<res_.body() << std::endl;
 
-            std::cout << res_.body() << std::endl;
+            std::cout << res_ << std::endl;
 
             // Set a timeout on the operation
             beast::get_lowest_layer(stream_).expires_after(std::chrono::seconds(30));
@@ -323,7 +323,6 @@ namespace binapi
             boost::url method{"avgPrice"};
             method.params().emplace_back("symbol",symbol);
             std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get, oper);
-
         }
 
         static void bidask(std::string symbol, net::io_context &ioc, ssl::context &ctx, operation oper)
@@ -338,7 +337,7 @@ namespace binapi
 
         static void openOrders(net::io_context &ioc, ssl::context &ctx, operation oper)
         {
-            static boost::url_view const base_api{"https://testnet.binance.com/api/v3/"};
+            static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"openOrders"};
 
             auto client = std::make_shared<httpClient>(ioc.get_executor(),ctx);
@@ -347,20 +346,42 @@ namespace binapi
             client->server_time(ioc,ctx,sync);
 
             boost::json::value server_timestamp = boost::json::parse(client->res_.body()).at("serverTime").as_int64();
-
             std::string server_time = serialize(server_timestamp);
 
-            std::cout << "server time : "<<server_time <<std::endl;
-
-            std::string query_params = "recvWindow=60000&timestamp=" + server_time;
-            std::string sign = encryptWithHMAC(client->secret_key.c_str(),query_params.c_str());
-
-            std::cout << "signature : " << sign <<std::endl; 
+            std::string query_params = "timestamp=" + server_time;
+            std::string sign = encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()); 
 
             method.params().emplace_back("signature",sign);  // order matters
             method.params().emplace_back("timestamp",server_time);
 
             std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get, oper);
+
+        }
+        static void neworder(std::string symbol,std::string side,std::string type,std::string quantity,net::io_context &ioc, ssl::context &ctx, operation oper)
+        {
+            static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
+            boost::url method{"order"};
+            method.params().emplace_back("symbol",symbol);
+            method.params().emplace_back("side",side);
+            method.params().emplace_back("type",type);
+            method.params().emplace_back("quantity",quantity);
+
+
+            auto client = std::make_shared<httpClient>(ioc.get_executor(),ctx);
+
+            operation sync=synchronous;
+            client->server_time(ioc,ctx,sync);
+
+            boost::json::value server_timestamp = boost::json::parse(client->res_.body()).at("serverTime").as_int64();
+            std::string server_time = serialize(server_timestamp);
+
+            std::string query_params ="symbol="+symbol+"&side="+side +"&type="+type+ "&quantity="+quantity+"timestamp=" + server_time;
+            std::string sign = encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()); 
+
+            method.params().emplace_back("signature",sign);  // order matters
+            method.params().emplace_back("timestamp",server_time);
+
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::post, oper);
 
         }
 

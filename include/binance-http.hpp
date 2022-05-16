@@ -37,6 +37,7 @@ namespace binapi{
         beast::flat_buffer buffer_; // (Must persist between reads)
         http::request<http::string_body>  req_;
         http::response<http::string_body> res_;
+        std::string secret_key = "FW8j4YobD26PVP6QLu0sv4Dv7OzrtfgQKzn8FoIMwGzMW9Y0VmX1DatbLIfXoCHV";
         net::io_context ioc;
         value json;
         
@@ -61,6 +62,8 @@ namespace binapi{
         void on_read(beast::error_code ec, std::size_t bytes_transferred);
 
         void on_shutdown(beast::error_code ec);
+
+        void server_time(net::io_context &ioc, ssl::context &ctx,operation oper);
     };
   }
 }
@@ -122,7 +125,7 @@ namespace binapi
             req_.target(url.c_str());
             req_.set(http::field::host, host);
             req_.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-            req_.set("X-MBX-APIKEY", "Acz85W54qihZsUFVL0NtOw5szKysHSpx80c217qBrEYZJhUb15QRJBzMvUp1tFII");
+            req_.set("X-MBX-APIKEY", "v6uhUtse5Ae1Gyz72eMSbUMGw7VUDdd5AnqobMOW1Llzi4snnfP4YCyY9V74PFJ4");
             //req_.body() = serialize(json::object {{"symbol", "btcusdt"}});
             req_.prepare_payload(); // make HTTP 1.1 compliant
 
@@ -142,6 +145,7 @@ namespace binapi
 
                 // Receive the HTTP response
                 http::read(stream_, buffer_, res_);
+                // std::cout << "res body : "<<res_.body() << std::endl;
             }
         }
 
@@ -177,15 +181,12 @@ namespace binapi
             // Send the HTTP request to the remote host
             std::cout << "Sending " << req_ << std::endl;
 
-            try 
-            {
-                http::async_write(stream_, req_, beast::bind_front_handler(&httpClient::on_write, shared_from_this()));
-            }
             
-            catch(const std::out_of_range  &e)
-            {
-                std::cout << "Caught out of range " << e.what() <<  "\n";
-            }
+            
+            http::async_write(stream_, req_, beast::bind_front_handler(&httpClient::on_write, shared_from_this()));
+            
+            
+            
         }
 
         void httpClient::on_write(beast::error_code ec, std::size_t bytes_transferred)
@@ -208,9 +209,9 @@ namespace binapi
                 return fail_http(ec, "read");
 
             // Write the message to standard out
-            std::cout << res_.body() << std::endl;
+            // std::cout << "onread : "<<res_.body() << std::endl;
 
-            // json = parse(res_.body());// .at("serverTime").as_int64();
+            std::cout << res_.body() << std::endl;
 
             // Set a timeout on the operation
             beast::get_lowest_layer(stream_).expires_after(std::chrono::seconds(30));
@@ -229,6 +230,13 @@ namespace binapi
                 return fail_http(ec, "shutdown");
 
         }
+        void httpClient::server_time(net::io_context &ioc, ssl::context &ctx,operation oper)
+        {
+
+            static boost::url_view const base_api{"https://api.binance.com/api/v3/time"};
+            run(base_api,http::verb::get,oper);
+        }
+
 
         std::string encryptWithHMAC(const char* key, const char* data) 
         {
@@ -268,26 +276,10 @@ namespace binapi
 
         }
 
-        static void server_time(net::io_context &ioc, ssl::context &ctx,operation oper)
-        {
-
-            static boost::url_view const base_api{"https://api.binance.com/api/v3/time"};
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api,http::verb::get,oper);
-        }
-
-
         static void ping_binance(net::io_context &ioc, ssl::context &ctx,operation oper)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/ping"};
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api,http::verb::get,oper);
-
-        }
-
-        static void open_orders(net::io_context &ioc, ssl::context &ctx,operation oper)
-        {
-
-            static boost::url_view const base_api{"https://api.binance.com/api/v3/openOrders"};
             std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api,http::verb::get,oper);
 
         }
@@ -344,14 +336,33 @@ namespace binapi
 
         }
 
-        static void openOrders(std::string symbol, net::io_context &ioc, ssl::context &ctx, operation oper)
+        static void openOrders(net::io_context &ioc, ssl::context &ctx, operation oper)
         {
-
-            static boost::url_view const base_api{"https://api.binance.com/api/v3/"};
+            static boost::url_view const base_api{"https://testnet.binance.com/api/v3/"};
             boost::url method{"openOrders"};
-            method.params().emplace_back("timestamp",symbol);
+
+            auto client = std::make_shared<httpClient>(ioc.get_executor(),ctx);
+
+            operation sync=synchronous;
+            client->server_time(ioc,ctx,sync);
+
+            boost::json::value server_timestamp = boost::json::parse(client->res_.body()).at("serverTime").as_int64();
+
+            std::string server_time = serialize(server_timestamp);
+
+            std::cout << "server time : "<<server_time <<std::endl;
+
+            std::string query_params = "recvWindow=60000&timestamp=" + server_time;
+            std::string sign = encryptWithHMAC(client->secret_key.c_str(),query_params.c_str());
+
+            std::cout << "signature : " << sign <<std::endl; 
+
+            method.params().emplace_back("signature",sign);  // order matters
+            method.params().emplace_back("timestamp",server_time);
+
             std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get, oper);
 
         }
+
     }
 }

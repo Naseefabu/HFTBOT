@@ -361,14 +361,8 @@ namespace binapi
         {
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"order"};
-            method.params().emplace_back("symbol",symbol);
-            method.params().emplace_back("side",side);
-            method.params().emplace_back("type",type);
-            method.params().emplace_back("quantity",quantity);
-
 
             auto client = std::make_shared<httpClient>(ioc.get_executor(),ctx);
-
             operation sync=synchronous;
             client->server_time(ioc,ctx,sync);
 
@@ -378,6 +372,10 @@ namespace binapi
             std::string query_params ="symbol="+symbol+"&side="+side +"&type="+type+ "&quantity="+quantity+"timestamp=" + server_time;
             std::string sign = encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()); 
 
+            method.params().emplace_back("symbol",symbol);
+            method.params().emplace_back("side",side);
+            method.params().emplace_back("type",type);
+            method.params().emplace_back("quantity",quantity);
             method.params().emplace_back("signature",sign);  // order matters
             method.params().emplace_back("timestamp",server_time);
 

@@ -7,6 +7,7 @@
 #include <boost/json.hpp>
 #include <iostream>
 #include <string>
+#include <exception>
 
 
 namespace beast = boost::beast;         
@@ -23,15 +24,17 @@ using namespace boost::json;
 boost::url make_url(boost::url_view base_api, boost::url_view method);
 void fail_http(beast::error_code ec, char const* what);
 
+enum operation {synchronous,asynchronous};
+
 namespace binapi{
 
-  namespace AsyncRest{
+  namespace rest{
 
     struct httpClient : public std::enable_shared_from_this<httpClient> 
     {
-        tcp::resolver                        resolver_;
+        tcp::resolver resolver_;
         beast::ssl_stream<beast::tcp_stream> stream_;
-        beast::flat_buffer                buffer_; // (Must persist between reads)
+        beast::flat_buffer buffer_; // (Must persist between reads)
         http::request<http::string_body>  req_;
         http::response<http::string_body> res_;
         net::io_context ioc;
@@ -44,9 +47,8 @@ namespace binapi{
         ssl::context ctxx{ssl::context::tlsv12_client};
 
 
-
-        // Start the asynchronous operation
-        void run(boost::url url, http::verb action);
+        // start the asynchronous operation
+        void run(boost::url url, http::verb action, operation o);
 
         void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
 
@@ -67,7 +69,7 @@ namespace binapi{
 namespace binapi
 {
     
-    namespace AsyncRest
+    namespace rest
     {
 
         boost::url make_url(boost::url_view base_api, boost::url_view method) {
@@ -95,7 +97,7 @@ namespace binapi
 
 
         // Start the asynchronous operation
-        void httpClient::run(boost::url url, http::verb action) 
+        void httpClient::run(boost::url url, http::verb action, operation o) 
         {
 
             std::string const host(url.host());
@@ -126,8 +128,21 @@ namespace binapi
 
             // Look up the domain name
 
-            resolver_.async_resolve(host, service,beast::bind_front_handler(&httpClient::on_resolve,shared_from_this()));
+            if(o==asynchronous){
+                resolver_.async_resolve(host, service,beast::bind_front_handler(&httpClient::on_resolve,shared_from_this()));
+            }
+            else
+            {
+                auto const results = resolver_.resolve(host, service);
+                beast::get_lowest_layer(stream_).connect(results);
 
+                // Perform the SSL handshake
+                stream_.handshake(ssl::stream_base::client);
+                http::write(stream_, req_);
+
+                // Receive the HTTP response
+                http::read(stream_, buffer_, res_);
+            }
         }
 
         void httpClient::on_resolve(beast::error_code ec, tcp::resolver::results_type results)
@@ -161,7 +176,16 @@ namespace binapi
 
             // Send the HTTP request to the remote host
             std::cout << "Sending " << req_ << std::endl;
-            http::async_write(stream_, req_, beast::bind_front_handler(&httpClient::on_write, shared_from_this()));
+
+            try 
+            {
+                http::async_write(stream_, req_, beast::bind_front_handler(&httpClient::on_write, shared_from_this()));
+            }
+            
+            catch(const std::out_of_range  &e)
+            {
+                std::cout << "Caught out of range " << e.what() <<  "\n";
+            }
         }
 
         void httpClient::on_write(beast::error_code ec, std::size_t bytes_transferred)
@@ -184,11 +208,9 @@ namespace binapi
                 return fail_http(ec, "read");
 
             // Write the message to standard out
-            // std::cout << res_.body() << std::endl;
+            std::cout << res_.body() << std::endl;
 
-            json = parse(res_.body()).at("serverTime").as_int64();
-
-            std::cout << json <<std::endl;
+            // json = parse(res_.body());// .at("serverTime").as_int64();
 
             // Set a timeout on the operation
             beast::get_lowest_layer(stream_).expires_after(std::chrono::seconds(30));
@@ -227,103 +249,109 @@ namespace binapi
             return signature;
         }
 
-        static void async_latest_price(std::string symbol, net::io_context &ioc, ssl::context &ctx)
+        static void latest_price(std::string symbol, net::io_context &ioc, ssl::context &ctx,operation oper)
         {
             static boost::url_view const base_api{"https://api.binance.com/api/v3/ticker/"};
             boost::url method{"price"};
             method.params().emplace_back("symbol",symbol);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get);
-
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get,oper);
         }
 
 
-        static void async_exchange_info(std::string symbol, net::io_context &ioc, ssl::context &ctx)
+        static void exchange_info(std::string symbol, net::io_context &ioc, ssl::context &ctx,operation oper)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/"};
             boost::url method{"exchangeInfo"};
             method.params().emplace_back("symbol",symbol);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get,oper);
 
         }
 
-        static void async_server_time(net::io_context &ioc, ssl::context &ctx)
+        static void server_time(net::io_context &ioc, ssl::context &ctx,operation oper)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/time"};
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api,http::verb::get);
-
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api,http::verb::get,oper);
         }
 
 
-        static void async_ping_binance(net::io_context &ioc, ssl::context &ctx)
+        static void ping_binance(net::io_context &ioc, ssl::context &ctx,operation oper)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/ping"};
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api,http::verb::get);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api,http::verb::get,oper);
 
         }
 
-        static void async_open_orders(net::io_context &ioc, ssl::context &ctx)
+        static void open_orders(net::io_context &ioc, ssl::context &ctx,operation oper)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/openOrders"};
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api,http::verb::get);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api,http::verb::get,oper);
 
         }
 
-        static void async_orderbook(std::string symbol,std::string levels, net::io_context &ioc, ssl::context &ctx)
+        static void orderbook(std::string symbol,std::string levels, net::io_context &ioc, ssl::context &ctx,operation oper)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/"};
             boost::url method{"depth"};
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("limit",levels);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get,oper);
 
         }
 
-        static void async_recent_trades(std::string symbol,std::string levels, net::io_context &ioc, ssl::context &ctx)
+        static void recent_trades(std::string symbol,std::string levels, net::io_context &ioc, ssl::context &ctx,operation oper)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/"};
             boost::url method{"trades"};
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("limit",levels);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get,oper);
 
         }
 
-        static void async_klines(std::string symbol,std::string interval, net::io_context &ioc, ssl::context &ctx)
+        static void klines(std::string symbol,std::string interval, net::io_context &ioc, ssl::context &ctx, operation oper)
         {
 
             static boost::url_view const base_api{"https://api.binance.com/api/v3/"};
             boost::url method{"klines"};
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("interval",interval);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get,oper);
 
         }
 
-        static void async_avg_price(std::string symbol, net::io_context &ioc, ssl::context &ctx)
+        static void avg_price(std::string symbol, net::io_context &ioc, ssl::context &ctx, operation oper)
         {
-
             static boost::url_view const base_api{"https://api.binance.com/api/v3/"};
             boost::url method{"avgPrice"};
             method.params().emplace_back("symbol",symbol);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get, oper);
 
         }
 
-        static void async_bidask(std::string symbol, net::io_context &ioc, ssl::context &ctx)
+        static void bidask(std::string symbol, net::io_context &ioc, ssl::context &ctx, operation oper)
         {
 
-            static boost::url_view const base_api{"https://api.binance.com/api/v3/ticker"};
+            static boost::url_view const base_api{"https://api.binance.com/api/v3/ticker/"};
             boost::url method{"bookTicker"};
             method.params().emplace_back("symbol",symbol);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get,oper);
 
         }
 
+        static void openOrders(std::string symbol, net::io_context &ioc, ssl::context &ctx, operation oper)
+        {
+
+            static boost::url_view const base_api{"https://api.binance.com/api/v3/"};
+            boost::url method{"openOrders"};
+            method.params().emplace_back("timestamp",symbol);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get, oper);
+
+        }
     }
 }

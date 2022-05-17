@@ -357,6 +357,7 @@ namespace binapi
             std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get, oper);
 
         }
+        
         static void neworder(std::string symbol,std::string side,std::string type,std::string quantity,net::io_context &ioc, ssl::context &ctx, operation oper)
         {
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
@@ -369,15 +370,16 @@ namespace binapi
             boost::json::value server_timestamp = boost::json::parse(client->res_.body()).at("serverTime").as_int64();
             std::string server_time = serialize(server_timestamp);
 
-            std::string query_params ="symbol="+symbol+"&side="+side +"&type="+type+ "&quantity="+quantity+"timestamp=" + server_time;
+            std::string query_params ="symbol="+symbol+"&side="+side +"&type="+type+ "&quantity="+quantity+"&recvWindow=60000"+"&timestamp=" + server_time;
             std::string sign = encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()); 
 
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("side",side);
             method.params().emplace_back("type",type);
-            method.params().emplace_back("quantity",quantity);
-            method.params().emplace_back("signature",sign);  // order matters
+            method.params().emplace_back("quantity",quantity); // order matters
+            method.params().emplace_back("recvWindow", "60000");
             method.params().emplace_back("timestamp",server_time);
+            method.params().emplace_back("signature",sign); 
 
             std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::post, oper);
 

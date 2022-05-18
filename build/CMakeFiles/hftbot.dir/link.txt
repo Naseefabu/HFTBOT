@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/hftbot.dir/src/binance-ws.cpp.o CMakeFiles/hftbot.dir/src/main.cpp.o -o hftbot  -ljsoncpp -lssl -lcrypto -lpthread 

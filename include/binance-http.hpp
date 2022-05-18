@@ -24,53 +24,107 @@ using namespace boost::json;
 boost::url make_url(boost::url_view base_api, boost::url_view method);
 void fail_http(beast::error_code ec, char const* what);
 
-enum operation {synchronous,asynchronous};
 
 namespace binapi{
 
-  namespace rest{
+    enum e_side{buy,sell};
+    std::string e_side_string(const e_side side);
 
-    struct httpClient : public std::enable_shared_from_this<httpClient> 
-    {
-        tcp::resolver resolver_;
-        beast::ssl_stream<beast::tcp_stream> stream_;
-        beast::flat_buffer buffer_; // (Must persist between reads)
-        http::request<http::string_body>  req_;
-        http::response<http::string_body> res_;
-        std::string secret_key = "FW8j4YobD26PVP6QLu0sv4Dv7OzrtfgQKzn8FoIMwGzMW9Y0VmX1DatbLIfXoCHV";
-        net::io_context ioc;
-        value json;
-        
+    enum order_type{limit,market};
+    std::string order_type_to_string(order_type type);
 
-      public:
+    enum timeforce{GTC,IOC,FOK};
+    std::string timeforce_to_string(timeforce timeforc);
 
-        httpClient(executor ex, ssl::context& ctx);
-        ssl::context ctxx{ssl::context::tlsv12_client};
+    enum trade_response_type{ack,result,full,test,unknown};
+    std::string trade_response_type_to_string(trade_response_type type);
+
+    enum operation {synchronous,asynchronous};
+
+    namespace rest{
+
+        struct httpClient : public std::enable_shared_from_this<httpClient> 
+        {
+            tcp::resolver resolver_;
+            beast::ssl_stream<beast::tcp_stream> stream_;
+            beast::flat_buffer buffer_; // (Must persist between reads)
+            http::request<http::string_body>  req_;
+            http::response<http::string_body> res_;
+            std::string secret_key = "FW8j4YobD26PVP6QLu0sv4Dv7OzrtfgQKzn8FoIMwGzMW9Y0VmX1DatbLIfXoCHV";
+            net::io_context ioc;
+            value json;
+            
+
+        public:
+
+            httpClient(executor ex, ssl::context& ctx);
+            ssl::context ctxx{ssl::context::tlsv12_client};
 
 
-        // start the asynchronous operation
-        void run(boost::url url, http::verb action, operation o);
+            // start the asynchronous operation
+            void run(boost::url url, http::verb action, operation o);
 
-        void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
+            void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
 
-        void on_connect(beast::error_code ec, tcp::resolver::results_type::endpoint_type);
+            void on_connect(beast::error_code ec, tcp::resolver::results_type::endpoint_type);
 
-        void on_handshake(beast::error_code ec);
+            void on_handshake(beast::error_code ec);
 
-        void on_write(beast::error_code ec, std::size_t bytes_transferred);
+            void on_write(beast::error_code ec, std::size_t bytes_transferred);
 
-        void on_read(beast::error_code ec, std::size_t bytes_transferred);
+            void on_read(beast::error_code ec, std::size_t bytes_transferred);
 
-        void on_shutdown(beast::error_code ec);
+            void on_shutdown(beast::error_code ec);
 
-        void server_time(net::io_context &ioc, ssl::context &ctx,operation oper);
-    };
-  }
+            void server_time(net::io_context &ioc, ssl::context &ctx,operation oper);
+        };
+    }
 }
 
 
 namespace binapi
 {
+    std::string e_side_to_string(const e_side side)
+    {
+        switch (side)
+        {
+            case buy : return "BUY";
+            case sell : return "SELL"; 
+        }
+        return nullptr;
+    }
+
+    std::string order_type_to_string(order_type type)
+    {
+        switch (type)
+        {
+            case limit : return "LIMIT";
+            case market : return "MARKET";
+        }
+        return nullptr;
+    }
+    std::string timeforce_to_string(timeforce timeforc)
+    {
+        switch (timeforc)
+        {
+            case GTC : return "GTC";
+            case IOC : return "IOC";
+            case FOK : return "FOK";
+        }
+        return nullptr;
+    }
+    std::string trade_response_type_to_string(trade_response_type type)
+    {
+        switch(type)
+        {
+            case ack : return "ACK";
+            case result : return "RESULT";
+            case full : return "FULL";
+            case test : return "TEST";
+            case unknown : return "UNKNOWN";
+        }
+        return nullptr;
+    }
     
     namespace rest
     {
@@ -342,44 +396,38 @@ namespace binapi
 
             auto client = std::make_shared<httpClient>(ioc.get_executor(),ctx);
 
-            operation sync=synchronous;
-            client->server_time(ioc,ctx,sync);
+            client->server_time(ioc,ctx,operation::synchronous);
 
             boost::json::value server_timestamp = boost::json::parse(client->res_.body()).at("serverTime").as_int64();
-            std::string server_time = serialize(server_timestamp);
+            std::string query_params = "timestamp=" + serialize(server_timestamp);;
 
-            std::string query_params = "timestamp=" + server_time;
-            std::string sign = encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()); 
-
-            method.params().emplace_back("signature",sign);  // order matters
-            method.params().emplace_back("timestamp",server_time);
+            method.params().emplace_back("signature",encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()));  // order matters
+            method.params().emplace_back("timestamp",serialize(server_timestamp));
 
             std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get, oper);
 
         }
         
-        static void neworder(std::string symbol,std::string side,std::string type,std::string quantity,net::io_context &ioc, ssl::context &ctx, operation oper)
+        static void neworder(std::string symbol,e_side side,order_type type,std::string quantity,net::io_context &ioc, ssl::context &ctx, operation oper)
         {
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"order"};
 
             auto client = std::make_shared<httpClient>(ioc.get_executor(),ctx);
-            operation sync=synchronous;
-            client->server_time(ioc,ctx,sync);
+
+            client->server_time(ioc,ctx,operation::synchronous);
 
             boost::json::value server_timestamp = boost::json::parse(client->res_.body()).at("serverTime").as_int64();
-            std::string server_time = serialize(server_timestamp);
-
-            std::string query_params ="symbol="+symbol+"&side="+side +"&type="+type+ "&quantity="+quantity+"&recvWindow=60000"+"&timestamp=" + server_time;
-            std::string sign = encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()); 
-
+            // systemic way should be there
+            std::string query_params ="symbol="+symbol+"&side="+e_side_to_string(side) +"&type="+order_type_to_string(type)+ "&quantity="+quantity+"&recvWindow=60000"+"&timestamp=" + serialize(server_timestamp);
+            // order matters
             method.params().emplace_back("symbol",symbol);
-            method.params().emplace_back("side",side);
-            method.params().emplace_back("type",type);
-            method.params().emplace_back("quantity",quantity); // order matters
+            method.params().emplace_back("side",e_side_to_string(side));
+            method.params().emplace_back("type",order_type_to_string(type));
+            method.params().emplace_back("quantity",quantity); 
             method.params().emplace_back("recvWindow", "60000");
-            method.params().emplace_back("timestamp",server_time);
-            method.params().emplace_back("signature",sign); 
+            method.params().emplace_back("timestamp",serialize(server_timestamp));
+            method.params().emplace_back("signature",encryptWithHMAC(client->secret_key.c_str(),query_params.c_str())); 
 
             std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::post, oper);
 

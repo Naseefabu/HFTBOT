@@ -7,17 +7,14 @@
 int main()
 {
     net::io_context ioc;
-    operation sync = synchronous;
-    operation async = asynchronous; 
     // The SSL context is required, and holds certificates
     ssl::context ctx{ssl::context::tlsv12_client};
 
     // Verify the remote server's certificate
     ctx.set_verify_mode(ssl::verify_peer);
     ctx.set_default_verify_paths();
-
     
-    binapi::rest::neworder("BTCUSDT","BUY","MARKET","10",ioc,ctx,async);
+    binapi::rest::neworder("BTCUSDT",binapi::e_side::buy,binapi::order_type::market,"10",ioc,ctx,binapi::operation::synchronous);
     // binapi::rest::openOrders(ioc,ctx,sync);
 
     // http::response<http::string_body> res = binapi::rest::sync_bidask("BTCUSDT",ioc,ctx);

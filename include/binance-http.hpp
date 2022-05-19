@@ -408,7 +408,7 @@ namespace binapi
 
         }
         
-        static void neworder(std::string symbol,e_side side,order_type type,std::string quantity,net::io_context &ioc, ssl::context &ctx, operation oper)
+        static void neworder(std::string symbol,int price,e_side side,order_type type,timeforce time,std::string quantity,net::io_context &ioc, ssl::context &ctx, operation oper)
         {
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"order"};
@@ -417,14 +417,19 @@ namespace binapi
 
             client->server_time(ioc,ctx,operation::synchronous);
 
-            boost::json::value server_timestamp = boost::json::parse(client->res_.body()).at("serverTime").as_int64();
-            // systemic way should be there
-            std::string query_params ="symbol="+symbol+"&side="+e_side_to_string(side) +"&type="+order_type_to_string(type)+ "&quantity="+quantity+"&recvWindow=60000"+"&timestamp=" + serialize(server_timestamp);
+            boost::json::value server_timestamp = parse(client->res_.body()).at("serverTime").as_int64();
+            std::string query_params;
+            
+            if (type == order_type::market) query_params ="symbol="+symbol+"&side="+e_side_to_string(side) +"&type="+order_type_to_string(type)+ "&quantity="+quantity+"&recvWindow=60000"+"&timestamp=" + serialize(server_timestamp);
+            else if(type == order_type::limit)  query_params ="symbol="+symbol+"&side="+e_side_to_string(side) +"&type="+order_type_to_string(type)+ "&timeInForce="+timeforce_to_string(time)+ "&quantity="+quantity+"&price="+std::to_string(price)+"&recvWindow=60000"+"&timestamp=" + serialize(server_timestamp);
+            
             // order matters
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("side",e_side_to_string(side));
             method.params().emplace_back("type",order_type_to_string(type));
+            if (type == order_type::limit) method.params().emplace_back("timeInForce",timeforce_to_string(time));
             method.params().emplace_back("quantity",quantity); 
+            if (type == order_type::limit) method.params().emplace_back("price",std::to_string(price));
             method.params().emplace_back("recvWindow", "60000");
             method.params().emplace_back("timestamp",serialize(server_timestamp));
             method.params().emplace_back("signature",encryptWithHMAC(client->secret_key.c_str(),query_params.c_str())); 

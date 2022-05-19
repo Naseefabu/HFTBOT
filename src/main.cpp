@@ -14,7 +14,7 @@ int main()
     ctx.set_verify_mode(ssl::verify_peer);
     ctx.set_default_verify_paths();
     
-    binapi::rest::neworder("BTCUSDT",binapi::e_side::buy,binapi::order_type::market,"10",ioc,ctx,binapi::operation::synchronous);
+    binapi::rest::neworder("BTCUSDT",29500,binapi::e_side::buy,binapi::order_type::limit,binapi::timeforce::GTC,"10",ioc,ctx,binapi::operation::synchronous);
     // binapi::rest::openOrders(ioc,ctx,sync);
 
     // http::response<http::string_body> res = binapi::rest::sync_bidask("BTCUSDT",ioc,ctx);

@@ -3,6 +3,7 @@
 #include "boost/url/src.hpp" // can only be included in one source file
 #include "binance-ws.hpp"
 #include "binance-http.hpp" 
+using namespace binapi;
 
 int main()
 {
@@ -13,8 +14,11 @@ int main()
     // Verify the remote server's certificate
     ctx.set_verify_mode(ssl::verify_peer);
     ctx.set_default_verify_paths();
+
+    // rest::cancel_order("BTCUSDT",28,ioc,ctx,operation::asynchronous);
     
-    binapi::rest::neworder("BTCUSDT",29500,binapi::e_side::buy,binapi::order_type::limit,binapi::timeforce::GTC,"10",ioc,ctx,binapi::operation::synchronous);
+    // rest::new_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10",ioc,ctx,binapi::operation::asynchronous);
+    rest::get_account_info(ioc,ctx,operation::asynchronous);
     // binapi::rest::openOrders(ioc,ctx,sync);
 
     // http::response<http::string_body> res = binapi::rest::sync_bidask("BTCUSDT",ioc,ctx);

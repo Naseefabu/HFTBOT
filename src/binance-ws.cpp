@@ -12,20 +12,22 @@ namespace binapi{
             : resolver_(net::make_strand(ioc))
             , ws_(net::make_strand(ioc), ctx)
         {
+            
         }
 
 
-        void WebsocketClient::run(char const* host, char const* port, Json::Value message)
+        void WebsocketClient::run(char const* host, char const* port, boost::json::value message, std::string stream)
 
         {
+            streamName = streamName + stream;
             // Set SNI Hostname (many hosts need this to handshake successfully)
             if (!SSL_set_tlsext_host_name(ws_.next_layer().native_handle(), host)) {
                 throw boost::system::system_error(beast::error_code(
                     ::ERR_get_error(), net::error::get_ssl_category()));
             }
 
-            host_         = host;
-            message_text_ = Json_to_string(message);
+            host_ = host;
+            message_text_ = serialize(message);
 
             resolver_.async_resolve(
                 host,
@@ -97,16 +99,10 @@ namespace binapi{
                 }));
 
             std::cout << "using host_: " << host_ << std::endl;
-            ws_.async_handshake(host_, "/ws/btcusdt@depth",
+            ws_.async_handshake(host_, streamName,
                 beast::bind_front_handler(
                     &WebsocketClient::on_handshake,
                     shared_from_this()));
-        }
-
-        std::string WebsocketClient::Json_to_string(const Json::Value& json) {
-            Json::StreamWriterBuilder wbuilder;
-            wbuilder["indentation"] = ""; // Optional
-            return Json::writeString(wbuilder, json);
         }
 
         void WebsocketClient::on_handshake(beast::error_code ec)
@@ -156,6 +152,52 @@ namespace binapi{
                 return fail_ws(ec, "close");
 
             std::cout << beast::make_printable(buffer_.data()) << std::endl;
+        }
+
+        void WebsocketClient::aggTrades(std::string action,std::string symbol, net::io_context &ioc, ssl::context& ctx)
+        {
+            std::string stream = symbol+"@"+"aggTrade";
+            boost::json::value jv = {
+                { "method", action },
+                { "params", {"btcusdt@aggTrade"} },
+                { "id", 1 }
+            };
+            std::make_shared<ws::WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
+        }
+
+        void WebsocketClient::trades(std::string action,std::string symbol, net::io_context &ioc, ssl::context& ctx)
+        {
+            std::string stream = symbol+"@"+"trade";
+            boost::json::value jv = {
+                { "method", action },
+                { "params", {stream} },
+                { "id", 1 }
+            };
+            std::make_shared<ws::WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
+        }
+
+        /* stream candle stick every second */
+        void WebsocketClient::candlestick(std::string action,std::string symbol, std::string interval, net::io_context &ioc, ssl::context& ctx)
+        {
+            std::string stream = symbol+"@"+"kline_"+interval;
+            boost::json::value jv = {
+                { "method", action },
+                { "params", {stream} },
+                { "id", 1 }
+            };
+            std::make_shared<ws::WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
+        }
+
+        /* best bid and best ask updates*/
+        void WebsocketClient::L1_deltas(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx)
+        {
+            std::string stream = symbol+"@"+"bookTicker";
+            boost::json::value jv = {
+                { "method", action },
+                { "params", {stream} },
+                { "id", 1 }
+            };
+            std::make_shared<ws::WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
         }
 
     }

@@ -21,7 +21,19 @@ using namespace boost::json;
 
 
 
-boost::url make_url(boost::url_view base_api, boost::url_view method);
+boost::url make_url(boost::url_view base_api, boost::url_view method) {
+    assert(!method.is_path_absolute());
+    assert(base_api.data()[base_api.size() - 1] == '/');
+
+    boost::urls::error_code ec;
+    boost::url url;
+    resolve(base_api, method, url, ec);
+    if (ec)
+        throw boost::system::system_error(ec);
+
+    std::cout << "URL : "<< url << std::endl;    
+    return url;
+}
 void fail_http(beast::error_code ec, char const* what);
 
 
@@ -60,9 +72,7 @@ namespace binapi{
             httpClient(executor ex, ssl::context& ctx);
             ssl::context ctxx{ssl::context::tlsv12_client};
 
-
-            // start the asynchronous operation
-            void run(boost::url url, http::verb action, operation o);
+            void http_call(boost::url url, http::verb action, operation o);
 
             void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
 
@@ -129,19 +139,6 @@ namespace binapi
     namespace rest
     {
 
-        boost::url make_url(boost::url_view base_api, boost::url_view method) {
-            assert(!method.is_path_absolute());
-            assert(base_api.data()[base_api.size() - 1] == '/');
-
-            boost::urls::error_code ec;
-            boost::url url;
-            resolve(base_api, method, url, ec);
-            if (ec)
-                throw boost::system::system_error(ec);
-
-            std::cout << "URL : "<< url << std::endl;    
-            return url;
-        }
         // Report a failure
         void fail_http(beast::error_code ec, char const* what)
         {
@@ -154,7 +151,7 @@ namespace binapi
 
 
         // Start the asynchronous operation
-        void httpClient::run(boost::url url, http::verb action, operation o) 
+        void httpClient::http_call(boost::url url, http::verb action, operation o) 
         {
 
             std::string const host(url.host());
@@ -237,8 +234,6 @@ namespace binapi
             
             http::async_write(stream_, req_, beast::bind_front_handler(&httpClient::on_write, shared_from_this()));
             
-            
-            
         }
 
         void httpClient::on_write(beast::error_code ec, std::size_t bytes_transferred)
@@ -286,7 +281,7 @@ namespace binapi
         {
 
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/time"};
-            run(base_api,http::verb::get,oper);
+            http_call(base_api,http::verb::get,oper);
         }
 
 
@@ -314,7 +309,7 @@ namespace binapi
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/ticker/"};
             boost::url method{"price"};
             method.params().emplace_back("symbol",symbol);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
         }
 
 
@@ -324,7 +319,7 @@ namespace binapi
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"exchangeInfo"};
             method.params().emplace_back("symbol",symbol);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
 
         }
 
@@ -332,7 +327,7 @@ namespace binapi
         {
 
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/ping"};
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(base_api,http::verb::get,oper);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(base_api,http::verb::get,oper);
 
         }
 
@@ -343,7 +338,7 @@ namespace binapi
             boost::url method{"depth"};
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("limit",levels);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
 
         }
 
@@ -354,7 +349,7 @@ namespace binapi
             boost::url method{"trades"};
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("limit",levels);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
 
         }
 
@@ -365,7 +360,7 @@ namespace binapi
             boost::url method{"klines"};
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("interval",interval);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
 
         }
 
@@ -374,7 +369,7 @@ namespace binapi
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"avgPrice"};
             method.params().emplace_back("symbol",symbol);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get, oper);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get, oper);
         }
 
         static void bidask(std::string symbol, net::io_context &ioc, ssl::context &ctx, operation oper)
@@ -383,7 +378,7 @@ namespace binapi
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/ticker/"};
             boost::url method{"bookTicker"};
             method.params().emplace_back("symbol",symbol);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
 
         }
 
@@ -402,7 +397,7 @@ namespace binapi
             method.params().emplace_back("signature",encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()));  // order matters
             method.params().emplace_back("timestamp",serialize(server_timestamp));
 
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get, oper);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get, oper);
 
         }
         
@@ -430,7 +425,7 @@ namespace binapi
             method.params().emplace_back("recvWindow", "60000");
             method.params().emplace_back("timestamp",serialize(server_timestamp));
             method.params().emplace_back("signature",encryptWithHMAC(client->secret_key.c_str(),query_params.c_str())); 
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::post, oper);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::post, oper);
 
         }
 
@@ -447,7 +442,7 @@ namespace binapi
             method.params().emplace_back("orderId",std::to_string(orderid));
             method.params().emplace_back("signature",encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()));
             method.params().emplace_back("timestamp",serialize(server_timestamp));
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::delete_,oper);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::delete_,oper);
 
         }
 
@@ -457,13 +452,12 @@ namespace binapi
             client->server_time(ioc,ctx,operation::synchronous);
             boost::json::value server_timestamp = parse(client->res_.body()).at("serverTime").as_int64();
             std::string query_params = "symbol="+symbol+"&timestamp="+serialize(server_timestamp);
-
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"openOrders"};
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("signature",encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()));
             method.params().emplace_back("timestamp",serialize(server_timestamp));
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::delete_,oper);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::delete_,oper);
 
         }
         
@@ -480,7 +474,7 @@ namespace binapi
             method.params().emplace_back("orderId",std::to_string(orderid));
             method.params().emplace_back("signature",encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()));
             method.params().emplace_back("timestamp",serialize(server_timestamp));
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
 
         }
 
@@ -495,7 +489,7 @@ namespace binapi
             boost::url method{"account"};
             method.params().emplace_back("signature",encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()));
             method.params().emplace_back("timestamp",serialize(server_timestamp));
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->run(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
 
         }
 

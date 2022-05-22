@@ -17,7 +17,7 @@ int main()
     ctx.set_default_verify_paths();
 
     auto client = std::make_shared<ws::WebsocketClient>(ioc,ctx);
-    client->L1_deltas("SUBSCRIBE","btcusdt",ioc,ctx);
+    client->OB_deltas("SUBSCRIBE","btcusdt",ioc,ctx);
 
     // The session is constructed with a strand to
     // ensure that handlers do not execute concurrently.

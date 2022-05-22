@@ -65,6 +65,10 @@ namespace binapi{
         void candlestick(std::string action,std::string symbol,std::string interval, net::io_context &ioc, ssl::context& ctx);
 
         void L1_deltas(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx);
+
+        void partial_deltas(std::string action,std::string symbol,short int levels,net::io_context &ioc, ssl::context& ctx);
+
+        void OB_deltas(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx);
     
     };
 

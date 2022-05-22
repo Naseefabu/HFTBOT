@@ -200,5 +200,27 @@ namespace binapi{
             std::make_shared<ws::WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
         }
 
+        void WebsocketClient::partial_deltas(std::string action,std::string symbol,short int depth_levels,net::io_context &ioc, ssl::context& ctx)
+        {
+            std::string stream = symbol+"@"+"depth"+std::to_string(depth_levels);
+            boost::json::value jv = {
+                { "method", action },
+                { "params", {stream} },
+                { "id", 1 }
+            };
+            std::make_shared<ws::WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
+        }
+
+        void WebsocketClient::OB_deltas(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx)
+        {
+            std::string stream = symbol+"@"+"depth";
+            boost::json::value jv = {
+                { "method", action },
+                { "params", {stream} },
+                { "id", 1 }
+            };
+            std::make_shared<ws::WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
+        }
+
     }
 }

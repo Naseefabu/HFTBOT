@@ -16,9 +16,16 @@ int main()
     ctx.set_verify_mode(ssl::verify_peer);
     ctx.set_default_verify_paths();
 
-    auto wsclient = std::make_shared<ws::WebsocketClient>(ioc,ctx);
-    wsclient->full_deltas("SUBSCRIBE","btcusdt",ioc,ctx);
+    //auto wsclient = std::make_shared<ws::WebsocketClient>(ioc,ctx);
+    //wsclient->full_deltas("SUBSCRIBE","btcusdt",ioc,ctx);
 
+    auto httpclients = std::make_shared<rest::httpClient>(ioc.get_executor(),ctx,ioc);
+
+    // httpclients->avg_price("BTCUSDT",operation::asynchronous);
+
+    // httpclients->new_order("BTCUSDT",25000,e_side::buy,order_type::market,timeforce::GTC,"0.10",operation::synchronous);
+    // httpclients->openOrders(operation::synchronous);
+    httpclients->cancel_all_orders("BTCUSDT",operation::synchronous);
     // The session is constructed with a strand to
     // ensure that handlers do not execute concurrently.
     

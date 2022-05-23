@@ -55,21 +55,27 @@ namespace binapi{
 
     namespace rest{
 
-        struct httpClient : public std::enable_shared_from_this<httpClient> 
+        class httpClient : public std::enable_shared_from_this<httpClient> 
         {
+
+        public:    
             tcp::resolver resolver_;
             beast::ssl_stream<beast::tcp_stream> stream_;
             beast::flat_buffer buffer_; // (Must persist between reads)
             http::request<http::string_body>  req_;
             http::response<http::string_body> res_;
+            std::string API_KEY = "v6uhUtse5Ae1Gyz72eMSbUMGw7VUDdd5AnqobMOW1Llzi4snnfP4YCyY9V74PFJ4";
             std::string secret_key = "FW8j4YobD26PVP6QLu0sv4Dv7OzrtfgQKzn8FoIMwGzMW9Y0VmX1DatbLIfXoCHV";
-            net::io_context ioc;
+            std::string BASE_URL = "https://testnet.binance.vision/api/v3/";
+            net::io_context& ioc;
+            ssl::context& ctx;
             value json;
             
 
         public:
 
-            httpClient(executor ex, ssl::context& ctx);
+            httpClient(executor ex, ssl::context& ctx,net::io_context& ioc);
+
             ssl::context ctxx{ssl::context::tlsv12_client};
 
             void http_call(boost::url url, http::verb action, operation o);
@@ -86,7 +92,36 @@ namespace binapi{
 
             void on_shutdown(beast::error_code ec);
 
-            void server_time(net::io_context &ioc, ssl::context &ctx,operation oper);
+            void server_time(operation oper);
+
+            void latest_price(std::string symbol,operation oper);
+
+            void exchange_info(std::string symbol, operation oper);
+
+            void get_account_info(operation oper);
+
+            void check_order_status(std::string symbol,int orderid,operation oper);
+
+            void cancel_all_orders(std::string symbol,operation oper);
+
+            void cancel_order(std::string symbol,int orderid,operation oper);
+
+            void new_order(std::string symbol,int price,e_side side,order_type type,timeforce time,std::string quantity, operation oper);
+
+            void openOrders(operation oper);
+
+            void bidask(std::string symbol, operation oper);
+
+            void avg_price(std::string symbol, operation oper);
+
+            void klines(std::string symbol,std::string interval, operation oper);
+
+            void recent_trades(std::string symbol,std::string levels, operation oper);
+
+            void orderbook(std::string symbol,std::string levels,operation oper);
+
+            void ping_binance(operation oper);
+
         };
     }
 }
@@ -145,9 +180,8 @@ namespace binapi
             std::cerr << what << ": " << ec.message() << "\n";
         }
 
-        httpClient::httpClient(executor ex, ssl::context& ctx)
-            : resolver_(ex)
-            , stream_(ex, ctx) {}
+        httpClient::httpClient(executor ex, ssl::context& ctxe, net::io_context &ioce)
+            : resolver_(ex),stream_(ex, ctxe),ioc(ioce),ctx(ctxe){}
 
 
         // Start the asynchronous operation
@@ -176,7 +210,7 @@ namespace binapi
             req_.target(url.c_str());
             req_.set(http::field::host, host);
             req_.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-            req_.set("X-MBX-APIKEY", "v6uhUtse5Ae1Gyz72eMSbUMGw7VUDdd5AnqobMOW1Llzi4snnfP4YCyY9V74PFJ4");
+            req_.set("X-MBX-APIKEY", API_KEY);
             //req_.body() = serialize(json::object {{"symbol", "btcusdt"}});
             req_.prepare_payload(); // make HTTP 1.1 compliant
 
@@ -191,18 +225,17 @@ namespace binapi
                 // Perform the SSL handshake
                 stream_.handshake(ssl::stream_base::client);
                 http::write(stream_, req_);
-
-                // Receive the HTTP response
                 http::read(stream_, buffer_, res_);
-                std::cout << "res body : "<<res_.body() << std::endl;
+
+                std::cout << res_.body() << std::endl;
+
             }
         }
-
         void httpClient::on_resolve(beast::error_code ec, tcp::resolver::results_type results)
         {
             if(ec)
                 return fail_http(ec, "resolve");
-
+         
             // Set a timeout on the operation
             beast::get_lowest_layer(stream_).expires_after(std::chrono::seconds(30));
 
@@ -256,8 +289,6 @@ namespace binapi
                 return fail_http(ec, "read");
 
             // Write the message to standard out
-            // std::cout << "onread : "<<res_.body() << std::endl;
-
             std::cout << res_.body() << std::endl;
 
             // Set a timeout on the operation
@@ -277,13 +308,12 @@ namespace binapi
                 return fail_http(ec, "shutdown");
 
         }
-        void httpClient::server_time(net::io_context &ioc, ssl::context &ctx,operation oper)
+        void httpClient::server_time(operation oper)
         {
-
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/time"};
-            http_call(base_api,http::verb::get,oper);
-        }
 
+            this->http_call(base_api,http::verb::get,oper);
+        }
 
         std::string encryptWithHMAC(const char* key, const char* data) 
         {
@@ -304,113 +334,110 @@ namespace binapi
             return signature;
         }
 
-        static void latest_price(std::string symbol, net::io_context &ioc, ssl::context &ctx,operation oper)
+        void httpClient::latest_price(std::string symbol,operation oper)
         {
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/ticker/"};
             boost::url method{"price"};
             method.params().emplace_back("symbol",symbol);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get,oper);
         }
 
 
-        static void exchange_info(std::string symbol, net::io_context &ioc, ssl::context &ctx,operation oper)
+        void httpClient::exchange_info(std::string symbol,operation oper)
         {
 
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"exchangeInfo"};
             method.params().emplace_back("symbol",symbol);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get,oper);
 
         }
 
-        static void ping_binance(net::io_context &ioc, ssl::context &ctx,operation oper)
+        void httpClient::ping_binance(operation oper)
         {
 
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/ping"};
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(base_api,http::verb::get,oper);
+            std::make_shared<httpClient>(ioc.get_executor(),ctx,ioc)->http_call(base_api,http::verb::get,oper);
 
         }
 
-        static void orderbook(std::string symbol,std::string levels, net::io_context &ioc, ssl::context &ctx,operation oper)
+        void httpClient::orderbook(std::string symbol,std::string levels, operation oper)
         {
 
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"depth"};
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("limit",levels);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get,oper);
 
         }
 
-        static void recent_trades(std::string symbol,std::string levels, net::io_context &ioc, ssl::context &ctx,operation oper)
+        void httpClient::recent_trades(std::string symbol,std::string levels,operation oper)
         {
 
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"trades"};
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("limit",levels);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get,oper);
 
         }
 
-        static void klines(std::string symbol,std::string interval, net::io_context &ioc, ssl::context &ctx, operation oper)
+        void httpClient::klines(std::string symbol,std::string interval, operation oper)
         {
 
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"klines"};
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("interval",interval);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get,oper);
 
         }
 
-        static void avg_price(std::string symbol, net::io_context &ioc, ssl::context &ctx, operation oper)
+        void httpClient::avg_price(std::string symbol,operation oper)
         {
+            // this->server_time(operation::synchronous);
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"avgPrice"};
             method.params().emplace_back("symbol",symbol);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get, oper);
+            std::make_shared<httpClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get, oper);
         }
 
-        static void bidask(std::string symbol, net::io_context &ioc, ssl::context &ctx, operation oper)
+        void httpClient::bidask(std::string symbol,operation oper)
         {
 
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/ticker/"};
             boost::url method{"bookTicker"};
             method.params().emplace_back("symbol",symbol);
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get,oper);
 
         }
 
-        static void openOrders(net::io_context &ioc, ssl::context &ctx, operation oper)
+        void httpClient::openOrders(operation oper)
         {
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"openOrders"};
 
-            auto client = std::make_shared<httpClient>(ioc.get_executor(),ctx);
+            this->server_time(operation::synchronous);
 
-            client->server_time(ioc,ctx,operation::synchronous);
-
-            boost::json::value server_timestamp = boost::json::parse(client->res_.body()).at("serverTime").as_int64();
+            boost::json::value server_timestamp = boost::json::parse(this->res_.body()).at("serverTime").as_int64();
             std::string query_params = "timestamp=" + serialize(server_timestamp);;
 
-            method.params().emplace_back("signature",encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()));  // order matters
+            method.params().emplace_back("signature",encryptWithHMAC(this->secret_key.c_str(),query_params.c_str()));  // order matters
             method.params().emplace_back("timestamp",serialize(server_timestamp));
 
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get, oper);
+            std::make_shared<httpClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get, oper);
 
         }
         
-        static void new_order(std::string symbol,int price,e_side side,order_type type,timeforce time,std::string quantity,net::io_context &ioc, ssl::context &ctx, operation oper)
+        void httpClient::new_order(std::string symbol,int price,e_side side,order_type type,timeforce time,std::string quantity,operation oper)
         {
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"order"};
 
-            auto client = std::make_shared<httpClient>(ioc.get_executor(),ctx);
+            server_time(operation::synchronous);
 
-            client->server_time(ioc,ctx,operation::synchronous);
-
-            boost::json::value server_timestamp = parse(client->res_.body()).at("serverTime").as_int64();
+            boost::json::value server_timestamp = parse(this->res_.body()).at("serverTime").as_int64();
             std::string query_params;
             
             if (type == order_type::market) query_params ="symbol="+symbol+"&side="+e_side_to_string(side) +"&type="+order_type_to_string(type)+ "&quantity="+quantity+"&recvWindow=60000"+"&timestamp=" + serialize(server_timestamp);
@@ -424,72 +451,68 @@ namespace binapi
             if (type == order_type::limit) method.params().emplace_back("price",std::to_string(price));
             method.params().emplace_back("recvWindow", "60000");
             method.params().emplace_back("timestamp",serialize(server_timestamp));
-            method.params().emplace_back("signature",encryptWithHMAC(client->secret_key.c_str(),query_params.c_str())); 
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::post, oper);
+            method.params().emplace_back("signature",encryptWithHMAC(this->secret_key.c_str(),query_params.c_str())); 
+            std::make_shared<httpClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::post, oper);
 
         }
 
-        static void cancel_order(std::string symbol,int orderid,net::io_context &ioc,ssl::context &ctx,operation oper)
+        void httpClient::cancel_order(std::string symbol,int orderid,operation oper)
         {
-            auto client = std::make_shared<httpClient>(ioc.get_executor(),ctx);
-            client->server_time(ioc,ctx,operation::synchronous);
-            boost::json::value server_timestamp = parse(client->res_.body()).at("serverTime").as_int64();
+            this->server_time(operation::synchronous);
+            boost::json::value server_timestamp = parse(this->res_.body()).at("serverTime").as_int64();
             std::string query_params = "symbol="+symbol+"&orderId="+std::to_string(orderid)+"&timestamp="+serialize(server_timestamp);
 
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"order"};
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("orderId",std::to_string(orderid));
-            method.params().emplace_back("signature",encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()));
+            method.params().emplace_back("signature",encryptWithHMAC(this->secret_key.c_str(),query_params.c_str()));
             method.params().emplace_back("timestamp",serialize(server_timestamp));
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::delete_,oper);
+            std::make_shared<httpClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::delete_,oper);
 
         }
 
-        static void cancel_all_orders(std::string symbol,net::io_context &ioc,ssl::context &ctx,operation oper)
+        void httpClient::cancel_all_orders(std::string symbol,operation oper)
         {
-            auto client = std::make_shared<httpClient>(ioc.get_executor(),ctx);
-            client->server_time(ioc,ctx,operation::synchronous);
-            boost::json::value server_timestamp = parse(client->res_.body()).at("serverTime").as_int64();
+            this->server_time(operation::synchronous);
+            boost::json::value server_timestamp = parse(this->res_.body()).at("serverTime").as_int64();
             std::string query_params = "symbol="+symbol+"&timestamp="+serialize(server_timestamp);
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"openOrders"};
             method.params().emplace_back("symbol",symbol);
-            method.params().emplace_back("signature",encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()));
+            method.params().emplace_back("signature",encryptWithHMAC(this->secret_key.c_str(),query_params.c_str()));
             method.params().emplace_back("timestamp",serialize(server_timestamp));
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::delete_,oper);
+            std::make_shared<httpClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::delete_,oper);
 
         }
         
-        static void check_order_status(std::string symbol,int orderid,net::io_context &ioc,ssl::context &ctx,operation oper)
+        void httpClient::check_order_status(std::string symbol,int orderid,operation oper)
         {
-            auto client = std::make_shared<httpClient>(ioc.get_executor(),ctx);
-            client->server_time(ioc,ctx,operation::synchronous);
-            boost::json::value server_timestamp = parse(client->res_.body()).at("serverTime").as_int64();
+            this->server_time(operation::synchronous);
+            boost::json::value server_timestamp = parse(this->res_.body()).at("serverTime").as_int64();
             std::string query_params = "symbol="+symbol+"&orderId="+std::to_string(orderid)+"&timestamp="+serialize(server_timestamp);
 
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"order"};
             method.params().emplace_back("symbol",symbol);
             method.params().emplace_back("orderId",std::to_string(orderid));
-            method.params().emplace_back("signature",encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()));
+            method.params().emplace_back("signature",encryptWithHMAC(this->secret_key.c_str(),query_params.c_str()));
             method.params().emplace_back("timestamp",serialize(server_timestamp));
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get,oper);
 
         }
 
-        static void get_account_info(net::io_context &ioc,ssl::context &ctx,operation oper)
+        void httpClient::get_account_info(operation oper)
         {
-            auto client = std::make_shared<httpClient>(ioc.get_executor(),ctx);
-            client->server_time(ioc,ctx,operation::synchronous);
-            boost::json::value server_timestamp = parse(client->res_.body()).at("serverTime").as_int64();
+            server_time(operation::synchronous);
+            boost::json::value server_timestamp = parse(this->res_.body()).at("serverTime").as_int64();
             std::string query_params = "timestamp="+serialize(server_timestamp);
 
             static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
             boost::url method{"account"};
-            method.params().emplace_back("signature",encryptWithHMAC(client->secret_key.c_str(),query_params.c_str()));
+            method.params().emplace_back("signature",encryptWithHMAC(this->secret_key.c_str(),query_params.c_str()));
             method.params().emplace_back("timestamp",serialize(server_timestamp));
-            std::make_shared<httpClient>(net::make_strand(ioc),ctx)->http_call(make_url(base_api,method),http::verb::get,oper);
+            std::make_shared<httpClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get,oper);
 
         }
 

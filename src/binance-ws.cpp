@@ -111,7 +111,7 @@ namespace binapi{
                 return fail_ws(ec, "handshake");
             }
             
-            std::cout << "Sending " << message_text_ << std::endl;
+            std::cout << "Sending : " << message_text_ << std::endl;
 
             ws_.async_write(
                 net::buffer(message_text_),
@@ -211,7 +211,7 @@ namespace binapi{
             std::make_shared<ws::WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
         }
 
-        void WebsocketClient::OB_deltas(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx)
+        void WebsocketClient::full_deltas(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx)
         {
             std::string stream = symbol+"@"+"depth";
             boost::json::value jv = {

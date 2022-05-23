@@ -68,7 +68,7 @@ namespace binapi{
 
         void partial_deltas(std::string action,std::string symbol,short int levels,net::io_context &ioc, ssl::context& ctx);
 
-        void OB_deltas(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx);
+        void full_deltas(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx);
     
     };
 

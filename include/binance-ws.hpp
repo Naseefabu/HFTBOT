@@ -54,21 +54,21 @@ namespace binapi{
 
         void on_write(beast::error_code ec, std::size_t bytes_transferred);
 
-        void on_read(beast::error_code ec, std::size_t bytes_transferred);
+        void on_message(beast::error_code ec, std::size_t bytes_transferred);
 
         void on_close(beast::error_code ec);
 
-        void aggTrades(std::string action,std::string symbol, net::io_context &ioc, ssl::context &ctx);
+        void subscribe_aggtrades(std::string action,std::string symbol, net::io_context &ioc, ssl::context &ctx);
 
-        void trades(std::string action,std::string symbol, net::io_context &ioc, ssl::context& ctx);
+        void subscribe_trades(std::string action,std::string symbol, net::io_context &ioc, ssl::context& ctx);
 
-        void candlestick(std::string action,std::string symbol,std::string interval, net::io_context &ioc, ssl::context& ctx);
+        void subscribe_candlestick(std::string action,std::string symbol,std::string interval, net::io_context &ioc, ssl::context& ctx);
 
-        void L1_deltas(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx);
+        void subscribe_levelone(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx);
 
-        void partial_deltas(std::string action,std::string symbol,short int levels,net::io_context &ioc, ssl::context& ctx);
+        void subscribe_partial_deltas(std::string action,std::string symbol,short int levels,net::io_context &ioc, ssl::context& ctx);
 
-        void full_deltas(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx);
+        void subscribe_orderbook(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx);
     
     };
 

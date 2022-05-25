@@ -3,6 +3,7 @@
 #include "boost/url/src.hpp" // can only be included in one source file
 #include "binance-ws.hpp"
 #include "binance-http.hpp" 
+using json = boost::json::value;
 
 using namespace binapi;
 
@@ -23,9 +24,12 @@ int main()
 
     // httpclients->avg_price("BTCUSDT",operation::asynchronous);
 
-    // httpclients->new_order("BTCUSDT",25000,e_side::buy,order_type::market,timeforce::GTC,"0.10",operation::synchronous);
+    json payload = httpclients->new_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10");
+
+    std::cout << "result payload : "<< payload << std::endl; 
     // httpclients->openOrders(operation::synchronous);
-    httpclients->cancel_all_orders("BTCUSDT",operation::synchronous);
+    // httpclients->cancel_all_orders("BTCUSDT",operation::synchronous);
+    // httpclients->bidask("BTCUSDT",operation::asynchronous);
     // The session is constructed with a strand to
     // ensure that handlers do not execute concurrently.
     

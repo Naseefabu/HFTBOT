@@ -127,22 +127,24 @@ namespace binapi{
             ws_.async_read(
                 buffer_,
                 beast::bind_front_handler(
-                    &WebsocketClient::on_read,
+                    &WebsocketClient::on_message,
                     shared_from_this()));
         }
 
-        void WebsocketClient::on_read(beast::error_code ec, std::size_t bytes_transferred)
+        void WebsocketClient::on_message(beast::error_code ec, std::size_t bytes_transferred)
         {
             boost::ignore_unused(bytes_transferred);
 
             if(ec)
                 return fail_ws(ec, "read");
 
+            // Signal generation and Quoting strategies on each tick events   
+
             std::cout << "Received: " << beast::buffers_to_string(buffer_.cdata()) <<std::endl;
 
             ws_.async_read(
                 buffer_,
-                beast::bind_front_handler(&WebsocketClient::on_read, shared_from_this()));
+                beast::bind_front_handler(&WebsocketClient::on_message, shared_from_this()));
         }
 
 
@@ -154,18 +156,18 @@ namespace binapi{
             std::cout << beast::make_printable(buffer_.data()) << std::endl;
         }
 
-        void WebsocketClient::aggTrades(std::string action,std::string symbol, net::io_context &ioc, ssl::context& ctx)
+        void WebsocketClient::subscribe_aggtrades(std::string action,std::string symbol, net::io_context &ioc, ssl::context& ctx)
         {
             std::string stream = symbol+"@"+"aggTrade";
             boost::json::value jv = {
                 { "method", action },
-                { "params", {"btcusdt@aggTrade"} },
+                { "params", {stream} },
                 { "id", 1 }
-            };
+            };  
             std::make_shared<ws::WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
         }
 
-        void WebsocketClient::trades(std::string action,std::string symbol, net::io_context &ioc, ssl::context& ctx)
+        void WebsocketClient::subscribe_trades(std::string action,std::string symbol, net::io_context &ioc, ssl::context& ctx)
         {
             std::string stream = symbol+"@"+"trade";
             boost::json::value jv = {
@@ -177,7 +179,7 @@ namespace binapi{
         }
 
         /* stream candle stick every second */
-        void WebsocketClient::candlestick(std::string action,std::string symbol, std::string interval, net::io_context &ioc, ssl::context& ctx)
+        void WebsocketClient::subscribe_candlestick(std::string action,std::string symbol, std::string interval, net::io_context &ioc, ssl::context& ctx)
         {
             std::string stream = symbol+"@"+"kline_"+interval;
             boost::json::value jv = {
@@ -189,7 +191,7 @@ namespace binapi{
         }
 
         /* best bid and best ask updates*/
-        void WebsocketClient::L1_deltas(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx)
+        void WebsocketClient::subscribe_levelone(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx)
         {
             std::string stream = symbol+"@"+"bookTicker";
             boost::json::value jv = {
@@ -200,7 +202,7 @@ namespace binapi{
             std::make_shared<ws::WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
         }
 
-        void WebsocketClient::partial_deltas(std::string action,std::string symbol,short int depth_levels,net::io_context &ioc, ssl::context& ctx)
+        void WebsocketClient::subscribe_partial_deltas(std::string action,std::string symbol,short int depth_levels,net::io_context &ioc, ssl::context& ctx)
         {
             std::string stream = symbol+"@"+"depth"+std::to_string(depth_levels);
             boost::json::value jv = {
@@ -211,7 +213,7 @@ namespace binapi{
             std::make_shared<ws::WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
         }
 
-        void WebsocketClient::full_deltas(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx)
+        void WebsocketClient::subscribe_orderbook(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx)
         {
             std::string stream = symbol+"@"+"depth";
             boost::json::value jv = {

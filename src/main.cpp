@@ -6,7 +6,7 @@
 using json = nlohmann::json;
 
 
-using namespace binapi;
+using namespace binance;
 
 int main()
 {
@@ -21,14 +21,14 @@ int main()
     //auto wsclient = std::make_shared<ws::WebsocketClient>(ioc,ctx);
     //wsclient->full_deltas("SUBSCRIBE","btcusdt",ioc,ctx);
 
-    auto httpclients = std::make_shared<rest::httpClient>(ioc.get_executor(),ctx,ioc);
+    auto httpclients = std::make_shared<httpClient>(ioc.get_executor(),ctx,ioc);
 
     // httpclients->avg_price("BTCUSDT",operation::asynchronous);
 
-    // json payload = httpclients->new_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10");
-    json payload = httpclients->latest_price("BTCUSDT");
+    json payload1 = httpclients->new_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10");
+    json payload2 = httpclients->latest_price("BTCUSDT");
 
-    std::cout << "result payload : "<< payload << std::endl; 
+    std::cout << "result payload : "<< payload2 << std::endl; 
     // httpclients->openOrders(operation::synchronous);
     // httpclients->cancel_all_orders("BTCUSDT",operation::synchronous);
     // httpclients->bidask("BTCUSDT",operation::asynchronous);

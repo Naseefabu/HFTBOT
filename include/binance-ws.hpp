@@ -8,7 +8,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <boost/json.hpp>
+#include <nlohmann/json.hpp>
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -19,6 +19,7 @@ namespace websocket = beast::websocket;
 namespace net       = boost::asio;      
 namespace ssl       = net::ssl;
 using tcp           = net::ip::tcp; 
+using json = nlohmann::json;
 
 using Stream = websocket::stream<beast::ssl_stream<beast::tcp_stream>>;
 using namespace std::chrono_literals;
@@ -42,7 +43,7 @@ namespace binapi{
 
         explicit WebsocketClient(net::io_context& ioc, ssl::context& ctx);
 
-        void run(char const* host, char const* port, boost::json::value message, std::string stream);
+        void run(char const* host, char const* port, json message, std::string stream);
 
         void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
 

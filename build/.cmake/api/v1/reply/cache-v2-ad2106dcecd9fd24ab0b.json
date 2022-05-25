@@ -1262,6 +1262,18 @@
 			"value" : "[TRUE][v()]"
 		},
 		{
+			"name" : "FIND_PACKAGE_MESSAGE_DETAILS_nlohmann_json",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Details about finding nlohmann_json"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "[/usr/lib/cmake/nlohmann_json/nlohmann_jsonConfig.cmake][v3.7.3(3.7.0)]"
+		},
+		{
 			"name" : "JSONCPP_CFLAGS",
 			"properties" : 
 			[
@@ -1840,6 +1852,18 @@
 			],
 			"type" : "STATIC",
 			"value" : "/home/user/Desktop/HFTBOT"
+		},
+		{
+			"name" : "nlohmann_json_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for nlohmann_json."
+				}
+			],
+			"type" : "PATH",
+			"value" : "/usr/lib/cmake/nlohmann_json"
 		},
 		{
 			"name" : "pkgcfg_lib_JSONCPP_jsoncpp",

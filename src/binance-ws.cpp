@@ -16,7 +16,7 @@ namespace binapi{
         }
 
 
-        void WebsocketClient::run(char const* host, char const* port, boost::json::value message, std::string stream)
+        void WebsocketClient::run(char const* host, char const* port, json message, std::string stream)
 
         {
             streamName = streamName + stream;
@@ -27,7 +27,7 @@ namespace binapi{
             }
 
             host_ = host;
-            message_text_ = serialize(message);
+            message_text_ = message.dump();
 
             resolver_.async_resolve(
                 host,
@@ -159,7 +159,7 @@ namespace binapi{
         void WebsocketClient::subscribe_aggtrades(std::string action,std::string symbol, net::io_context &ioc, ssl::context& ctx)
         {
             std::string stream = symbol+"@"+"aggTrade";
-            boost::json::value jv = {
+            json jv = {
                 { "method", action },
                 { "params", {stream} },
                 { "id", 1 }
@@ -170,7 +170,7 @@ namespace binapi{
         void WebsocketClient::subscribe_trades(std::string action,std::string symbol, net::io_context &ioc, ssl::context& ctx)
         {
             std::string stream = symbol+"@"+"trade";
-            boost::json::value jv = {
+            json jv = {
                 { "method", action },
                 { "params", {stream} },
                 { "id", 1 }
@@ -182,7 +182,7 @@ namespace binapi{
         void WebsocketClient::subscribe_candlestick(std::string action,std::string symbol, std::string interval, net::io_context &ioc, ssl::context& ctx)
         {
             std::string stream = symbol+"@"+"kline_"+interval;
-            boost::json::value jv = {
+            json jv = {
                 { "method", action },
                 { "params", {stream} },
                 { "id", 1 }
@@ -194,7 +194,7 @@ namespace binapi{
         void WebsocketClient::subscribe_levelone(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx)
         {
             std::string stream = symbol+"@"+"bookTicker";
-            boost::json::value jv = {
+            json jv = {
                 { "method", action },
                 { "params", {stream} },
                 { "id", 1 }
@@ -205,7 +205,7 @@ namespace binapi{
         void WebsocketClient::subscribe_partial_deltas(std::string action,std::string symbol,short int depth_levels,net::io_context &ioc, ssl::context& ctx)
         {
             std::string stream = symbol+"@"+"depth"+std::to_string(depth_levels);
-            boost::json::value jv = {
+            json jv = {
                 { "method", action },
                 { "params", {stream} },
                 { "id", 1 }
@@ -216,7 +216,7 @@ namespace binapi{
         void WebsocketClient::subscribe_orderbook(std::string action,std::string symbol,net::io_context &ioc, ssl::context& ctx)
         {
             std::string stream = symbol+"@"+"depth";
-            boost::json::value jv = {
+            json jv = {
                 { "method", action },
                 { "params", {stream} },
                 { "id", 1 }

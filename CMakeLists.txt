@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.18.0)
 
 project(hftbot)
   
+find_package(nlohmann_json 3.7.0 REQUIRED)
 find_package(Boost 1.79.0 REQUIRED COMPONENTS system thread filesystem container)
 find_package(Threads REQUIRED)
 
@@ -23,4 +24,5 @@ link_libraries(${JSONCPP_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PUBLIC Boost::boost Threads::Threads)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${JSONCPP_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PUBLIC ssl crypto)
+target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
 

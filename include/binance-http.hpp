@@ -309,30 +309,33 @@ namespace binance
     json RESTClient::avg_price(std::string symbol )
     {
         // this->server_time( );
+        auto t1 = high_resolution_clock::now();
         static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"avgPrice"};
         method.params().emplace_back("symbol",symbol);
+        auto t2 = high_resolution_clock::now();
+        auto ms_int = duration_cast<std::chrono::microseconds>(t2 -t1);
+        std::cout << "it took avg price: " << ms_int.count() << "micros" <<std::endl;
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
+    
     }
 
     json RESTClient::bidask(std::string symbol )
     {
-
         static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/ticker/"};
         boost::url method{"bookTicker"};
         method.params().emplace_back("symbol",symbol);
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
-
     }
 
     json RESTClient::openOrders( )
     {
         static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"openOrders"};
-        json time = server_time();
-        std::string query_params = "timestamp=" + time["serverTime"].dump();
+        std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
+        std::string query_params = "timestamp=" +server_timestamp;
         method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str()));  // order matters
-        method.params().emplace_back("timestamp",time["serverTime"].dump());
+        method.params().emplace_back("timestamp",server_timestamp);
 
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
 
@@ -360,63 +363,63 @@ namespace binance
         method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str())); 
         auto t2 = high_resolution_clock::now();
         auto ms_int = duration_cast<std::chrono::microseconds>(t2 -t1);
-        std::cout << "it took 2: " << ms_int.count() << "micros" <<std::endl;
+        std::cout << "it took to place new order : " << ms_int.count() << "micros" <<std::endl;
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::post).body());;
 
     }
 
     json RESTClient::cancel_order(std::string symbol,int orderid )
     {
-        json time = server_time();
-        std::string query_params = "symbol="+symbol+"&orderId="+std::to_string(orderid)+"&timestamp="+time["serverTime"].dump();
+        std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
+        std::string query_params = "symbol="+symbol+"&orderId="+std::to_string(orderid)+"&timestamp="+server_timestamp;
 
         static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"order"};
         method.params().emplace_back("symbol",symbol);
         method.params().emplace_back("orderId",std::to_string(orderid));
         method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str()));
-        method.params().emplace_back("timestamp",time["serverTime"].dump());
+        method.params().emplace_back("timestamp",server_timestamp);
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::delete_).body());
 
     }
 
     json RESTClient::cancel_all_orders(std::string symbol)
     {
-        json time = server_time();
-        std::string query_params = "symbol="+symbol+"&timestamp="+time["serverTime"].dump();
+        std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
+        std::string query_params = "symbol="+symbol+"&timestamp="+server_timestamp;
         static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"openOrders"};
         method.params().emplace_back("symbol",symbol);
         method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str()));
-        method.params().emplace_back("timestamp",time["serverTime"].dump());
+        method.params().emplace_back("timestamp",server_timestamp);
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::delete_).body());
 
     }
     
     json RESTClient::check_order_status(std::string symbol,int orderid )
     {
-        json time = server_time();
-        std::string query_params = "symbol="+symbol+"&orderId="+std::to_string(orderid)+"&timestamp="+time["serverTime"].dump();
+        std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
+        std::string query_params = "symbol="+symbol+"&orderId="+std::to_string(orderid)+"&timestamp="+server_timestamp;
 
         static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"order"};
         method.params().emplace_back("symbol",symbol);
         method.params().emplace_back("orderId",std::to_string(orderid));
         method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str()));
-        method.params().emplace_back("timestamp",time["serverTime"].dump());
+        method.params().emplace_back("timestamp",server_timestamp);
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
 
     }
 
     json RESTClient::get_account_info()
     {
-        json time = server_time();
-        std::string query_params = "timestamp="+time["serverTime"].dump();
+        std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
+        std::string query_params = "timestamp="+server_timestamp;
 
         static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"account"};
         method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str()));
-        method.params().emplace_back("timestamp",time["serverTime"].dump());
+        method.params().emplace_back("timestamp",server_timestamp);
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
 
     }

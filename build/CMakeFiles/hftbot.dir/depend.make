@@ -154,5 +154,6 @@ CMakeFiles/hftbot.dir/src/main.cpp.o: ../external/url/include/boost/url/url_view
 CMakeFiles/hftbot.dir/src/main.cpp.o: ../external/url/include/boost/url/urls.hpp
 CMakeFiles/hftbot.dir/src/main.cpp.o: ../include/binance-http.hpp
 CMakeFiles/hftbot.dir/src/main.cpp.o: ../include/binance-ws.hpp
+CMakeFiles/hftbot.dir/src/main.cpp.o: ../include/utils.hpp
 CMakeFiles/hftbot.dir/src/main.cpp.o: ../src/main.cpp
 

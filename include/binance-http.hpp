@@ -6,7 +6,9 @@
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <string>
+#include <chrono>
 #include <exception>
+#include "utils.hpp"
 
 namespace beast = boost::beast;         
 namespace http  = beast::http;          
@@ -16,22 +18,9 @@ using tcp       = boost::asio::ip::tcp;
 
 using json = nlohmann::json;
 using executor = net::any_io_executor; 
-using std::chrono::high_resolution_clock;
-using std::chrono::duration_cast;
-using std::chrono::duration;
-using std::chrono::milliseconds;
-using Clock = std::chrono::system_clock;
-using TimePoint = std::chrono::time_point<Clock>;
+using namespace utils;
 
-TimePoint current_time()
-{
-    return Clock::now();
-}
-
-std::chrono::milliseconds get_ms_timestamp(TimePoint time)
-{
-    return std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch());
-}
+void fail_http(beast::error_code ec, char const* what);
 
 boost::url make_url(boost::url_view base_api, boost::url_view method) {
     assert(!method.is_path_absolute());
@@ -44,62 +33,6 @@ boost::url make_url(boost::url_view base_api, boost::url_view method) {
         throw boost::system::system_error(ec);
     return url;
 }
-
-void fail_http(beast::error_code ec, char const* what);
-enum e_side{buy,sell};
-std::string e_side_string(const e_side side);
-
-enum order_type{limit,market};
-std::string order_type_to_string(order_type type);
-
-enum timeforce{GTC,IOC,FOK};
-std::string timeforce_to_string(timeforce timeforc);
-
-enum trade_response_type{ack,result,full,test,unknown};
-std::string trade_response_type_to_string(trade_response_type type);
-
-std::string e_side_to_string(const e_side side)
-{
-    switch (side)
-    {
-        case buy : return "BUY";
-        case sell : return "SELL"; 
-    }
-    return nullptr;
-}
-
-std::string order_type_to_string(order_type type)
-{
-    switch (type)
-    {
-        case limit : return "LIMIT";
-        case market : return "MARKET";
-    }
-    return nullptr;
-}
-std::string timeforce_to_string(timeforce timeforc)
-{
-    switch (timeforc)
-    {
-        case GTC : return "GTC";
-        case IOC : return "IOC";
-        case FOK : return "FOK";
-    }
-    return nullptr;
-}
-std::string trade_response_type_to_string(trade_response_type type)
-{
-    switch(type)
-    {
-        case ack : return "ACK";
-        case result : return "RESULT";
-        case full : return "FULL";
-        case test : return "TEST";
-        case unknown : return "UNKNOWN";
-    }
-    return nullptr;
-}
-
 
 namespace binance{
 
@@ -145,7 +78,7 @@ namespace binance{
 
         json new_order(std::string symbol,int price,e_side side,order_type type,timeforce time,std::string quantity);
 
-        json openOrders();
+        json open_orders();
 
         json bidask(std::string symbol);
 
@@ -176,11 +109,11 @@ namespace binance
 
     http::response<http::string_body> RESTClient::http_call(boost::url url, http::verb action) 
     {
-        auto t1 = high_resolution_clock::now();
+
         std::string const host(url.host());
-        std::string const service = url.has_port() //
+        std::string const service = url.has_port() 
             ? url.port()
-            : (url.scheme_id() == boost::urls::scheme::https) //
+            : (url.scheme_id() == boost::urls::scheme::https) 
                 ? "https"
                 : "http";
         url.remove_origin(); 
@@ -201,10 +134,6 @@ namespace binance
 
         auto const results = resolver_.resolve(host, service);
         beast::get_lowest_layer(stream_).connect(results);
-
-        auto t2 = high_resolution_clock::now();
-        auto ms_int = duration_cast<std::chrono::microseconds>(t2 -t1);
-        std::cout << "it took 3: " << ms_int.count() << "micros" <<std::endl;
 
         stream_.handshake(ssl::stream_base::client);
 
@@ -319,16 +248,14 @@ namespace binance
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
     }
 
-    json RESTClient::openOrders( )
+    json RESTClient::open_orders( )
     {
         boost::url method{"openOrders"};
         std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
         std::string query_params = "timestamp=" +server_timestamp;
         method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str()));  // order matters
         method.params().emplace_back("timestamp",server_timestamp);
-
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
-
     }
     
     json RESTClient::new_order(std::string symbol,int price,e_side side,order_type type,timeforce time,std::string quantity )

@@ -109,15 +109,15 @@ namespace binance{
 
     private:    
 
-        void configure(std::string api, std::string secret, std::string baseurl);
+        void configure(std::string api, std::string secret);
+        boost::url_view base_api{"https://testnet.binance.vision/api/v3/"};
         tcp::resolver resolver_;
         beast::ssl_stream<beast::tcp_stream> stream_;
-        beast::flat_buffer buffer_; // (Must persist between reads)
+        beast::flat_buffer buffer_;
         http::request<http::string_body>  req_;
         http::response<http::string_body> res_;
         std::string api_key = "v6uhUtse5Ae1Gyz72eMSbUMGw7VUDdd5AnqobMOW1Llzi4snnfP4YCyY9V74PFJ4";
         std::string secret_key = "FW8j4YobD26PVP6QLu0sv4Dv7OzrtfgQKzn8FoIMwGzMW9Y0VmX1DatbLIfXoCHV";
-        std::string base_url = "https://testnet.binance.vision/api/v3/";
         net::io_context& ioc;
         ssl::context& ctx;
         
@@ -235,18 +235,16 @@ namespace binance
         return signature;
     }
 
-    void RESTClient::configure(std::string api, std::string secret, std::string baseurl)
+    void RESTClient::configure(std::string api, std::string secret)
     {
         this->api_key = api;
         this->secret_key = secret;
-        this->base_url = baseurl;
     }
 
     json RESTClient::server_time()
     {
-        static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/time"};
-
-        return json::parse(http_call(base_api,http::verb::get).body());
+        boost::url method{"time"};
+        return json::parse(http_call(make_url(base_api,method),http::verb::get).body());
     }
 
     json RESTClient::latest_price(std::string symbol)
@@ -260,7 +258,6 @@ namespace binance
 
     json RESTClient::exchange_info(std::string symbol)
     {
-        static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"exchangeInfo"};
         method.params().emplace_back("symbol",symbol);
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
@@ -268,15 +265,14 @@ namespace binance
 
     json RESTClient::ping_binance( )
     {
-
-        static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/ping"};
-        return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(base_api,http::verb::get).body());
+        boost::url method{"ping"};
+        return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
 
     }
 
     json RESTClient::orderbook(std::string symbol,std::string levels)
     {
-        static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
+
         boost::url method{"depth"};
         method.params().emplace_back("symbol",symbol);
         method.params().emplace_back("limit",levels);
@@ -286,8 +282,6 @@ namespace binance
 
     json RESTClient::recent_trades(std::string symbol,std::string levels)
     {
-
-        static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"trades"};
         method.params().emplace_back("symbol",symbol);
         method.params().emplace_back("limit",levels);
@@ -298,7 +292,6 @@ namespace binance
     json RESTClient::klines(std::string symbol,std::string interval)
     {
 
-        static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"klines"};
         method.params().emplace_back("symbol",symbol);
         method.params().emplace_back("interval",interval);
@@ -310,7 +303,6 @@ namespace binance
     {
         // this->server_time( );
         auto t1 = high_resolution_clock::now();
-        static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"avgPrice"};
         method.params().emplace_back("symbol",symbol);
         auto t2 = high_resolution_clock::now();
@@ -322,15 +314,13 @@ namespace binance
 
     json RESTClient::bidask(std::string symbol )
     {
-        static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/ticker/"};
-        boost::url method{"bookTicker"};
+        boost::url method{"ticker/bookTicker"};
         method.params().emplace_back("symbol",symbol);
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
     }
 
     json RESTClient::openOrders( )
     {
-        static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"openOrders"};
         std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
         std::string query_params = "timestamp=" +server_timestamp;
@@ -343,8 +333,6 @@ namespace binance
     
     json RESTClient::new_order(std::string symbol,int price,e_side side,order_type type,timeforce time,std::string quantity )
     {
-        auto t1 = high_resolution_clock::now();
-        static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"order"};
         std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
         std::string query_params;
@@ -361,9 +349,7 @@ namespace binance
         method.params().emplace_back("recvWindow", "60000");
         method.params().emplace_back("timestamp",server_timestamp);
         method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str())); 
-        auto t2 = high_resolution_clock::now();
-        auto ms_int = duration_cast<std::chrono::microseconds>(t2 -t1);
-        std::cout << "it took to place new order : " << ms_int.count() << "micros" <<std::endl;
+
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::post).body());;
 
     }
@@ -372,8 +358,6 @@ namespace binance
     {
         std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
         std::string query_params = "symbol="+symbol+"&orderId="+std::to_string(orderid)+"&timestamp="+server_timestamp;
-
-        static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"order"};
         method.params().emplace_back("symbol",symbol);
         method.params().emplace_back("orderId",std::to_string(orderid));
@@ -387,7 +371,6 @@ namespace binance
     {
         std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
         std::string query_params = "symbol="+symbol+"&timestamp="+server_timestamp;
-        static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"openOrders"};
         method.params().emplace_back("symbol",symbol);
         method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str()));
@@ -400,8 +383,6 @@ namespace binance
     {
         std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
         std::string query_params = "symbol="+symbol+"&orderId="+std::to_string(orderid)+"&timestamp="+server_timestamp;
-
-        static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"order"};
         method.params().emplace_back("symbol",symbol);
         method.params().emplace_back("orderId",std::to_string(orderid));
@@ -415,8 +396,6 @@ namespace binance
     {
         std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
         std::string query_params = "timestamp="+server_timestamp;
-
-        static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/"};
         boost::url method{"account"};
         method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str()));
         method.params().emplace_back("timestamp",server_timestamp);

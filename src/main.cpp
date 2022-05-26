@@ -22,13 +22,13 @@ int main()
     //auto wsclient = std::make_shared<ws::WebsocketClient>(ioc,ctx);
     //wsclient->full_deltas("SUBSCRIBE","btcusdt",ioc,ctx);
 
-    auto httpclients = std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc);
+    RESTClient binance(ioc.get_executor(),ctx,ioc);
 
     // httpclients->avg_price("BTCUSDT",operation::asynchronous);
     // json payload1 = httpclients->new_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10");
     
     auto t1 = high_resolution_clock::now();
-    json payload2 = httpclients->new_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10");
+    json payload2 = binance.bidask("BTCUSDT");
     std::cout << payload2 <<std::endl;
     auto t2 = high_resolution_clock::now();
     //auto ms_int = duration_cast<milliseconds>(t2 -t1);

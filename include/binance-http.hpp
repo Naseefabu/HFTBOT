@@ -4,6 +4,7 @@
 #include <boost/beast.hpp>
 #include <boost/beast/ssl.hpp>
 #include <nlohmann/json.hpp>
+#include<string>
 #include <iostream>
 #include <string>
 #include <chrono>
@@ -20,9 +21,12 @@ using json = nlohmann::json;
 using executor = net::any_io_executor; 
 using namespace utils;
 
-void fail_http(beast::error_code ec, char const* what);
+void fail_http(beast::error_code ec, char const* what)
+{
+    std::cerr << what << ": " << ec.message() << "\n";
+}
 
-boost::url make_url(boost::url_view base_api, boost::url_view method) {
+boost::url make_url(boost::url base_api, boost::url method) {
     assert(!method.is_path_absolute());
     assert(base_api.data()[base_api.size() - 1] == '/');
 
@@ -42,8 +46,8 @@ namespace binance{
 
     private:    
 
-        void configure(std::string api, std::string secret);
-        boost::url_view base_api{"https://testnet.binance.vision/api/v3/"};
+        void configure(const std::string &api,const std::string &secret);
+        boost::url base_api{"https://testnet.binance.vision/api/v3/"};
         tcp::resolver resolver_;
         beast::ssl_stream<beast::tcp_stream> stream_;
         beast::flat_buffer buffer_;
@@ -64,41 +68,35 @@ namespace binance{
 
         json server_time();
 
-        json latest_price(std::string symbol);
+        json latest_price(const std::string &symbol);
 
-        json exchange_info(std::string symbol);
+        json exchange_info(const std::string &symbol);
 
         json get_account_info();
 
-        json check_order_status(std::string symbol,int orderid);
+        json check_order_status(const std::string &symbol,int orderid);
 
-        json cancel_all_orders(std::string symbol);
+        json cancel_all_orders(const std::string &symbol);
 
-        json cancel_order(std::string symbol,int orderid);
+        json cancel_order(const std::string &symbol,int orderid);
 
-        json new_order(std::string symbol,int price,e_side side,order_type type,timeforce time,std::string quantity);
+        json place_order(const std::string &symbol,int price,e_side side,order_type type,timeforce time,const std::string &quantity);
 
         json open_orders();
 
-        json bidask(std::string symbol);
+        json bidask(const std::string &symbol);
 
-        json avg_price(std::string symbol);
+        json avg_price(const std::string &symbol);
 
-        json klines(std::string symbol,std::string interval);
+        json klines(const std::string &symbol,const std::string &interval);
 
-        json recent_trades(std::string symbol,std::string levels);
+        json recent_trades(const std::string &symbol,const std::string &levels);
 
-        json orderbook(std::string symbol,std::string levels);
+        json orderbook(const std::string &symbol,const std::string &levels);
 
         json ping_binance();
 
     };
-}
-
-// Report a failure
-void fail_http(beast::error_code ec, char const* what)
-{
-    std::cerr << what << ": " << ec.message() << "\n";
 }
 
 namespace binance
@@ -164,7 +162,7 @@ namespace binance
         return signature;
     }
 
-    void RESTClient::configure(std::string api, std::string secret)
+    void RESTClient::configure(const std::string &api,const std::string &secret)
     {
         this->api_key = api;
         this->secret_key = secret;
@@ -176,16 +174,15 @@ namespace binance
         return json::parse(http_call(make_url(base_api,method),http::verb::get).body());
     }
 
-    json RESTClient::latest_price(std::string symbol)
+    json RESTClient::latest_price(const std::string &symbol)
     {
-        static boost::url_view const base_api{"https://testnet.binance.vision/api/v3/ticker/"};
-        boost::url method{"price"};
+        boost::url method{"ticker/price"};
         method.params().emplace_back("symbol",symbol);
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
     }
 
 
-    json RESTClient::exchange_info(std::string symbol)
+    json RESTClient::exchange_info(const std::string &symbol)
     {
         boost::url method{"exchangeInfo"};
         method.params().emplace_back("symbol",symbol);
@@ -199,7 +196,7 @@ namespace binance
 
     }
 
-    json RESTClient::orderbook(std::string symbol,std::string levels)
+    json RESTClient::orderbook(const std::string &symbol,const std::string &levels)
     {
 
         boost::url method{"depth"};
@@ -209,16 +206,15 @@ namespace binance
 
     }
 
-    json RESTClient::recent_trades(std::string symbol,std::string levels)
+    json RESTClient::recent_trades(const std::string &symbol,const std::string &levels)
     {
         boost::url method{"trades"};
         method.params().emplace_back("symbol",symbol);
         method.params().emplace_back("limit",levels);
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
-
     }
 
-    json RESTClient::klines(std::string symbol,std::string interval)
+    json RESTClient::klines(const std::string &symbol,const std::string &interval)
     {
 
         boost::url method{"klines"};
@@ -228,7 +224,7 @@ namespace binance
 
     }
 
-    json RESTClient::avg_price(std::string symbol )
+    json RESTClient::avg_price(const std::string &symbol )
     {
         // this->server_time( );
         auto t1 = high_resolution_clock::now();
@@ -241,7 +237,7 @@ namespace binance
     
     }
 
-    json RESTClient::bidask(std::string symbol )
+    json RESTClient::bidask(const std::string &symbol )
     {
         boost::url method{"ticker/bookTicker"};
         method.params().emplace_back("symbol",symbol);
@@ -258,7 +254,7 @@ namespace binance
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
     }
     
-    json RESTClient::new_order(std::string symbol,int price,e_side side,order_type type,timeforce time,std::string quantity )
+    json RESTClient::place_order(const std::string &symbol,int price,e_side side,order_type type,timeforce time,const std::string &quantity )
     {
         boost::url method{"order"};
         std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
@@ -281,7 +277,7 @@ namespace binance
 
     }
 
-    json RESTClient::cancel_order(std::string symbol,int orderid )
+    json RESTClient::cancel_order(const std::string &symbol,int orderid )
     {
         std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
         std::string query_params = "symbol="+symbol+"&orderId="+std::to_string(orderid)+"&timestamp="+server_timestamp;
@@ -294,7 +290,7 @@ namespace binance
 
     }
 
-    json RESTClient::cancel_all_orders(std::string symbol)
+    json RESTClient::cancel_all_orders(const std::string &symbol)
     {
         std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
         std::string query_params = "symbol="+symbol+"&timestamp="+server_timestamp;
@@ -303,10 +299,9 @@ namespace binance
         method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str()));
         method.params().emplace_back("timestamp",server_timestamp);
         return json::parse(std::make_shared<RESTClient>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::delete_).body());
-
     }
     
-    json RESTClient::check_order_status(std::string symbol,int orderid )
+    json RESTClient::check_order_status(const std::string &symbol,int orderid )
     {
         std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
         std::string query_params = "symbol="+symbol+"&orderId="+std::to_string(orderid)+"&timestamp="+server_timestamp;

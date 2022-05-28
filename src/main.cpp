@@ -28,7 +28,7 @@ int main()
     // json payload1 = httpclients->new_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10");
     
     auto t1 = high_resolution_clock::now();
-    json payload2 = binance.bidask("BTCUSDT");
+    json payload2 = binance.place_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10");
     std::cout << payload2 <<std::endl;
     auto t2 = high_resolution_clock::now();
     //auto ms_int = duration_cast<milliseconds>(t2 -t1);

@@ -119,11 +119,7 @@ namespace binance{
         if(ec)
             return fail_ws(ec, "write");
         
-        ws_.async_read(
-            buffer_,
-            beast::bind_front_handler(
-                &WebsocketClient::on_message,
-                shared_from_this()));
+        ws_.async_read(buffer_,beast::bind_front_handler(&WebsocketClient::on_message,shared_from_this()));
     }
 
     void WebsocketClient::on_message(beast::error_code ec, std::size_t bytes_transferred)
@@ -137,9 +133,7 @@ namespace binance{
 
         std::cout << "Received: " << beast::buffers_to_string(buffer_.cdata()) <<std::endl;
 
-        ws_.async_read(
-            buffer_,
-            beast::bind_front_handler(&WebsocketClient::on_message, shared_from_this()));
+        ws_.async_read(buffer_,beast::bind_front_handler(&WebsocketClient::on_message, shared_from_this()));
     }
 
 
@@ -185,7 +179,6 @@ namespace binance{
         std::make_shared<WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
     }
 
-    /* best bid and best ask updates*/
     void WebsocketClient::subscribe_levelone(std::string action,std::string symbol)
     {
         std::string stream = symbol+"@"+"bookTicker";

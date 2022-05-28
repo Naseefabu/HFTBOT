@@ -65,6 +65,10 @@
         "bit": "cpp",
         "*.ipp": "cpp",
         "any": "cpp",
-        "source_location": "cpp"
+        "source_location": "cpp",
+        "cfenv": "cpp",
+        "forward_list": "cpp",
+        "filesystem": "cpp",
+        "valarray": "cpp"
     }
 }

@@ -1,12 +1,12 @@
 [
 {
   "directory": "/home/user/Desktop/HFTBOT/build",
-  "command": "/usr/bin/x86_64-linux-gnu-g++-7 -I../external/url/include -I../include -g -o CMakeFiles/hftbot.dir/src/binance-ws.cpp.o -c /home/user/Desktop/HFTBOT/src/binance-ws.cpp",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7 -I../external/url/include -I../include -g -std=gnu++1z -o CMakeFiles/hftbot.dir/src/binance-ws.cpp.o -c /home/user/Desktop/HFTBOT/src/binance-ws.cpp",
   "file": "/home/user/Desktop/HFTBOT/src/binance-ws.cpp"
 },
 {
   "directory": "/home/user/Desktop/HFTBOT/build",
-  "command": "/usr/bin/x86_64-linux-gnu-g++-7 -I../external/url/include -I../include -g -o CMakeFiles/hftbot.dir/src/main.cpp.o -c /home/user/Desktop/HFTBOT/src/main.cpp",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7 -I../external/url/include -I../include -g -std=gnu++1z -o CMakeFiles/hftbot.dir/src/main.cpp.o -c /home/user/Desktop/HFTBOT/src/main.cpp",
   "file": "/home/user/Desktop/HFTBOT/src/main.cpp"
 }
 ]

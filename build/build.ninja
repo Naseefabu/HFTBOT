@@ -68,14 +68,14 @@ build cmake_object_order_depends_target_hftbot: phony || CMakeFiles/hftbot.dir
 
 build CMakeFiles/hftbot.dir/src/binance-ws.cpp.o: CXX_COMPILER__hftbot_Debug ../src/binance-ws.cpp || cmake_object_order_depends_target_hftbot
   DEP_FILE = CMakeFiles/hftbot.dir/src/binance-ws.cpp.o.d
-  FLAGS = -g
+  FLAGS = -g -std=gnu++1z
   INCLUDES = -I../external/url/include -I../include
   OBJECT_DIR = CMakeFiles/hftbot.dir
   OBJECT_FILE_DIR = CMakeFiles/hftbot.dir/src
 
 build CMakeFiles/hftbot.dir/src/main.cpp.o: CXX_COMPILER__hftbot_Debug ../src/main.cpp || cmake_object_order_depends_target_hftbot
   DEP_FILE = CMakeFiles/hftbot.dir/src/main.cpp.o.d
-  FLAGS = -g
+  FLAGS = -g -std=gnu++1z
   INCLUDES = -I../external/url/include -I../include
   OBJECT_DIR = CMakeFiles/hftbot.dir
   OBJECT_FILE_DIR = CMakeFiles/hftbot.dir/src

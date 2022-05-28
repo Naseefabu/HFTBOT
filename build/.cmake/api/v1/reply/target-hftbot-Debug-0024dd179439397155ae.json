@@ -62,6 +62,9 @@
 			[
 				{
 					"fragment" : "-g"
+				},
+				{
+					"fragment" : "-std=gnu++1z"
 				}
 			],
 			"includes" : 

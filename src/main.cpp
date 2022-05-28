@@ -7,7 +7,8 @@
 using json = nlohmann::json;
 
 
-using namespace binance;
+using namespace binanceREST;
+using namespace binanceWS;
 
 int main()
 {
@@ -15,12 +16,11 @@ int main()
     // The SSL context is required, and holds certificates
     ssl::context ctx{ssl::context::tlsv12_client};
 
-    // Verify the remote server's certificate
     ctx.set_verify_mode(ssl::verify_peer);
     ctx.set_default_verify_paths();
 
-    //auto wsclient = std::make_shared<ws::WebsocketClient>(ioc,ctx);
-    //wsclient->full_deltas("SUBSCRIBE","btcusdt",ioc,ctx);
+    WebsocketClient ws(ioc,ctx);
+    ws.orderbook("SUBSCRIBE","btcusdt");
 
     RESTClient binance(ioc.get_executor(),ctx,ioc);
 

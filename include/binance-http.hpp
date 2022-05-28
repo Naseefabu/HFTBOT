@@ -38,7 +38,7 @@ boost::url make_url(boost::url base_api, boost::url method) {
     return url;
 }
 
-namespace binance{
+namespace binanceREST{
 
 
     class RESTClient : public std::enable_shared_from_this<RESTClient> 
@@ -99,7 +99,7 @@ namespace binance{
     };
 }
 
-namespace binance
+namespace binanceREST
 {
     RESTClient::RESTClient(executor ex, ssl::context& ctxe, net::io_context &ioce)
         : resolver_(ex),stream_(ex, ctxe),ioc(ioce),ctx(ctxe){}

@@ -5,7 +5,7 @@ void fail_ws(beast::error_code ec, char const* what)
     std::cerr << what << ": " << ec.message() << "\n";
 }
 
-namespace binance{
+namespace binanceWS{
 
 
     WebsocketClient::WebsocketClient(net::io_context& ioc, ssl::context& ctx)
@@ -145,7 +145,7 @@ namespace binance{
         std::cout << beast::make_printable(buffer_.data()) << std::endl;
     }
 
-    void WebsocketClient::subscribe_aggtrades(std::string action,std::string symbol)
+    void WebsocketClient::aggtrades(const std::string& action,const std::string& symbol)
     {
         std::string stream = symbol+"@"+"aggTrade";
         json jv = {
@@ -153,10 +153,10 @@ namespace binance{
             { "params", {stream} },
             { "id", 1 }
         };  
-        std::make_shared<WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
+        std::make_shared<WebsocketClient>(ioc,ctx)->run(host, port,jv, stream);
     }
 
-    void WebsocketClient::subscribe_trades(std::string action,std::string symbol)
+    void WebsocketClient::trades(const std::string& action,const std::string& symbol)
     {
         std::string stream = symbol+"@"+"trade";
         json jv = {
@@ -164,11 +164,11 @@ namespace binance{
             { "params", {stream} },
             { "id", 1 }
         };
-        std::make_shared<WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
+        std::make_shared<WebsocketClient>(ioc,ctx)->run(host, port,jv, stream);
     }
 
     /* stream candle stick every second */
-    void WebsocketClient::subscribe_candlestick(std::string action,std::string symbol, std::string interval)
+    void WebsocketClient::candlestick(const std::string& action,const std::string& symbol,const std::string& interval)
     {
         std::string stream = symbol+"@"+"kline_"+interval;
         json jv = {
@@ -176,10 +176,10 @@ namespace binance{
             { "params", {stream} },
             { "id", 1 }
         };
-        std::make_shared<WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
+        std::make_shared<WebsocketClient>(ioc,ctx)->run(host, port,jv, stream);
     }
 
-    void WebsocketClient::subscribe_levelone(std::string action,std::string symbol)
+    void WebsocketClient::levelone(const std::string& action,const std::string& symbol)
     {
         std::string stream = symbol+"@"+"bookTicker";
         json jv = {
@@ -187,10 +187,10 @@ namespace binance{
             { "params", {stream} },
             { "id", 1 }
         };
-        std::make_shared<WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
+        std::make_shared<WebsocketClient>(ioc,ctx)->run(host, port,jv, stream);
     }
 
-    void WebsocketClient::subscribe_partial_deltas(std::string action,std::string symbol,short int depth_levels)
+    void WebsocketClient::partial_deltas(const std::string& action,const std::string& symbol,short int &depth_levels)
     {
         std::string stream = symbol+"@"+"depth"+std::to_string(depth_levels);
         json jv = {
@@ -198,10 +198,10 @@ namespace binance{
             { "params", {stream} },
             { "id", 1 }
         };
-        std::make_shared<WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
+        std::make_shared<WebsocketClient>(ioc,ctx)->run(host, port,jv, stream);
     }
 
-    void WebsocketClient::subscribe_orderbook(std::string action,std::string symbol)
+    void WebsocketClient::orderbook(const std::string& action,const std::string& symbol)
     {
         std::string stream = symbol+"@"+"depth";
         json jv = {
@@ -209,7 +209,7 @@ namespace binance{
             { "params", {stream} },
             { "id", 1 }
         };
-        std::make_shared<WebsocketClient>(ioc,ctx)->run("stream.binance.com", "9443",jv, stream);
+        std::make_shared<WebsocketClient>(ioc,ctx)->run(host, port,jv, stream);
     }
 
 

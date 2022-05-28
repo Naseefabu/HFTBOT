@@ -24,7 +24,7 @@ using json = nlohmann::json;
 using Stream = websocket::stream<beast::ssl_stream<beast::tcp_stream>>;
 using namespace std::chrono_literals;
 
-namespace binance{
+namespace binanceWS{
 
 
   class WebsocketClient : public std::enable_shared_from_this<WebsocketClient>
@@ -37,12 +37,14 @@ namespace binance{
       net::io_context &ioc;
       ssl::context& ctx;
       std::string streamName = "/ws/";
+      char const* host = "stream.binance.com";
+      char const* port = "9443";
 
     public:
 
       explicit WebsocketClient(net::io_context& ioc, ssl::context& ctx);
 
-      void run(char const* host, char const* port, json message, std::string stream);
+      void run(char const* host, char const* port, json message,const std::string& stream);
 
       void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
 
@@ -58,17 +60,17 @@ namespace binance{
 
       void on_close(beast::error_code ec);
 
-      void subscribe_aggtrades(std::string action,std::string symbol);
+      void aggtrades(const std::string& action,const std::string& symbol);
 
-      void subscribe_trades(std::string action,std::string symbol);
+      void trades(const std::string& action,const std::string& symbol);
 
-      void subscribe_candlestick(std::string action,std::string symbol,std::string interval);
+      void candlestick(const std::string& action,const std::string& symbol,const std::string& interval);
 
-      void subscribe_levelone(std::string action,std::string symbol);
+      void levelone(const std::string& action,const std::string& symbol);
 
-      void subscribe_partial_deltas(std::string action,std::string symbol,short int levels);
+      void partial_deltas(const std::string& action,const std::string& symbol,short int& levels);
 
-      void subscribe_orderbook(std::string action,std::string symbol);
+      void orderbook(const std::string& action,const std::string& symbol);
   
   };
 

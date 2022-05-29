@@ -19,20 +19,19 @@ int main()
     ctx.set_verify_mode(ssl::verify_peer);
     ctx.set_default_verify_paths();
 
-    WebsocketClient ws(ioc,ctx);
-    ws.orderbook("SUBSCRIBE","btcusdt");
+    // WebsocketClient ws(ioc,ctx);
+    // ws.orderbook("SUBSCRIBE","btcusdt");
 
     RESTClient binance(ioc.get_executor(),ctx,ioc);
 
     // httpclients->avg_price("BTCUSDT",operation::asynchronous);
     // json payload1 = httpclients->new_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10");
-    
+    // json payload2 = binance.place_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10");
     auto t1 = high_resolution_clock::now();
-    json payload2 = binance.place_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10");
-    std::cout << payload2 <<std::endl;
+    json payload2 = binance.ping_binance();
     auto t2 = high_resolution_clock::now();
-    //auto ms_int = duration_cast<milliseconds>(t2 -t1);
-    //std::cout << "it took : " << ms_int.count() << "ms" <<std::endl;
+    auto ms_int = duration_cast<milliseconds>(t2 -t1);
+    std::cout << "it took : " << ms_int.count() << "ms" <<std::endl;
 
     
     

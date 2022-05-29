@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.18.0)
 set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_FLAGS "-O3 -pthread -lssl -lcrypto")
+set(CMAKE_BUILD_TYPE "Release")
 project(hftbot)
   
 find_package(nlohmann_json 3.7.0 REQUIRED)

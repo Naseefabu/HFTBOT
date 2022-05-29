@@ -1,8 +1,0 @@
-{
-    "method": "SUBSCRIBE",
-    "params":
-    [
-        "btcusdt@aggTrade"
-    ],
-    "id": 1
-}

@@ -18,7 +18,7 @@ namespace binanceWS{
     }
 
 
-    void WebsocketClient::run(char const* host, char const* port, json message, std::string stream)
+    void WebsocketClient::run(char const* host, char const* port, json message, const std::string& stream)
 
     {
         streamName = streamName + stream;

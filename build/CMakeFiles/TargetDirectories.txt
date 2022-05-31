@@ -1,0 +1,3 @@
+/home/user/Desktop/HFTBOT/build/CMakeFiles/edit_cache.dir
+/home/user/Desktop/HFTBOT/build/CMakeFiles/rebuild_cache.dir
+/home/user/Desktop/HFTBOT/build/CMakeFiles/hftbot.dir

@@ -1,2 +1,3 @@
-# HIGH FREQUENCY TRADING BOT
+# Short Vol System
+
 [in construction]

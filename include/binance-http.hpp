@@ -121,6 +121,7 @@ namespace binanceREST
             beast::error_code ec{static_cast<int>(::ERR_get_error()), net::error::get_ssl_category()};
             std::cerr << ec.message() << "\n";
         }
+        
 
         req_.method(action);
         req_.target(url.c_str());
@@ -129,6 +130,8 @@ namespace binanceREST
         req_.set("X-MBX-APIKEY", api_key);
 
         req_.prepare_payload();
+
+        std::cout << "body : " << req_.body() << std::endl;
 
         auto const results = resolver_.resolve(host, service);
         beast::get_lowest_layer(stream_).connect(results);

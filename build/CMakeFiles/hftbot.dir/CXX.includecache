@@ -1196,7 +1196,17 @@ boost/url/url.hpp
 boost/url/url_view.hpp
 -
 
-../include/binance-http.hpp
+../include/utils.hpp
+iostream
+-
+chrono
+-
+
+/home/user/Desktop/HFTBOT/exchanges/binance-http.cpp
+binance-http.hpp
+/home/user/Desktop/HFTBOT/exchanges/binance-http.hpp
+
+/home/user/Desktop/HFTBOT/exchanges/binance-http.hpp
 boost/asio.hpp
 -
 boost/beast.hpp
@@ -1216,11 +1226,15 @@ chrono
 exception
 -
 utils.hpp
-../include/utils.hpp
+/home/user/Desktop/HFTBOT/exchanges/utils.hpp
 boost/url.hpp
 -
 
-../include/binance-ws.hpp
+/home/user/Desktop/HFTBOT/exchanges/binance-ws.cpp
+binance-ws.hpp
+/home/user/Desktop/HFTBOT/exchanges/binance-ws.hpp
+
+/home/user/Desktop/HFTBOT/exchanges/binance-ws.hpp
 boost/asio.hpp
 -
 boost/asio/ssl.hpp
@@ -1241,30 +1255,4 @@ sys/types.h
 -
 unistd.h
 -
-
-../include/utils.hpp
-iostream
--
-chrono
--
-
-/home/user/Desktop/HFTBOT/src/binance-http.cpp
-binance-http.hpp
-/home/user/Desktop/HFTBOT/src/binance-http.hpp
-
-/home/user/Desktop/HFTBOT/src/main.cpp
-iostream
--
-ctime
--
-chrono
--
-binance-ws.hpp
-/home/user/Desktop/HFTBOT/src/binance-ws.hpp
-binance-http.hpp
-/home/user/Desktop/HFTBOT/src/binance-http.hpp
-
-/home/user/Desktop/HFTBOT/src/utils.cpp
-utils.hpp
-/home/user/Desktop/HFTBOT/src/utils.hpp
 

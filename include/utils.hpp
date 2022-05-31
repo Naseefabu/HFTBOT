@@ -32,5 +32,4 @@ namespace utils
     enum trade_response_type{ack,result,full,test,unknown};
     std::string trade_response_type_to_string(trade_response_type type);
 
-
 }

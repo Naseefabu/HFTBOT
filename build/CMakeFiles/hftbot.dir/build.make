@@ -77,18 +77,18 @@ include CMakeFiles/hftbot.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/hftbot.dir/flags.make
 
-CMakeFiles/hftbot.dir/src/binance-ws.cpp.o: CMakeFiles/hftbot.dir/flags.make
-CMakeFiles/hftbot.dir/src/binance-ws.cpp.o: ../src/binance-ws.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Desktop/HFTBOT/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/hftbot.dir/src/binance-ws.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/hftbot.dir/src/binance-ws.cpp.o -c /home/user/Desktop/HFTBOT/src/binance-ws.cpp
+CMakeFiles/hftbot.dir/exchanges/binance-ws.cpp.o: CMakeFiles/hftbot.dir/flags.make
+CMakeFiles/hftbot.dir/exchanges/binance-ws.cpp.o: ../exchanges/binance-ws.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Desktop/HFTBOT/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/hftbot.dir/exchanges/binance-ws.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/hftbot.dir/exchanges/binance-ws.cpp.o -c /home/user/Desktop/HFTBOT/exchanges/binance-ws.cpp
 
-CMakeFiles/hftbot.dir/src/binance-ws.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/hftbot.dir/src/binance-ws.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Desktop/HFTBOT/src/binance-ws.cpp > CMakeFiles/hftbot.dir/src/binance-ws.cpp.i
+CMakeFiles/hftbot.dir/exchanges/binance-ws.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/hftbot.dir/exchanges/binance-ws.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Desktop/HFTBOT/exchanges/binance-ws.cpp > CMakeFiles/hftbot.dir/exchanges/binance-ws.cpp.i
 
-CMakeFiles/hftbot.dir/src/binance-ws.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/hftbot.dir/src/binance-ws.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Desktop/HFTBOT/src/binance-ws.cpp -o CMakeFiles/hftbot.dir/src/binance-ws.cpp.s
+CMakeFiles/hftbot.dir/exchanges/binance-ws.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/hftbot.dir/exchanges/binance-ws.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Desktop/HFTBOT/exchanges/binance-ws.cpp -o CMakeFiles/hftbot.dir/exchanges/binance-ws.cpp.s
 
 CMakeFiles/hftbot.dir/src/main.cpp.o: CMakeFiles/hftbot.dir/flags.make
 CMakeFiles/hftbot.dir/src/main.cpp.o: ../src/main.cpp
@@ -116,18 +116,18 @@ CMakeFiles/hftbot.dir/src/boosturl.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/hftbot.dir/src/boosturl.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Desktop/HFTBOT/src/boosturl.cpp -o CMakeFiles/hftbot.dir/src/boosturl.cpp.s
 
-CMakeFiles/hftbot.dir/src/binance-http.cpp.o: CMakeFiles/hftbot.dir/flags.make
-CMakeFiles/hftbot.dir/src/binance-http.cpp.o: ../src/binance-http.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Desktop/HFTBOT/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/hftbot.dir/src/binance-http.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/hftbot.dir/src/binance-http.cpp.o -c /home/user/Desktop/HFTBOT/src/binance-http.cpp
+CMakeFiles/hftbot.dir/exchanges/binance-http.cpp.o: CMakeFiles/hftbot.dir/flags.make
+CMakeFiles/hftbot.dir/exchanges/binance-http.cpp.o: ../exchanges/binance-http.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/user/Desktop/HFTBOT/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/hftbot.dir/exchanges/binance-http.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/hftbot.dir/exchanges/binance-http.cpp.o -c /home/user/Desktop/HFTBOT/exchanges/binance-http.cpp
 
-CMakeFiles/hftbot.dir/src/binance-http.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/hftbot.dir/src/binance-http.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Desktop/HFTBOT/src/binance-http.cpp > CMakeFiles/hftbot.dir/src/binance-http.cpp.i
+CMakeFiles/hftbot.dir/exchanges/binance-http.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/hftbot.dir/exchanges/binance-http.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/user/Desktop/HFTBOT/exchanges/binance-http.cpp > CMakeFiles/hftbot.dir/exchanges/binance-http.cpp.i
 
-CMakeFiles/hftbot.dir/src/binance-http.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/hftbot.dir/src/binance-http.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Desktop/HFTBOT/src/binance-http.cpp -o CMakeFiles/hftbot.dir/src/binance-http.cpp.s
+CMakeFiles/hftbot.dir/exchanges/binance-http.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/hftbot.dir/exchanges/binance-http.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/user/Desktop/HFTBOT/exchanges/binance-http.cpp -o CMakeFiles/hftbot.dir/exchanges/binance-http.cpp.s
 
 CMakeFiles/hftbot.dir/src/utils.cpp.o: CMakeFiles/hftbot.dir/flags.make
 CMakeFiles/hftbot.dir/src/utils.cpp.o: ../src/utils.cpp
@@ -144,19 +144,19 @@ CMakeFiles/hftbot.dir/src/utils.cpp.s: cmake_force
 
 # Object files for target hftbot
 hftbot_OBJECTS = \
-"CMakeFiles/hftbot.dir/src/binance-ws.cpp.o" \
+"CMakeFiles/hftbot.dir/exchanges/binance-ws.cpp.o" \
 "CMakeFiles/hftbot.dir/src/main.cpp.o" \
 "CMakeFiles/hftbot.dir/src/boosturl.cpp.o" \
-"CMakeFiles/hftbot.dir/src/binance-http.cpp.o" \
+"CMakeFiles/hftbot.dir/exchanges/binance-http.cpp.o" \
 "CMakeFiles/hftbot.dir/src/utils.cpp.o"
 
 # External object files for target hftbot
 hftbot_EXTERNAL_OBJECTS =
 
-hftbot: CMakeFiles/hftbot.dir/src/binance-ws.cpp.o
+hftbot: CMakeFiles/hftbot.dir/exchanges/binance-ws.cpp.o
 hftbot: CMakeFiles/hftbot.dir/src/main.cpp.o
 hftbot: CMakeFiles/hftbot.dir/src/boosturl.cpp.o
-hftbot: CMakeFiles/hftbot.dir/src/binance-http.cpp.o
+hftbot: CMakeFiles/hftbot.dir/exchanges/binance-http.cpp.o
 hftbot: CMakeFiles/hftbot.dir/src/utils.cpp.o
 hftbot: CMakeFiles/hftbot.dir/build.make
 hftbot: CMakeFiles/hftbot.dir/link.txt

@@ -143,59 +143,59 @@ hftbot/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/build
 .PHONY : hftbot/fast
 
-src/binance-http.o: src/binance-http.cpp.o
+exchanges/binance-http.o: exchanges/binance-http.cpp.o
 
-.PHONY : src/binance-http.o
-
-# target to build an object file
-src/binance-http.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/binance-http.cpp.o
-.PHONY : src/binance-http.cpp.o
-
-src/binance-http.i: src/binance-http.cpp.i
-
-.PHONY : src/binance-http.i
-
-# target to preprocess a source file
-src/binance-http.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/binance-http.cpp.i
-.PHONY : src/binance-http.cpp.i
-
-src/binance-http.s: src/binance-http.cpp.s
-
-.PHONY : src/binance-http.s
-
-# target to generate assembly for a file
-src/binance-http.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/binance-http.cpp.s
-.PHONY : src/binance-http.cpp.s
-
-src/binance-ws.o: src/binance-ws.cpp.o
-
-.PHONY : src/binance-ws.o
+.PHONY : exchanges/binance-http.o
 
 # target to build an object file
-src/binance-ws.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/binance-ws.cpp.o
-.PHONY : src/binance-ws.cpp.o
+exchanges/binance-http.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/exchanges/binance-http.cpp.o
+.PHONY : exchanges/binance-http.cpp.o
 
-src/binance-ws.i: src/binance-ws.cpp.i
+exchanges/binance-http.i: exchanges/binance-http.cpp.i
 
-.PHONY : src/binance-ws.i
+.PHONY : exchanges/binance-http.i
 
 # target to preprocess a source file
-src/binance-ws.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/binance-ws.cpp.i
-.PHONY : src/binance-ws.cpp.i
+exchanges/binance-http.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/exchanges/binance-http.cpp.i
+.PHONY : exchanges/binance-http.cpp.i
 
-src/binance-ws.s: src/binance-ws.cpp.s
+exchanges/binance-http.s: exchanges/binance-http.cpp.s
 
-.PHONY : src/binance-ws.s
+.PHONY : exchanges/binance-http.s
 
 # target to generate assembly for a file
-src/binance-ws.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/binance-ws.cpp.s
-.PHONY : src/binance-ws.cpp.s
+exchanges/binance-http.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/exchanges/binance-http.cpp.s
+.PHONY : exchanges/binance-http.cpp.s
+
+exchanges/binance-ws.o: exchanges/binance-ws.cpp.o
+
+.PHONY : exchanges/binance-ws.o
+
+# target to build an object file
+exchanges/binance-ws.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/exchanges/binance-ws.cpp.o
+.PHONY : exchanges/binance-ws.cpp.o
+
+exchanges/binance-ws.i: exchanges/binance-ws.cpp.i
+
+.PHONY : exchanges/binance-ws.i
+
+# target to preprocess a source file
+exchanges/binance-ws.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/exchanges/binance-ws.cpp.i
+.PHONY : exchanges/binance-ws.cpp.i
+
+exchanges/binance-ws.s: exchanges/binance-ws.cpp.s
+
+.PHONY : exchanges/binance-ws.s
+
+# target to generate assembly for a file
+exchanges/binance-ws.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/exchanges/binance-ws.cpp.s
+.PHONY : exchanges/binance-ws.cpp.s
 
 src/boosturl.o: src/boosturl.cpp.o
 
@@ -287,12 +287,12 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... hftbot"
-	@echo "... src/binance-http.o"
-	@echo "... src/binance-http.i"
-	@echo "... src/binance-http.s"
-	@echo "... src/binance-ws.o"
-	@echo "... src/binance-ws.i"
-	@echo "... src/binance-ws.s"
+	@echo "... exchanges/binance-http.o"
+	@echo "... exchanges/binance-http.i"
+	@echo "... exchanges/binance-http.s"
+	@echo "... exchanges/binance-ws.o"
+	@echo "... exchanges/binance-ws.i"
+	@echo "... exchanges/binance-ws.s"
 	@echo "... src/boosturl.o"
 	@echo "... src/boosturl.i"
 	@echo "... src/boosturl.s"

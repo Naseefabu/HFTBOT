@@ -12,16 +12,13 @@ find_package(Threads REQUIRED)
 
 set(URLIB_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/external/url/include")
 set(URLIB_HEADERS ${URLIB_DIRECTORY}/boost/url.hpp ${URLIB_DIRECTORY}/boost/url/src.hpp)
-set(SOURCES src/binance-ws.cpp src/main.cpp src/boosturl.cpp src/binance-http.cpp src/utils.cpp)
+set(SOURCES exchanges/binance-ws.cpp src/main.cpp src/boosturl.cpp exchanges/binance-http.cpp src/utils.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${URLIB_DIRECTORY})
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/exchanges)
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(JSONCPP jsoncpp)
-link_libraries(${JSONCPP_LIBRARIES})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC Boost::boost Threads::Threads)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${JSONCPP_LIBRARIES})

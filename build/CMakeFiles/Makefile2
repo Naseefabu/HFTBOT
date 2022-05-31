@@ -94,12 +94,12 @@ clean: CMakeFiles/hftbot.dir/clean
 CMakeFiles/hftbot.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/Desktop/HFTBOT/build/CMakeFiles --progress-num=1,2,3 "Built target hftbot"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/Desktop/HFTBOT/build/CMakeFiles --progress-num=1,2,3,4,5,6 "Built target hftbot"
 .PHONY : CMakeFiles/hftbot.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/hftbot.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/Desktop/HFTBOT/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/Desktop/HFTBOT/build/CMakeFiles 6
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/hftbot.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/Desktop/HFTBOT/build/CMakeFiles 0
 .PHONY : CMakeFiles/hftbot.dir/rule

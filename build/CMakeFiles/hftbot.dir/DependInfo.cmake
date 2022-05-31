@@ -4,8 +4,11 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
+  "/home/user/Desktop/HFTBOT/src/binance-http.cpp" "/home/user/Desktop/HFTBOT/build/CMakeFiles/hftbot.dir/src/binance-http.cpp.o"
   "/home/user/Desktop/HFTBOT/src/binance-ws.cpp" "/home/user/Desktop/HFTBOT/build/CMakeFiles/hftbot.dir/src/binance-ws.cpp.o"
+  "/home/user/Desktop/HFTBOT/src/boosturl.cpp" "/home/user/Desktop/HFTBOT/build/CMakeFiles/hftbot.dir/src/boosturl.cpp.o"
   "/home/user/Desktop/HFTBOT/src/main.cpp" "/home/user/Desktop/HFTBOT/build/CMakeFiles/hftbot.dir/src/main.cpp.o"
+  "/home/user/Desktop/HFTBOT/src/utils.cpp" "/home/user/Desktop/HFTBOT/build/CMakeFiles/hftbot.dir/src/utils.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

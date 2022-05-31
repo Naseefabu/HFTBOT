@@ -143,6 +143,33 @@ hftbot/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/build
 .PHONY : hftbot/fast
 
+src/binance-http.o: src/binance-http.cpp.o
+
+.PHONY : src/binance-http.o
+
+# target to build an object file
+src/binance-http.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/binance-http.cpp.o
+.PHONY : src/binance-http.cpp.o
+
+src/binance-http.i: src/binance-http.cpp.i
+
+.PHONY : src/binance-http.i
+
+# target to preprocess a source file
+src/binance-http.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/binance-http.cpp.i
+.PHONY : src/binance-http.cpp.i
+
+src/binance-http.s: src/binance-http.cpp.s
+
+.PHONY : src/binance-http.s
+
+# target to generate assembly for a file
+src/binance-http.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/binance-http.cpp.s
+.PHONY : src/binance-http.cpp.s
+
 src/binance-ws.o: src/binance-ws.cpp.o
 
 .PHONY : src/binance-ws.o
@@ -169,6 +196,33 @@ src/binance-ws.s: src/binance-ws.cpp.s
 src/binance-ws.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/binance-ws.cpp.s
 .PHONY : src/binance-ws.cpp.s
+
+src/boosturl.o: src/boosturl.cpp.o
+
+.PHONY : src/boosturl.o
+
+# target to build an object file
+src/boosturl.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/boosturl.cpp.o
+.PHONY : src/boosturl.cpp.o
+
+src/boosturl.i: src/boosturl.cpp.i
+
+.PHONY : src/boosturl.i
+
+# target to preprocess a source file
+src/boosturl.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/boosturl.cpp.i
+.PHONY : src/boosturl.cpp.i
+
+src/boosturl.s: src/boosturl.cpp.s
+
+.PHONY : src/boosturl.s
+
+# target to generate assembly for a file
+src/boosturl.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/boosturl.cpp.s
+.PHONY : src/boosturl.cpp.s
 
 src/main.o: src/main.cpp.o
 
@@ -197,6 +251,33 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/utils.o: src/utils.cpp.o
+
+.PHONY : src/utils.o
+
+# target to build an object file
+src/utils.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/utils.cpp.o
+.PHONY : src/utils.cpp.o
+
+src/utils.i: src/utils.cpp.i
+
+.PHONY : src/utils.i
+
+# target to preprocess a source file
+src/utils.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/utils.cpp.i
+.PHONY : src/utils.cpp.i
+
+src/utils.s: src/utils.cpp.s
+
+.PHONY : src/utils.s
+
+# target to generate assembly for a file
+src/utils.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hftbot.dir/build.make CMakeFiles/hftbot.dir/src/utils.cpp.s
+.PHONY : src/utils.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -206,12 +287,21 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... hftbot"
+	@echo "... src/binance-http.o"
+	@echo "... src/binance-http.i"
+	@echo "... src/binance-http.s"
 	@echo "... src/binance-ws.o"
 	@echo "... src/binance-ws.i"
 	@echo "... src/binance-ws.s"
+	@echo "... src/boosturl.o"
+	@echo "... src/boosturl.i"
+	@echo "... src/boosturl.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/utils.o"
+	@echo "... src/utils.i"
+	@echo "... src/utils.s"
 .PHONY : help
 
 

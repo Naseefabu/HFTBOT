@@ -1,22 +1,22 @@
 Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
 Change Dir: /home/user/Desktop/HFTBOT/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_551f2/fast && /usr/bin/make  -f CMakeFiles/cmTC_551f2.dir/build.make CMakeFiles/cmTC_551f2.dir/build
+Run Build Command(s):/usr/bin/make cmTC_dd3da/fast && /usr/bin/make  -f CMakeFiles/cmTC_dd3da.dir/build.make CMakeFiles/cmTC_dd3da.dir/build
 make[1]: Entering directory '/home/user/Desktop/HFTBOT/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_551f2.dir/src.c.o
-/usr/bin/cc   -DCMAKE_HAVE_LIBC_PTHREAD -o CMakeFiles/cmTC_551f2.dir/src.c.o -c /home/user/Desktop/HFTBOT/build/CMakeFiles/CMakeTmp/src.c
-Linking C executable cmTC_551f2
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_551f2.dir/link.txt --verbose=1
-/usr/bin/cc  -DCMAKE_HAVE_LIBC_PTHREAD CMakeFiles/cmTC_551f2.dir/src.c.o -o cmTC_551f2 
-/usr/bin/ld: CMakeFiles/cmTC_551f2.dir/src.c.o: in function `main':
+Building C object CMakeFiles/cmTC_dd3da.dir/src.c.o
+/usr/bin/cc   -DCMAKE_HAVE_LIBC_PTHREAD -o CMakeFiles/cmTC_dd3da.dir/src.c.o -c /home/user/Desktop/HFTBOT/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_dd3da
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_dd3da.dir/link.txt --verbose=1
+/usr/bin/cc  -DCMAKE_HAVE_LIBC_PTHREAD CMakeFiles/cmTC_dd3da.dir/src.c.o -o cmTC_dd3da 
+/usr/bin/ld: CMakeFiles/cmTC_dd3da.dir/src.c.o: in function `main':
 src.c:(.text+0x46): undefined reference to `pthread_create'
 /usr/bin/ld: src.c:(.text+0x52): undefined reference to `pthread_detach'
 /usr/bin/ld: src.c:(.text+0x5e): undefined reference to `pthread_cancel'
 /usr/bin/ld: src.c:(.text+0x6f): undefined reference to `pthread_join'
 collect2: error: ld returned 1 exit status
-make[1]: *** [CMakeFiles/cmTC_551f2.dir/build.make:107: cmTC_551f2] Error 1
+make[1]: *** [CMakeFiles/cmTC_dd3da.dir/build.make:107: cmTC_dd3da] Error 1
 make[1]: Leaving directory '/home/user/Desktop/HFTBOT/build/CMakeFiles/CMakeTmp'
-make: *** [Makefile:141: cmTC_551f2/fast] Error 2
+make: *** [Makefile:141: cmTC_dd3da/fast] Error 2
 
 
 Source file was:
@@ -43,68 +43,18 @@ int main(void)
 Determining if the function pthread_create exists in the pthreads failed with the following output:
 Change Dir: /home/user/Desktop/HFTBOT/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_fcc73/fast && /usr/bin/make  -f CMakeFiles/cmTC_fcc73.dir/build.make CMakeFiles/cmTC_fcc73.dir/build
+Run Build Command(s):/usr/bin/make cmTC_b6986/fast && /usr/bin/make  -f CMakeFiles/cmTC_b6986.dir/build.make CMakeFiles/cmTC_b6986.dir/build
 make[1]: Entering directory '/home/user/Desktop/HFTBOT/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_fcc73.dir/CheckFunctionExists.c.o
-/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create -o CMakeFiles/cmTC_fcc73.dir/CheckFunctionExists.c.o -c /usr/local/share/cmake-3.18/Modules/CheckFunctionExists.c
-Linking C executable cmTC_fcc73
-/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fcc73.dir/link.txt --verbose=1
-/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create CMakeFiles/cmTC_fcc73.dir/CheckFunctionExists.c.o -o cmTC_fcc73  -lpthreads 
+Building C object CMakeFiles/cmTC_b6986.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create -o CMakeFiles/cmTC_b6986.dir/CheckFunctionExists.c.o -c /usr/local/share/cmake-3.18/Modules/CheckFunctionExists.c
+Linking C executable cmTC_b6986
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b6986.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create CMakeFiles/cmTC_b6986.dir/CheckFunctionExists.c.o -o cmTC_b6986  -lpthreads 
 /usr/bin/ld: cannot find -lpthreads
 collect2: error: ld returned 1 exit status
-make[1]: *** [CMakeFiles/cmTC_fcc73.dir/build.make:107: cmTC_fcc73] Error 1
+make[1]: *** [CMakeFiles/cmTC_b6986.dir/build.make:107: cmTC_b6986] Error 1
 make[1]: Leaving directory '/home/user/Desktop/HFTBOT/build/CMakeFiles/CMakeTmp'
-make: *** [Makefile:141: cmTC_fcc73/fast] Error 2
-
-
-
-Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
-Change Dir: /home/user/Desktop/HFTBOT/build/CMakeFiles/CMakeTmp
-
-Run Build Command(s):/usr/bin/ninja cmTC_dd3e8 && [1/2] Building C object CMakeFiles/cmTC_dd3e8.dir/src.c.o
-[2/2] Linking C executable cmTC_dd3e8
-FAILED: cmTC_dd3e8 
-: && /usr/bin/x86_64-linux-gnu-gcc-7 -DCMAKE_HAVE_LIBC_PTHREAD  CMakeFiles/cmTC_dd3e8.dir/src.c.o -o cmTC_dd3e8   && :
-/usr/bin/ld: CMakeFiles/cmTC_dd3e8.dir/src.c.o: in function `main':
-src.c:(.text+0x3e): undefined reference to `pthread_create'
-/usr/bin/ld: src.c:(.text+0x4a): undefined reference to `pthread_detach'
-/usr/bin/ld: src.c:(.text+0x56): undefined reference to `pthread_cancel'
-/usr/bin/ld: src.c:(.text+0x67): undefined reference to `pthread_join'
-collect2: error: ld returned 1 exit status
-ninja: build stopped: subcommand failed.
-
-
-Source file was:
-#include <pthread.h>
-
-void* test_func(void* data)
-{
-  return data;
-}
-
-int main(void)
-{
-  pthread_t thread;
-  pthread_create(&thread, NULL, test_func, NULL);
-  pthread_detach(thread);
-  pthread_cancel(thread);
-  pthread_join(thread, NULL);
-  pthread_atfork(NULL, NULL, NULL);
-  pthread_exit(NULL);
-
-  return 0;
-}
-
-Determining if the function pthread_create exists in the pthreads failed with the following output:
-Change Dir: /home/user/Desktop/HFTBOT/build/CMakeFiles/CMakeTmp
-
-Run Build Command(s):/usr/bin/ninja cmTC_b30b7 && [1/2] Building C object CMakeFiles/cmTC_b30b7.dir/CheckFunctionExists.c.o
-[2/2] Linking C executable cmTC_b30b7
-FAILED: cmTC_b30b7 
-: && /usr/bin/x86_64-linux-gnu-gcc-7 -DCHECK_FUNCTION_EXISTS=pthread_create  CMakeFiles/cmTC_b30b7.dir/CheckFunctionExists.c.o -o cmTC_b30b7  -lpthreads && :
-/usr/bin/ld: cannot find -lpthreads
-collect2: error: ld returned 1 exit status
-ninja: build stopped: subcommand failed.
+make: *** [Makefile:141: cmTC_b6986/fast] Error 2
 
 
 

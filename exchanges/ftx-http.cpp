@@ -22,13 +22,15 @@ http::response<http::string_body> ftxAPI::http_call(boost::url url, http::verb a
         beast::error_code ec{static_cast<int>(::ERR_get_error()), net::error::get_ssl_category()};
         std::cerr << ec.message() << "\n";
     }
-    
 
     req_.method(action);
     req_.target(url.c_str());
     req_.set(http::field::host, host);
     req_.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-
+    req_.set("FTX-KEY",api_key);
+    req_.set("FTX-TS",std::to_string(get_ms_timestamp(current_time()).count()));
+    req_.set("FTX-SIGN",sign);
+    
     req_.prepare_payload();
 
     auto const results = resolver_.resolve(host, service);
@@ -72,29 +74,46 @@ void ftxAPI::configure(const std::string &api,const std::string &secret)
 json ftxAPI::list_markets()
 {
     boost::url method{"markets"};
-    return json::parse(std::make_shared<ftxAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
+    return json::parse(http_call(make_url(base_api,method),http::verb::get).body());
 }
 
-json ftxAPI::get_single_market(std::string market)
+json ftxAPI::list_market(std::string market)
 {
     boost::url method{"markets/"+market};
-    return json::parse(std::make_shared<ftxAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
+    return json::parse(http_call(make_url(base_api,method),http::verb::get).body());
 }
 
 json ftxAPI::get_orderbook(std::string market, int depth)
 {
     boost::url method{"markets/"+market+"/orderbook"};
     method.params().emplace_back("depth",std::to_string(depth));
-    return json::parse(std::make_shared<ftxAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
-}
+    return json::parse(http_call(make_url(base_api,method),http::verb::get).body());
+}   
 
 json ftxAPI::get_trades(std::string market)
 {
     boost::url method{"markets/"+market+"/trades"};
-    return json::parse(std::make_shared<ftxAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
+    return json::parse(http_call(make_url(base_api,method),http::verb::get).body());
 }
 
+json ftxAPI::list_future(std::string future)
+{
+    boost::url method{"futures/"+future};
+    return json::parse(http_call(make_url(base_api,method),http::verb::get).body());
+}
 
+json ftxAPI::future_stats(std::string future)
+{
+    boost::url method{"futures/"+future+"/stats"};
+    return json::parse(http_call(make_url(base_api,method),http::verb::get).body());
+}
 
+json ftxAPI::account_info(std::string future)
+{
+    boost::url method{"account"};
+    std::string data = std::to_string(get_ms_timestamp(current_time()).count()) + "GET" + "/api/account";
+    sign = authenticate(secret_key.c_str(),data.c_str());
+    return json::parse(http_call(make_url(base_api,method),http::verb::get).body());
+}
 
 

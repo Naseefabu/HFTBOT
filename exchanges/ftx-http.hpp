@@ -37,6 +37,7 @@ private:
     std::string secret_key = "GKPAz77T2X54MQH3ICe379ZFxS_Si9qbxzJtzQ5I";
     net::io_context& ioc;
     ssl::context& ctx;
+    std::string sign;
     
 public:
 
@@ -48,10 +49,16 @@ public:
 
     json list_markets();
 
-    json get_single_market(std::string market);
+    json list_market(std::string market);
 
     json get_orderbook(std::string market,int depth);
 
     json get_trades(std::string market);
+
+    json list_future(std::string future);
+
+    json future_stats(std::string future);
+
+    json account_info(std::string future);
 
 };

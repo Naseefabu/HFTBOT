@@ -32,6 +32,8 @@ http::response<http::string_body> binanceAPI::http_call(boost::url url, http::ve
 
     req_.prepare_payload();
 
+    std::cout << "request body : " << req_.body() << std::endl;
+
     auto const results = resolver_.resolve(host, service);
     beast::get_lowest_layer(stream_).connect(results);
 

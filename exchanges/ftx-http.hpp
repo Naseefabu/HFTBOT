@@ -67,10 +67,11 @@ public:
 
     json open_orders(std::string market);
 
-    json place_market_order(std::string market, std::string side, double size,bool ioc,bool post_only,bool reduce_only);
+    json place_order(std::string market, std::string side, double size,bool ioc,bool post_only,bool reduce_only);
 
     json cancel_order(int orderid);
 
     json cancel_all_orders(std::string market);
 
+    json place_order(std::string market, std::string side,double price, double size,bool ioc,bool post_only,bool reduce_only);
 };

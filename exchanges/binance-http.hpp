@@ -20,10 +20,6 @@ using tcp       = boost::asio::ip::tcp;
 
 using json = nlohmann::json;
 using executor = net::any_io_executor; 
-using namespace utils;
-
-void fail_http(beast::error_code ec, char const* what);
-boost::url make_url(boost::url base_api, boost::url method); 
 
 
 class binanceAPI : public std::enable_shared_from_this<binanceAPI> 

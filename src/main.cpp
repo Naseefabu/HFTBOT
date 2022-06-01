@@ -4,6 +4,8 @@
 #include <boost/url/src.hpp> // can only include in one source file
 #include "binance-ws.hpp"
 #include "binance-http.hpp" 
+#include "ftx-http.hpp"
+
 using json = nlohmann::json;
 
 int main()
@@ -18,17 +20,20 @@ int main()
     // WSClient ws(ioc,ctx);
     // ws.orderbook("SUBSCRIBE","btcusdt");
 
-    binanceAPI binance(ioc.get_executor(),ctx,ioc);
-
-    // httpclients->avg_price("BTCUSDT",operation::asynchronous);
-    // json payload1 = httpclients->new_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10");
-    // json payload2 = binance.place_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10");
+    ftxAPI ftx(ioc.get_executor(),ctx,ioc);
     auto t1 = high_resolution_clock::now();
-    json payload2 = binance.place_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10");
+    json ftxpayload = ftx.get_trades("BTC-PERP");
+    std::cout << ftxpayload << std::endl;
     auto t2 = high_resolution_clock::now();
-    std::cout << payload2 <<std::endl;
     auto ms_int = duration_cast<milliseconds>(t2 -t1);
-    std::cout << "it took : " << ms_int.count() << "ms" <<std::endl;
+    std::cout << "it took ftx: " << ms_int.count() << "ms" <<std::endl;
+    binanceAPI binance(ioc.get_executor(),ctx,ioc);
+    t1 = high_resolution_clock::now();
+    json payload2 = binance.place_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10");
+    t2 = high_resolution_clock::now();
+    // std::cout << payload2 <<std::endl;
+    ms_int = duration_cast<milliseconds>(t2 -t1);
+    // std::cout << "it took : " << ms_int.count() << "ms" <<std::endl;
 
 
     ioc.run();

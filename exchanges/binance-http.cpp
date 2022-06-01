@@ -1,21 +1,5 @@
 #include "binance-http.hpp"
 
-boost::url make_url(boost::url base_api, boost::url method){
-    assert(!method.is_path_absolute());
-    assert(base_api.data()[base_api.size() - 1] == '/');
-
-    boost::urls::error_code ec;
-    boost::url url;
-    resolve(base_api, method, url, ec);
-    if (ec)
-        throw boost::system::system_error(ec);
-    return url;
-}
-
-void fail_http(beast::error_code ec, char const* what)
-{
-    std::cerr << what << ": " << ec.message() << "\n";
-}
 
 
 binanceAPI::binanceAPI(executor ex, ssl::context& ctxe, net::io_context &ioce)
@@ -47,8 +31,6 @@ http::response<http::string_body> binanceAPI::http_call(boost::url url, http::ve
     req_.set("X-MBX-APIKEY", api_key);
 
     req_.prepare_payload();
-
-    std::cout << "body : " << req_.body() << std::endl;
 
     auto const results = resolver_.resolve(host, service);
     beast::get_lowest_layer(stream_).connect(results);

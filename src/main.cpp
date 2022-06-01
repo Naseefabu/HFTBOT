@@ -22,7 +22,7 @@ int main()
 
     ftxAPI ftx(ioc.get_executor(),ctx,ioc);
     auto t1 = high_resolution_clock::now();
-    json ftxpayload = ftx.future_stats("BTC-PERP");
+    json ftxpayload = ftx.open_orders("BTC-PERP");
     std::cout << ftxpayload << std::endl;
     auto t2 = high_resolution_clock::now();
     auto ms_int = duration_cast<milliseconds>(t2 -t1);

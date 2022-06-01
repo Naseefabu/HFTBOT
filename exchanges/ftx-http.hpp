@@ -61,4 +61,10 @@ public:
 
     json account_info(std::string future);
 
+    json closed_positions();
+
+    json open_orders();
+
+    json open_orders(std::string market);
+
 };

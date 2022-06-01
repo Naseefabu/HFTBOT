@@ -141,4 +141,24 @@ json ftxAPI::open_orders(std::string market)
     return json::parse(http_call(make_url(base_api,method),http::verb::get).body());
 }
 
+json ftxAPI::place_market_order(std::string market, std::string side, double size,bool ioc,bool post_only,bool reduce_only)
+{
+    boost::url method{"orders"};
+
+    json payload = {{"market", market},
+                {"side", side},
+                {"price", NULL},
+                {"type", "market"},
+                {"size", size},
+                {"reduceOnly", reduce_only},
+                {"ioc", ioc},
+                {"postOnly", post_only}};
+                
+    req_.body() = payload.dump();
+    std::string data = std::to_string(get_ms_timestamp(current_time()).count()) + "POST" + "/api/orders" + payload.dump();
+    sign = authenticate(secret_key.c_str(),data.c_str());
+    return json::parse(http_call(make_url(base_api,method),http::verb::post).body());
+}
+
+
 

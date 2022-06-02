@@ -13,18 +13,17 @@ ftxWS::ftxWS(net::io_context& ioc, ssl::context& ctx)
 }
 
 
-void ftxWS::run(char const* host, std::string port, json message)
+void ftxWS::run(json message)
 {
 
     if (!SSL_set_tlsext_host_name(ws_.next_layer().native_handle(), host)) {
         throw boost::system::system_error(beast::error_code(
             ::ERR_get_error(), net::error::get_ssl_category()));
     }
-    this->port = port;
 
     host_ = host;
     message_text_ = message.dump();
-    std::cout << " run " << std::endl;
+
     resolver_.async_resolve(host,"443",beast::bind_front_handler(&ftxWS::on_resolve,shared_from_this()));
 }
 
@@ -42,7 +41,7 @@ void ftxWS::on_resolve(beast::error_code ec, tcp::resolver::results_type results
 
     get_lowest_layer(ws_).expires_after(30s);
 
-    std::cout << "on resolve " << std::endl;
+
     beast::get_lowest_layer(ws_).async_connect(
         results,
         beast::bind_front_handler(
@@ -55,7 +54,7 @@ void ftxWS::on_connect(beast::error_code ec, [[maybe_unused]] tcp::resolver::res
     if(ec)
         return fail_ws(ec, "connect");
 
-    std::cout << "on connect " << std::endl;
+
     // Perform the SSL handshake
     ws_.next_layer().async_handshake(
         ssl::stream_base::client,
@@ -70,7 +69,7 @@ void ftxWS::on_ssl_handshake(beast::error_code ec)
 
     beast::get_lowest_layer(ws_).expires_never();
 
-    std::cout << "on ssl handshake " << std::endl;
+
     ws_.set_option(
         websocket::stream_base::timeout::suggested(
             beast::role_type::client));
@@ -83,7 +82,7 @@ void ftxWS::on_ssl_handshake(beast::error_code ec)
                     " websocket-client-async");
         }));
 
-    std::cout << "using host_: " << host_ << std::endl;
+
     ws_.async_handshake(host_, "/ws/",
         beast::bind_front_handler(
             &ftxWS::on_handshake,
@@ -143,7 +142,7 @@ void ftxWS::ticker(const std::string& action,const std::string& symbol)
         { "channel", "ticker" },
         { "market", symbol }
     };  
-    run(host, "false",jv);
+    run(jv);
 }
 
 void ftxWS::orderbook(const std::string& action,const std::string& symbol)
@@ -153,7 +152,7 @@ void ftxWS::orderbook(const std::string& action,const std::string& symbol)
         { "channel", "orderbook" },
         { "market", symbol }
     };  
-    run(host, "false",jv);
+    run(jv);
 }
 
 void ftxWS::trades(const std::string& action,const std::string& symbol)
@@ -163,5 +162,5 @@ void ftxWS::trades(const std::string& action,const std::string& symbol)
         { "channel", "trades" },
         { "market", symbol }
     };  
-    run(host, "false",jv);
+    run(jv);
 }

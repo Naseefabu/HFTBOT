@@ -38,13 +38,12 @@ class ftxWS : public std::enable_shared_from_this<ftxWS>
     ssl::context& ctx;
     std::string streamName = "/ws/";
     char const* host = "ftx.com";
-    std::string port = "false";
 
   public:
 
     ftxWS(net::io_context& ioc, ssl::context& ctx);
 
-    void run(char const* host, std::string port, json message);
+    void run(json message);
 
     void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
 

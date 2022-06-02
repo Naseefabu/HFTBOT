@@ -27,7 +27,7 @@ using namespace std::chrono_literals;
 
 
 
-class binanceWS : public std::enable_shared_from_this<binanceWS>
+class ftxWS : public std::enable_shared_from_this<ftxWS>
 {
     tcp::resolver resolver_;
     Stream ws_;
@@ -37,14 +37,14 @@ class binanceWS : public std::enable_shared_from_this<binanceWS>
     net::io_context &ioc;
     ssl::context& ctx;
     std::string streamName = "/ws/";
-    char const* host = "stream.binance.com";
-    char const* port = "9443";
+    char const* host = "ftx.com";
+    std::string port = "false";
 
   public:
 
-    explicit binanceWS(net::io_context& ioc, ssl::context& ctx);
+    ftxWS(net::io_context& ioc, ssl::context& ctx);
 
-    void run(char const* host, char const* port, json message,const std::string& stream);
+    void run(char const* host, std::string port, json message);
 
     void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
 
@@ -60,21 +60,12 @@ class binanceWS : public std::enable_shared_from_this<binanceWS>
 
     void on_close(beast::error_code ec);
 
-    void aggtrades(const std::string& action,const std::string& symbol);
-
-    void trades(const std::string& action,const std::string& symbol);
-
-    void candlestick(const std::string& action,const std::string& symbol,const std::string& interval);
-
-    void levelone(const std::string& action,const std::string& symbol);
-
-    void partial_deltas(const std::string& action,const std::string& symbol,short int& levels);
+    // provides the latest best bid and offer market data
+    void ticker(const std::string& action,const std::string& symbol);
 
     void orderbook(const std::string& action,const std::string& symbol);
 
+    void trades(const std::string& action,const std::string& symbol);
+
+
 };
-
-
-
-
-

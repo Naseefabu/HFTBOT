@@ -40,3 +40,7 @@ boost::url make_url(boost::url base_api, boost::url method);
 
 void fail_http(beast::error_code ec, char const* what);
 
+void fail_ws(beast::error_code ec, char const* what);
+
+
+

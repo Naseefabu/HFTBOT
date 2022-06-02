@@ -1,10 +1,7 @@
 #include "binance-ws.hpp"
 
 
-void fail_ws(beast::error_code ec, char const* what)
-{
-    std::cerr << what << ": " << ec.message() << "\n";
-}
+void fail_ws(beast::error_code ec, char const* what);
 
 
 
@@ -21,7 +18,6 @@ binanceWS::binanceWS(net::io_context& ioc, ssl::context& ctx)
 void binanceWS::run(char const* host, char const* port, json message, const std::string& stream)
 
 {
-    streamName = streamName + stream;
     if (!SSL_set_tlsext_host_name(ws_.next_layer().native_handle(), host)) {
         throw boost::system::system_error(beast::error_code(
             ::ERR_get_error(), net::error::get_ssl_category()));

@@ -41,7 +41,7 @@ private:
     
 public:
 
-    ftxAPI(executor ex, ssl::context& ctx,net::io_context& ioc);
+    explicit ftxAPI(executor ex, ssl::context& ctx,net::io_context& ioc);
 
     http::response<http::string_body> http_call(boost::url url, http::verb action);
 

@@ -68,3 +68,8 @@ boost::url make_url(boost::url base_api, boost::url method){
         throw boost::system::system_error(ec);
     return url;
 }
+
+void fail_ws(beast::error_code ec, char const* what)
+{
+    std::cerr << what << ": " << ec.message() << "\n";
+}

@@ -63,6 +63,8 @@ public:
 
     json place_order(const std::string &symbol,int price,e_side side,order_type type,timeforce time,const std::string &quantity);
 
+    json place_order(const std::string &symbol,e_side side,const std::string &quantity );
+
     json open_orders();
 
     json bidask(const std::string &symbol);

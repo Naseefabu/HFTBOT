@@ -162,16 +162,35 @@ json binanceAPI::place_order(const std::string &symbol,int price,e_side side,ord
     boost::url method{"order"};
     std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
     std::string query_params;
-    
-    if (type == order_type::market) query_params ="symbol="+symbol+"&side="+e_side_to_string(side) +"&type="+order_type_to_string(type)+ "&quantity="+quantity+"&recvWindow=60000"+"&timestamp=" + server_timestamp;
-    else if(type == order_type::limit)  query_params ="symbol="+symbol+"&side="+e_side_to_string(side) +"&type="+order_type_to_string(type)+ "&timeInForce="+timeforce_to_string(time)+ "&quantity="+quantity+"&price="+std::to_string(price)+"&recvWindow=60000"+"&timestamp=" + server_timestamp;
+
+    query_params ="symbol="+symbol+"&side="+e_side_to_string(side) +"&type=LIMIT"+ "&timeInForce="+timeforce_to_string(time)+ "&quantity="+quantity+"&price="+std::to_string(price)+"&recvWindow=60000"+"&timestamp=" + server_timestamp;
 
     method.params().emplace_back("symbol",symbol);
     method.params().emplace_back("side",e_side_to_string(side));
     method.params().emplace_back("type",order_type_to_string(type));
-    if (type == order_type::limit) method.params().emplace_back("timeInForce",timeforce_to_string(time));
+    method.params().emplace_back("timeInForce",timeforce_to_string(time));
     method.params().emplace_back("quantity",quantity); 
-    if (type == order_type::limit) method.params().emplace_back("price",std::to_string(price));
+    method.params().emplace_back("price",std::to_string(price));
+    method.params().emplace_back("recvWindow", "60000");
+    method.params().emplace_back("timestamp",server_timestamp);
+    method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str())); 
+
+    return json::parse(std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::post).body());;
+
+}
+
+json binanceAPI::place_order(const std::string &symbol,e_side side,const std::string &quantity )
+{
+    boost::url method{"order"};
+    std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
+    std::string query_params;
+    
+    query_params ="symbol="+symbol+"&side="+e_side_to_string(side) +"&type=MARKET"+ "&quantity="+quantity+"&recvWindow=60000"+"&timestamp=" + server_timestamp;
+
+    method.params().emplace_back("symbol",symbol);
+    method.params().emplace_back("side",e_side_to_string(side));
+    method.params().emplace_back("type","MARKET");
+    method.params().emplace_back("quantity",quantity); 
     method.params().emplace_back("recvWindow", "60000");
     method.params().emplace_back("timestamp",server_timestamp);
     method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str())); 

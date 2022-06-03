@@ -135,7 +135,7 @@ void ftxWS::on_close(beast::error_code ec)
 }
 
 // provides the latest best bid and offer market data
-void ftxWS::ticker(const std::string& action,const std::string& symbol)
+void ftxWS::levelone(const std::string& action,const std::string& symbol)
 {
     json jv = {
         { "op", action },

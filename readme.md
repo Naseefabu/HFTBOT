@@ -1,6 +1,6 @@
 # Short Gamma Strategy
 
-Steps to build:
+Steps to build and run the bot:
 ```
 git clone --recurse-submodules https://github.com/Naseefabu/HFTBOT.git
 cd HFTBOT/

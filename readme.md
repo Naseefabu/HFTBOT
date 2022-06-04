@@ -2,11 +2,11 @@
 
 Steps to build:
 ```
-    git clone --recurse-submodules https://github.com/Naseefabu/HFTBOT.git
-    cd HFTBOT/
-    ./configure.sh
-    ./build.sh
-    ./run.sh
+git clone --recurse-submodules https://github.com/Naseefabu/HFTBOT.git
+cd HFTBOT/
+./configure.sh
+./build.sh
+./run.sh
 ```
 
 # Introduction

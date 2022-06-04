@@ -23,6 +23,7 @@ using executor = net::any_io_executor;
 
 /*
     Timeforce : GTC,IOC,FOK
+    fix expensive smart pointers
 */
 
 class binanceAPI : public std::enable_shared_from_this<binanceAPI> 

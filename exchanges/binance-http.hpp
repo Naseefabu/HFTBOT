@@ -21,6 +21,9 @@ using tcp       = boost::asio::ip::tcp;
 using json = nlohmann::json;
 using executor = net::any_io_executor; 
 
+/*
+    Timeforce : GTC,IOC,FOK
+*/
 
 class binanceAPI : public std::enable_shared_from_this<binanceAPI> 
 {
@@ -61,9 +64,9 @@ public:
 
     json cancel_order(const std::string &symbol,int orderid);
 
-    json place_order(const std::string &symbol,int price,e_side side,order_type type,timeforce time,const std::string &quantity);
+    json place_order(const std::string &symbol,double price,std::string side,std::string timeforce,const std::string &quantity);
 
-    json place_order(const std::string &symbol,e_side side,const std::string &quantity );
+    json place_order(const std::string &symbol,std::string side,const std::string &quantity );
 
     json open_orders();
 

@@ -10,11 +10,7 @@ http::response<http::string_body> binanceAPI::http_call(boost::url url, http::ve
 {
 
     std::string const host(url.host());
-    std::string const service = url.has_port() 
-        ? url.port()
-        : (url.scheme_id() == boost::urls::scheme::https) 
-            ? "https"
-            : "http";
+    std::string const service = "https";
     url.remove_origin(); 
 
     if(! SSL_set_tlsext_host_name(stream_.native_handle(), host.c_str()))
@@ -22,7 +18,6 @@ http::response<http::string_body> binanceAPI::http_call(boost::url url, http::ve
         beast::error_code ec{static_cast<int>(::ERR_get_error()), net::error::get_ssl_category()};
         std::cerr << ec.message() << "\n";
     }
-    
 
     req_.method(action);
     req_.target(url.c_str());
@@ -75,7 +70,7 @@ void binanceAPI::configure(const std::string &api,const std::string &secret)
 json binanceAPI::server_time()
 {
     boost::url method{"time"};
-    return json::parse(http_call(make_url(base_api,method),http::verb::get).body());
+    return json::parse(std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
 }
 
 json binanceAPI::latest_price(const std::string &symbol)
@@ -157,18 +152,19 @@ json binanceAPI::open_orders( )
     return json::parse(std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
 }
 
-json binanceAPI::place_order(const std::string &symbol,int price,e_side side,order_type type,timeforce time,const std::string &quantity )
+
+json binanceAPI::place_order(const std::string &symbol,double price,std::string side,std::string timeforce,const std::string &quantity )
 {
     boost::url method{"order"};
     std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
     std::string query_params;
 
-    query_params ="symbol="+symbol+"&side="+e_side_to_string(side) +"&type=LIMIT"+ "&timeInForce="+timeforce_to_string(time)+ "&quantity="+quantity+"&price="+std::to_string(price)+"&recvWindow=60000"+"&timestamp=" + server_timestamp;
+    query_params ="symbol="+symbol+"&side="+side +"&type=LIMIT"+ "&timeInForce="+timeforce+ "&quantity="+quantity+"&price="+std::to_string(price)+"&recvWindow=60000"+"&timestamp=" + server_timestamp;
 
     method.params().emplace_back("symbol",symbol);
-    method.params().emplace_back("side",e_side_to_string(side));
-    method.params().emplace_back("type",order_type_to_string(type));
-    method.params().emplace_back("timeInForce",timeforce_to_string(time));
+    method.params().emplace_back("side",side);
+    method.params().emplace_back("type","LIMIT");
+    method.params().emplace_back("timeInForce",timeforce);
     method.params().emplace_back("quantity",quantity); 
     method.params().emplace_back("price",std::to_string(price));
     method.params().emplace_back("recvWindow", "60000");
@@ -179,16 +175,16 @@ json binanceAPI::place_order(const std::string &symbol,int price,e_side side,ord
 
 }
 
-json binanceAPI::place_order(const std::string &symbol,e_side side,const std::string &quantity )
+json binanceAPI::place_order(const std::string &symbol,std::string side,const std::string &quantity )
 {
     boost::url method{"order"};
     std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
     std::string query_params;
     
-    query_params ="symbol="+symbol+"&side="+e_side_to_string(side) +"&type=MARKET"+ "&quantity="+quantity+"&recvWindow=60000"+"&timestamp=" + server_timestamp;
+    query_params ="symbol="+symbol+"&side="+side +"&type=MARKET"+ "&quantity="+quantity+"&recvWindow=60000"+"&timestamp=" + server_timestamp;
 
     method.params().emplace_back("symbol",symbol);
-    method.params().emplace_back("side",e_side_to_string(side));
+    method.params().emplace_back("side",side);
     method.params().emplace_back("type","MARKET");
     method.params().emplace_back("quantity",quantity); 
     method.params().emplace_back("recvWindow", "60000");

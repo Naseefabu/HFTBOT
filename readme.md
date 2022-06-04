@@ -1,4 +1,4 @@
-# Short Volatility System
+# Short Gamma Strategy
 
 Steps to build:
 ```

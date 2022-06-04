@@ -31,13 +31,15 @@ int main()
     // auto ms_int = duration_cast<milliseconds>(t2 -t1);
     // std::cout << "it took ftx: " << ms_int.count() << "ms" <<std::endl;
 
-    binanceAPI binance(ioc.get_executor(),ctx,ioc);
+    auto binance = std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc);
     // t1 = high_resolution_clock::now();
-    json payload1 = binance.place_order("BTCUSDT",29500,e_side::buy,order_type::limit,timeforce::GTC,"10");
-    json payload2 = binance.place_order("BTCUSDT",e_side::buy,"10");
+    json payload1 = binance->place_order("BTCUSDT",29500,"BUY","GTC","10");
+    json payload2 = binance->bidask("BTCUSDT");
+    json payload3 = binance->server_time();
 
     std::cout << "payload 1 : " << payload1 << std::endl;
     std::cout << "payload 2 : " << payload2 << std::endl;
+    std::cout << "payload 3 : " << payload3 << std::endl;
     
     // t2 = high_resolution_clock::now();
     // // std::cout << payload2 <<std::endl;

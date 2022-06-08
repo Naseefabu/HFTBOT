@@ -13,11 +13,7 @@ http::response<http::string_body> binanceAPI::http_call(boost::url url, http::ve
     std::string const service = "https";
     url.remove_origin(); 
 
-    if(! SSL_set_tlsext_host_name(stream_.native_handle(), host.c_str()))
-    {
-        beast::error_code ec{static_cast<int>(::ERR_get_error()), net::error::get_ssl_category()};
-        std::cerr << ec.message() << "\n";
-    }
+    SSL_set_tlsext_host_name(stream_.native_handle(), host.c_str());
 
     req_.method(action);
     req_.target(url.c_str());
@@ -26,8 +22,6 @@ http::response<http::string_body> binanceAPI::http_call(boost::url url, http::ve
     req_.set("X-MBX-APIKEY", api_key);
 
     req_.prepare_payload();
-
-    std::cout << "request body : " << req_.body() << std::endl;
 
     auto const results = resolver_.resolve(host, service);
     beast::get_lowest_layer(stream_).connect(results);
@@ -125,12 +119,9 @@ json binanceAPI::klines(const std::string &symbol,const std::string &interval)
 
 json binanceAPI::avg_price(const std::string &symbol )
 {
-    auto t1 = high_resolution_clock::now();
+
     boost::url method{"avgPrice"};
     method.params().emplace_back("symbol",symbol);
-    auto t2 = high_resolution_clock::now();
-    auto ms_int = duration_cast<std::chrono::microseconds>(t2 -t1);
-    std::cout << "it took avg price: " << ms_int.count() << "micros" <<std::endl;
     return json::parse(std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
 
 }
@@ -139,7 +130,7 @@ json binanceAPI::bidask(const std::string &symbol )
 {
     boost::url method{"ticker/bookTicker"};
     method.params().emplace_back("symbol",symbol);
-    return json::parse(std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
+    return json::parse(http_call(make_url(base_api,method),http::verb::get).body());
 }
 
 json binanceAPI::open_orders( )

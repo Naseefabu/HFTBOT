@@ -1,6 +1,4 @@
-# Short Gamma Strategy 
-in construction
-
+# Short Gamma Strategy (In Construction)
 
 Steps to build and run the bot:
 ```

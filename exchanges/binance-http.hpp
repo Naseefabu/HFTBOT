@@ -32,7 +32,7 @@ class binanceAPI : public std::enable_shared_from_this<binanceAPI>
 private:    
 
     void configure(const std::string &api,const std::string &secret);
-    boost::url base_api{"https://testnet.binance.vision/api/v3/"};
+    boost::url base_api{"https://api1.binance.com/api/v3/"};
     tcp::resolver resolver_;
     beast::ssl_stream<beast::tcp_stream> stream_;
     beast::flat_buffer buffer_;

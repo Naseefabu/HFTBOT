@@ -6,12 +6,9 @@
 #include "binance-http.hpp" 
 #include "ftx-http.hpp"
 #include "ftx-ws.hpp"
+#include "coinbase-ws.hpp"
 #include "coinbase-http.hpp"
-#include <bitset>
 #include <sstream>
-using json = nlohmann::json;
-
-
 
 int main()
 {
@@ -21,20 +18,20 @@ int main()
 
     ctx.set_verify_mode(ssl::verify_peer);
     ctx.set_default_verify_paths();
-    coinbaseAPI coin(ioc.get_executor(),ctx,ioc);
-    json response = coin.get_orderbook("BTC-USD",1);
-    std::cout << "coinbase response : " << response << std::endl;
+
+    //auto coin = std::make_shared<coinbaseWS>(ioc,ctx);
+    // coin->subscribe("subscribe","BTC-USD","ticker");
+    // std::cout << "coinbase response : " << response << std::endl;
 
 
     auto binance = std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc);
-    // t1 = high_resolution_clock::now();
-    json payload1 = binance->place_order("BTCUSDT",29500,"BUY","GTC","10");
+    //json payload1 = binance->place_order("BTCUSDT",29500,"BUY","GTC","10");
     json payload2 = binance->bidask("BTCUSDT");
-    json payload3 = binance->server_time();
+    // json payload3 = binance->server_time();
 
-    // std::cout << "payload 1 : " << payload1 << std::endl;
-    // std::cout << "payload 2 : " << payload2 << std::endl;
-    // std::cout << "payload 3 : " << payload3 << std::endl;
+    //std::cout << "payload 1 : " << payload1 << std::endl;
+    std::cout << "payload 2 : " << payload2 << std::endl;
+    //std::cout << "payload 3 : " << payload3 << std::endl;
     
     // t2 = high_resolution_clock::now();
     // // std::cout << payload2 <<std::endl;

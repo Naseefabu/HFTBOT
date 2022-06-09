@@ -22,7 +22,7 @@ int main()
     ctx.set_verify_mode(ssl::verify_peer);
     ctx.set_default_verify_paths();
     coinbaseAPI coin(ioc.get_executor(),ctx,ioc);
-    json response = coin.place_limit_order("BTC-USD",40000,"45","buy");
+    json response = coin.get_orderbook("BTC-USD",1);
     std::cout << "coinbase response : " << response << std::endl;
 
 

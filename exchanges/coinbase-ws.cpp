@@ -140,9 +140,9 @@ void coinbaseWS::on_close(beast::error_code ec)
 void coinbaseWS::subscribe(std::string method, std::string market, std::string channel)
 {
 
-    json mess = {{"type", method},
+    json payload = {{"type", method},
                 {"product_ids", {market}},
                 {"channels", {channel}}};
 
-    run(mess);            
+    run(payload);            
 }

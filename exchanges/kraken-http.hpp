@@ -47,7 +47,7 @@ public:
 
     http::response<http::string_body> http_call(boost::url url, http::verb action);
 
-    json GET_OHLC(std::string pair, std::string interval);
+    json get_ohlc(std::string pair, std::string interval);
 
     json get_orderbook(std::string pair, std::string levels);
 

@@ -9,6 +9,7 @@
 #include "coinbase-ws.hpp"
 #include "coinbase-http.hpp"
 #include "kraken-http.hpp"
+#include "kraken-ws.hpp"
 #include <sstream>
 
 int main()
@@ -24,9 +25,10 @@ int main()
     // coin->subscribe("subscribe","BTC-USD","ticker");
     // std::cout << "coinbase response : " << response << std::endl;
 
-    auto kraken = std::make_shared<KrakenAPI>(ioc.get_executor(),ctx,ioc);
-    json result = kraken->GET_OHLC("XBTUSD","15");
-    std::cout <<"result : " << result << std::endl;
+    auto kraken = std::make_shared<krakenWS>(ioc,ctx);
+    kraken->subscribe_orderbook("subscribe","XBT/USD",10);
+
+
     auto binance = std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc);
     //json payload1 = binance->place_order("BTCUSDT",29500,"BUY","GTC","10");
     json payload2 = binance->bidask("BTCUSDT");

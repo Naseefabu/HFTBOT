@@ -46,7 +46,7 @@ void KrakenAPI::configure(const std::string &api, const std::string &secret)
 }
 
 // interval in minutes
-json KrakenAPI::GET_OHLC(std::string pair, std::string interval)
+json KrakenAPI::get_ohlc(std::string pair, std::string interval)
 {
     boost::url method{"public/OHLC"};
     method.params().emplace_back("pair",pair);

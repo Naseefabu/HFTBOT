@@ -138,7 +138,6 @@ void krakenWS::on_close(beast::error_code ec)
 
 void krakenWS::subscribe_trades(std::string action, std::string pair)
 {
-
     json payload = {{"event", action},
                 {"pair", {pair}}};
 

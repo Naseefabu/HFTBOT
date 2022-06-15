@@ -17,3 +17,4 @@ Low realised vol regime in BTC gave unique opportunity to exploit. Since RV < IV
 
 * If speed of arrival market orders picks up across exchanges, then reduce/exit position. 
 * If predicted RVOL is greater than implied vol by "X" margin exit the position.
+* If (taker volume/liquidity at top "X" levels) ratio pick up, then reduce/exit position.

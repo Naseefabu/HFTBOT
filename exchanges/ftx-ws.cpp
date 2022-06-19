@@ -122,7 +122,6 @@ void ftxWS::on_message(beast::error_code ec, std::size_t bytes_transferred)
     json payload =  json::parse(beast::buffers_to_string(buffer_.cdata()));   
     Database database;
 
-    float bidasks = 0;
     if(!payload["data"]["bid"].is_null())
     {
         // payload["data"]["bid"] = float{};

@@ -12,6 +12,8 @@
 
 #include <sys/types.h>
 #include <unistd.h>
+#include <thread>
+#include <chrono>
 
 namespace beast     = boost::beast;    
 namespace http      = beast::http;     

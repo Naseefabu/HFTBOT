@@ -1,5 +1,5 @@
 #include "binance-ws.hpp"
-
+#include "database.hpp"
 
 void fail_ws(beast::error_code ec, char const* what);
 
@@ -90,7 +90,7 @@ void binanceWS::on_ssl_handshake(beast::error_code ec)
         }));
 
     std::cout << "using host_: " << host_ << std::endl;
-    ws_.async_handshake(host_, streamName,
+    ws_.async_handshake(host_, "/ws/",
         beast::bind_front_handler(
             &binanceWS::on_handshake,
             shared_from_this()));
@@ -125,9 +125,12 @@ void binanceWS::on_message(beast::error_code ec, std::size_t bytes_transferred)
     if(ec)
         return fail_ws(ec, "read");
 
-    // Signal generation and Quoting strategies on each tick events   
+    json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));    
 
-    std::cout << "Received: " << beast::buffers_to_string(buffer_.cdata()) <<std::endl;
+    // Signal generation and Quoting strategies on each tick events   
+    // Database d;
+    // d.ADDRECORD(123654765,payload["bids"][0],payload["bids"][1],payload["asks"][0],payload["asks"][1]);
+    // std::cout << "Received: " << beast::buffers_to_string(buffer_.cdata()) <<std::endl;
 
     ws_.async_read(buffer_,beast::bind_front_handler(&binanceWS::on_message, shared_from_this()));
 }
@@ -186,7 +189,7 @@ void binanceWS::levelone(const std::string& action,const std::string& symbol)
     std::make_shared<binanceWS>(ioc,ctx)->run(host, port,jv, stream);
 }
 
-void binanceWS::partial_deltas(const std::string& action,const std::string& symbol,short int &depth_levels)
+void binanceWS::partial_deltas(const std::string action,const std::string symbol,short int depth_levels)
 {
     std::string stream = symbol+"@"+"depth"+std::to_string(depth_levels);
     json jv = {

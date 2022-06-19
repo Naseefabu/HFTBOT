@@ -68,7 +68,7 @@ class binanceWS : public std::enable_shared_from_this<binanceWS>
 
     void levelone(const std::string& action,const std::string& symbol);
 
-    void partial_deltas(const std::string& action,const std::string& symbol,short int& levels);
+    void partial_deltas(const std::string action,const std::string symbol,short int depth_levels);
 
     void orderbook(const std::string& action,const std::string& symbol);
 

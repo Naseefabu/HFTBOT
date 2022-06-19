@@ -14,7 +14,7 @@ find_package(Threads REQUIRED)
 
 set(URLIB_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/external/url/include")
 set(URLIB_HEADERS ${URLIB_DIRECTORY}/boost/url.hpp ${URLIB_DIRECTORY}/boost/url/src.hpp)
-set(SOURCES exchanges/binance-ws.cpp src/main.cpp exchanges/binance-http.cpp src/utils.cpp exchanges/ftx-http.cpp exchanges/ftx-ws.cpp exchanges/coinbase-http.cpp exchanges/coinbase-ws.cpp exchanges/kraken-http.cpp exchanges/kraken-ws.cpp)
+set(SOURCES exchanges/binance-ws.cpp src/main.cpp exchanges/binance-http.cpp src/utils.cpp exchanges/ftx-http.cpp exchanges/ftx-ws.cpp exchanges/coinbase-http.cpp exchanges/coinbase-ws.cpp exchanges/kraken-http.cpp exchanges/kraken-ws.cpp src/database.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})

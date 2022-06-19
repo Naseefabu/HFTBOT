@@ -1,4 +1,5 @@
 #include "ftx-ws.hpp"
+#include "database.hpp"
 
 void fail_ws(beast::error_code ec, char const* what);   
 
@@ -118,10 +119,21 @@ void ftxWS::on_message(beast::error_code ec, std::size_t bytes_transferred)
     if(ec)
         return fail_ws(ec, "read");
 
-    // Signal generation and Quoting strategies on each tick events   
+    json payload =  json::parse(beast::buffers_to_string(buffer_.cdata()));   
+    Database database;
 
-    std::cout << "Received: " << beast::buffers_to_string(buffer_.cdata()) << std::endl;
+    float bidasks = 0;
+    if(!payload["data"]["bid"].is_null())
+    {
+        // payload["data"]["bid"] = float{};
+        float bid = payload["data"]["bid"].get<float>();
+        float bidsize = payload["data"]["bidSize"].get<float>();
+        float ask = payload["data"]["ask"].get<float>();
+        float asksize = payload["data"]["askSize"].get<float>();
+        // database.ADDRECORD(1236,bid,bidsize,ask,asksize);
+    }    
 
+    buffer_.clear();
     ws_.async_read(buffer_,beast::bind_front_handler(&ftxWS::on_message, shared_from_this()));
 }
 

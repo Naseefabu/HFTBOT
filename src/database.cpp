@@ -19,7 +19,7 @@ void Database::SHOW()
     std::cout<<"Ask size : "<<ms.askSize<<std::endl;
 }
 
-void Database::ADDRECORD(double timestamp, unsigned int bidprice, unsigned int bidsize, unsigned int askprice, unsigned int asksize)
+void Database::ADDRECORD_AND_SAVE(double timestamp, unsigned int bidprice, unsigned int bidsize, unsigned int askprice, unsigned int asksize)
 {
     fstream fin;
     fin.open("orderbook_database.dat",ios::in|ios::binary|ios::app);

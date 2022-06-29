@@ -16,6 +16,7 @@ struct market_snapshot
 
 void SHOW_ORDERBOOK();
 
+// save data in binary files to the disk
 class Database
 {
 public:
@@ -24,6 +25,6 @@ public:
 	int get_id();
 	void READ(double timestamp, unsigned int bidprice, unsigned int bidsize, unsigned int askprice, unsigned int asksize);
 	void SHOW();
-	void ADDRECORD(double timestamp, unsigned int bidprice, unsigned int bidsize, unsigned int askprice, unsigned int asksize);
+	void ADDRECORD_AND_SAVE(double timestamp, unsigned int bidprice, unsigned int bidsize, unsigned int askprice, unsigned int asksize);
 
 };

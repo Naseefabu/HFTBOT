@@ -19,3 +19,6 @@ Low realised vol regime in BTC gave unique opportunity to exploit. Since RV < IV
 * If predicted RVOL is greater than implied vol by "X" margin exit the position.
 * If (taker volume/liquidity at top "X" levels) ratio pick up, then reduce/exit position.
 
+# Join our community
+
+Join us on discord : https://discord.gg/mtjNcZDa

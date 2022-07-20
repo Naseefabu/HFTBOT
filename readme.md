@@ -9,9 +9,6 @@
 sudo apt-get update
 sudo apt-get -y install build-essential doxygen graphviz ninja-build libboost-all-dev libssl-dev libcpprest-dev
 
-# install cmake 3.18
-wget https://github.com/Kitware/CMake/releases/download/v3.18.0-rc1/cmake-3.18.0-rc1.tar.gz && tar -xzvf cmake-3.18.0-rc1.tar.gz && cd cmake-3.18.0-rc1
-
 # install cmake
 sudo apt install cmake
 

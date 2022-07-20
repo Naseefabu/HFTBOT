@@ -15,6 +15,7 @@ sudo apt install cmake
 # install boost 1.79
 wget https://www.boost.org/users/history/version_1_79_0.html
 tar --bzip2 -xf boost_1_79_0.tar.bz2
+cd boost_1_79_0/
 ./boostrap.sh
 ./b2
 sudo ./b2 install

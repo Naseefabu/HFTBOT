@@ -4,7 +4,7 @@
 
 ## Install dependencies
 
-```cpp
+```
 # install dependent packages
 sudo apt-get update
 sudo apt-get -y install build-essential doxygen graphviz ninja-build libboost-all-dev libssl-dev libcpprest-dev

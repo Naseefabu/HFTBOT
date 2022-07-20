@@ -1,5 +1,4 @@
 #include "binance-ws.hpp"
-#include "database.hpp"
 
 void fail_ws(beast::error_code ec, char const* what);
 

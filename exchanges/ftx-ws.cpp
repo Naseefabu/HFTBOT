@@ -1,5 +1,5 @@
 #include "ftx-ws.hpp"
-#include "database.hpp"
+
 
 void fail_ws(beast::error_code ec, char const* what);   
 
@@ -120,7 +120,6 @@ void ftxWS::on_message(beast::error_code ec, std::size_t bytes_transferred)
         return fail_ws(ec, "read");
 
     json payload =  json::parse(beast::buffers_to_string(buffer_.cdata()));   
-    Database database;
 
     if(!payload["data"]["bid"].is_null())
     {

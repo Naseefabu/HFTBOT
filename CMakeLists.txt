@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18.0)
+cmake_minimum_required(VERSION 3.16)
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_FLAGS "-O3 -pthread -lssl -lcrypto")
 set(CMAKE_BUILD_TYPE "Release")
@@ -14,7 +14,7 @@ find_package(Threads REQUIRED)
 
 set(URLIB_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/external/url/include")
 set(URLIB_HEADERS ${URLIB_DIRECTORY}/boost/url.hpp ${URLIB_DIRECTORY}/boost/url/src.hpp)
-set(SOURCES exchanges/binance-ws.cpp src/main.cpp exchanges/binance-http.cpp src/utils.cpp exchanges/ftx-http.cpp exchanges/ftx-ws.cpp exchanges/coinbase-http.cpp exchanges/coinbase-ws.cpp exchanges/kraken-http.cpp exchanges/kraken-ws.cpp src/database.cpp)
+set(SOURCES exchanges/binance-ws.cpp src/main.cpp exchanges/binance-http.cpp src/utils.cpp exchanges/ftx-http.cpp exchanges/ftx-ws.cpp exchanges/coinbase-http.cpp exchanges/coinbase-ws.cpp exchanges/kraken-http.cpp exchanges/kraken-ws.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})

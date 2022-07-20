@@ -1,5 +1,29 @@
 # Short Gamma Strategy (In Construction)
 
+# Build Instructions
+
+## Install dependencies
+
+```
+# install dependent packages
+sudo apt-get update
+sudo apt-get -y install build-essential doxygen graphviz ninja-build libboost-all-dev libssl-dev libcpprest-dev
+
+# install cmake 3.18
+wget https://github.com/Kitware/CMake/releases/download/v3.18.0-rc1/cmake-3.18.0-rc1.tar.gz && tar -xzvf cmake-3.18.0-rc1.tar.gz && cd cmake-3.18.0-rc1
+
+# install cmake
+sudo apt install cmake
+
+# install boost 1.79
+wget https://www.boost.org/users/history/version_1_79_0.html
+tar --bzip2 -xf boost_1_79_0.tar.bz2
+./boostrap.sh
+./b2
+sudo ./b2 install
+
+```
+
 Steps to build and run the bot:
 ```
 git clone --recurse-submodules https://github.com/Naseefabu/HFTBOT.git

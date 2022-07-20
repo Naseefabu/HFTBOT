@@ -2,12 +2,13 @@
 
 # Build Instructions
 
-## Install dependencies
+#### Install dependencies
 
 ```
 # install dependent packages
 sudo apt-get update
-sudo apt-get -y install build-essential doxygen graphviz ninja-build libboost-all-dev libssl-dev libcpprest-dev
+sudo apt-get install libboost-all-dev
+
 
 # install cmake
 sudo apt install cmake

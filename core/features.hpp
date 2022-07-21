@@ -2,12 +2,13 @@
 
 #include<vector>
 
-class InstantVolatilityIndicator
+class TapeSpeedIndicator
 {
 public:
 
     std::vector<int> processing_buffer;
     std::vector<int> sampling_buffer;
-    InstantVolatilityIndicator();
+    TapeSpeedIndicator();
+
 private:
-}
+};

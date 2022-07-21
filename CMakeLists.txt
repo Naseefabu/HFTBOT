@@ -19,7 +19,7 @@ set(SOURCES exchanges/binance-ws.cpp src/main.cpp exchanges/binance-http.cpp src
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${URLIB_DIRECTORY})
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/exchanges ${PROJECT_SOURCE_DIR}/core)
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/exchanges ${PROJECT_SOURCE_DIR}/core)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC Boost::boost Threads::Threads)
 target_link_libraries(${PROJECT_NAME} PUBLIC ssl crypto)

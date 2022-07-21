@@ -2,7 +2,7 @@
 
 # Build Instructions
 
-#### Install dependencies
+### Install dependencies
 
 ```
 # install dependent packages

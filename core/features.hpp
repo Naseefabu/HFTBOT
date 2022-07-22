@@ -1,14 +1,20 @@
 #pragma once
 
-#include<vector>
+#include <iostream>
+#include <vector>
 
+// No. of Trades in a given time
 class TapeSpeedIndicator
 {
 public:
 
-    std::vector<int> processing_buffer;
-    std::vector<int> sampling_buffer;
-    TapeSpeedIndicator();
+    TapeSpeedIndicator(lookback);
+    void clear();
+    void add();
+    int get_tapespeed();
+    void remove();
 
 private:
+    int lookback_period = 60;
+    int tapespeed = 0;
 };

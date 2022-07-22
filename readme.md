@@ -1,4 +1,4 @@
-# Short Gamma Strategy (In Construction)
+# Short Gamma Strategy (in Construction)
 
 # Build Instructions
 

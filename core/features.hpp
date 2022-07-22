@@ -16,7 +16,8 @@ public:
     void remove();
 
 private:
-    int lookback_period = 60;
+
+    int lookback_period = 60; // seconds
     int tapespeed = 0;
     std::vector<double> times;
 };

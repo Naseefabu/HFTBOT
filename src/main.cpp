@@ -10,6 +10,7 @@
 #include "coinbase-http.hpp"
 #include "kraken-http.hpp"
 #include "kraken-ws.hpp"
+#include "features.hpp"
 #include <sstream>
 
 int main()

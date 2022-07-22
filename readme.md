@@ -1,6 +1,8 @@
-# Short Gamma Strategy (in Construction)
+# Theta-Ripper  
 
-# Build Instructions
+Short Gamma strategy.
+
+## Build Instructions
 
 ### Install dependencies
 

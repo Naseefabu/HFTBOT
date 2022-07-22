@@ -20,7 +20,7 @@ Low realised vol regime in BTC gave unique opportunity to exploit. Since RV < IV
 
 ### Install dependencies
 
-```py
+```
 # install dependent packages
 sudo apt-get update
 sudo apt-get install libboost-all-dev
@@ -40,7 +40,7 @@ sudo ./b2 install
 ```
 
 Steps to build and run the bot:
-```py
+```
 git clone --recurse-submodules https://github.com/Naseefabu/HFTBOT.git
 cd HFTBOT/
 ./configure.sh

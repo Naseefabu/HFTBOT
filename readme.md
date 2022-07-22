@@ -50,4 +50,4 @@ cd HFTBOT/
 
 # Join our community
 
-Join us on discord : https://discord.gg/mtjNcZDa
+Join us on discord : https://discord.gg/8ZWx58SfWQ

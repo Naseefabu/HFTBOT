@@ -1,5 +1,5 @@
 # Theta-Ripper  
-![thetagang.png]
+![thetagang](https://user-images.githubusercontent.com/104965020/180367924-c6c7bb89-8acd-47d9-ac21-f28ceab92a04.png)
 WARNING: The author of this software will not be responsible for your losses on the market, use at your own discretion.
 
 ## Introduction

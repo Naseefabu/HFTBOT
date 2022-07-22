@@ -42,7 +42,7 @@ void TapeSpeedIndicator::remove()
     }
     for(int x = 0; x < pop; x++)
     {
-        times.erase(front());
+        times.erase(times.cbegin());
     }
 
     tapespeed+=temp;

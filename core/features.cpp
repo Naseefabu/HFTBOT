@@ -1,8 +1,9 @@
 #include "features.hpp"
 
-TapeSpeedIndicator::TapeSpeedIndicator(int& lookback)
+TapeSpeedIndicator::TapeSpeedIndicator(int& lookback, size_t &size)
 {
     lookback_period = lookback;
+    times.reserve(size);
 }
 
 int TapeSpeedIndicator::get_tapespeed()
@@ -24,5 +25,25 @@ void TapeSpeedIndicator::remove()
 {
     std::chrono::seconds lbt = get_sec_timestamp(current_time()).count() - lookback_period;
     int temp=0;
-    int pop=0
+    int pop=0;
+
+    for(int x : times)
+    {
+        if(lbt > x)
+        {
+            temp--;
+            pop++;
+        }
+        else
+        {
+            break;
+        }
+
+    }
+    for(int x = 0; x < pop; x++)
+    {
+        times.erase(front());
+    }
+
+    tapespeed+=temp;
 }

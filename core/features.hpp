@@ -9,7 +9,7 @@ class TapeSpeedIndicator
 {
 public:
 
-    TapeSpeedIndicator(int &lookback);
+    TapeSpeedIndicator(int &lookback, size_t &size);
     void clear();
     void add(double &volume);
     int get_tapespeed();

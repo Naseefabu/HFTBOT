@@ -23,11 +23,11 @@ void TapeSpeedIndicator::add(double &volume)
 
 void TapeSpeedIndicator::remove()
 {
-    std::chrono::seconds lbt = get_sec_timestamp(current_time()).count() - lookback_period;
+    double lbt = get_sec_timestamp(current_time()).count() - lookback_period;
     int temp=0;
     int pop=0;
 
-    for(int x : times)
+    for(double x : times)
     {
         if(lbt > x)
         {

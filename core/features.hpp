@@ -18,5 +18,5 @@ public:
 private:
     int lookback_period = 60;
     int tapespeed = 0;
-    std::vector<float> times;
+    std::vector<double> times;
 };

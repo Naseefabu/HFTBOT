@@ -21,7 +21,14 @@ int main()
 
     ctx.set_verify_mode(ssl::verify_peer);
     ctx.set_default_verify_paths();
+
     std::cout <<"SHORT GAMMA STRATEGY" << std::endl;
+
+    TapeSpeedIndicator feature(60,50);
+    double volume = 500;
+    feature.add(volume);
+    int tapespeed = feature.get_tapespeed();
+    std::cout << "Tape Speed : "<<tapespeed << std::endl;
     //auto coin = std::make_shared<coinbaseWS>(ioc,ctx);
     // coin->subscribe("subscribe","BTC-USD","ticker");
     // std::cout << "coinbase response : " << response << std::endl;

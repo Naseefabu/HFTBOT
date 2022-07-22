@@ -1,6 +1,6 @@
 #include "features.hpp"
 
-TapeSpeedIndicator::TapeSpeedIndicator(int& lookback, size_t &size)
+TapeSpeedIndicator::TapeSpeedIndicator(int lookback, size_t size)
 {
     lookback_period = lookback;
     times.reserve(size);

@@ -28,7 +28,8 @@ int main()
     double volume = 500;
     feature.add(volume);
     int tapespeed = feature.get_tapespeed();
-    std::cout << "Tape Speed : "<<tapespeed << std::endl;
+
+    std::cout << "Bot is still in construction, thankyou for your patience " << std::endl;
     //auto coin = std::make_shared<coinbaseWS>(ioc,ctx);
     // coin->subscribe("subscribe","BTC-USD","ticker");
     // std::cout << "coinbase response : " << response << std::endl;

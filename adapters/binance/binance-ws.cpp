@@ -113,7 +113,7 @@ void binanceWS::on_write(beast::error_code ec, std::size_t bytes_transferred) {
 
     if(ec)
         return fail_ws(ec, "write");
-    
+    // pass the event handlers here 
     ws_.async_read(buffer_,beast::bind_front_handler(&binanceWS::on_message,shared_from_this()));
 }
 

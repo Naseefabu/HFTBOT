@@ -1,4 +1,4 @@
-#include "features.hpp"
+#include "TapeSpeedIndicator.hpp"
 
 TapeSpeedIndicator::TapeSpeedIndicator(int lookback, size_t size)
 {

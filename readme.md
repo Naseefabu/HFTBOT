@@ -1,4 +1,4 @@
-# HFT++  
+# MM++  
 
 WARNING : The author of this software will not be responsible for your losses on the market, use at your own discretion.
 This bot is still in construction.

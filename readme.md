@@ -1,20 +1,24 @@
-# Theta-Ripper++  
-![thetagang](https://user-images.githubusercontent.com/104965020/180367924-c6c7bb89-8acd-47d9-ac21-f28ceab92a04.png)
+# HFT++  
 
 WARNING : The author of this software will not be responsible for your losses on the market, use at your own discretion.
-
 This bot is still in construction.
 
 ## Introduction
 
-Low realised vol regime in BTC gave unique opportunity to exploit. Since RV < IV (most of the time), shorting FTX MOVE contracts is +ev due to theta decay and simply collect premium over T. This bot monitors multiple other big exchanges to identify whether a big move in BTC is coming (eg : BART-move detection and multiple other risk management tools) as tails of this strategy can be really bad. 
+The cross exchange market making / Hedged Market Making strategy performs market making trades between two markets: 
+* It emits limit orders to a less liquid, larger spread market. 
+* It emits market orders on a more liquid, smaller spread market whenever the limit orders were hit. 
+Market making isn't about placing bunch of bids and asks orders, you will soon realize orderflow isn't random at all and you get 
+filled irregularly and accumulate inventory(which is a serious risk). Hedged Market making can help you with the inventory risk, unless you
+are slow somewhere. Basics remains the same, MM is all about capturing the spread and managing your inventory.
+You need to price in information as much as possible in a very low latency manner as MM has a negatively skewed return profile. 
+
+![Photo](https://user-images.githubusercontent.com/104965020/183235797-03f2f9d1-648e-4e12-a68b-62059a870f4d.png)
 
 ## Risk Management Tools
 
-* If speed of arrival market orders picks up across exchanges, then reduce/exit position. 
-* If predicted RVOL is greater than implied vol by "X" margin exit the position.
-* If (taker volume/liquidity at top "X" levels) ratio pick up, then reduce/exit position.
-
+* If speed of arrival market orders picks up across exchanges, stop quoting. 
+* BART move detections 
 
 ## Build Instructions
 

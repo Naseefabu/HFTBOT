@@ -5,7 +5,7 @@ TapeSpeedIndicator::TapeSpeedIndicator(int lookback, size_t size)
     lookback_period = lookback;
     times.reserve(size);
 }
-
+// right in the pussy
 int TapeSpeedIndicator::get_tapespeed()
 {
     remove();

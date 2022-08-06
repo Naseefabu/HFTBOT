@@ -13,9 +13,11 @@ The cross exchange market making / Hedged Market Making strategy performs market
 Market making isn't about placing bunch of bids and asks orders, you will soon realize orderflow isn't random at all and you get 
 filled irregularly and accumulate inventory(which is a serious risk). Hedged Market making can help you with the inventory risk, unless you
 are slow somewhere. Basics remains the same, MM is all about capturing the spread and managing your inventory.
-You need to price in information as much as possible in a very low latency manner as MM has a negatively skewed return profile. 
+You need to price in information as much as possible in a very low latency manner. 
 
 ![Photo](https://user-images.githubusercontent.com/104965020/183235797-03f2f9d1-648e-4e12-a68b-62059a870f4d.png)
+
+If your limit bid
 
 ## Risk Management Tools
 

@@ -17,7 +17,6 @@ You need to price in information as much as possible in a very low latency manne
 
 ![Photo](https://user-images.githubusercontent.com/104965020/183235797-03f2f9d1-648e-4e12-a68b-62059a870f4d.png)
 
-If your limit bid
 
 ## Risk Management Tools
 

@@ -6,8 +6,10 @@ This bot is still in construction.
 ## Introduction
 
 The cross exchange market making / Hedged Market Making strategy performs market making trades between two markets: 
+
 * It emits limit orders to a less liquid, larger spread market. 
 * It emits market orders on a more liquid, smaller spread market whenever the limit orders were hit. 
+
 Market making isn't about placing bunch of bids and asks orders, you will soon realize orderflow isn't random at all and you get 
 filled irregularly and accumulate inventory(which is a serious risk). Hedged Market making can help you with the inventory risk, unless you
 are slow somewhere. Basics remains the same, MM is all about capturing the spread and managing your inventory.
@@ -18,7 +20,7 @@ You need to price in information as much as possible in a very low latency manne
 ## Risk Management Tools
 
 * If speed of arrival market orders picks up across exchanges, stop quoting. 
-* BART move detections 
+* BART move detections helps in determining taker exchange overloads.
 
 ## Build Instructions
 

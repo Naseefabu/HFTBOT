@@ -22,7 +22,7 @@ int main()
     ctx.set_verify_mode(ssl::verify_peer);
     ctx.set_default_verify_paths();
 
-    std::cout <<"Cross Exchange Arbitrage" << std::endl;
+    std::cout <<"Cross Exchange market making" << std::endl;
 
     TapeSpeedIndicator feature(60,50);
     double volume = 500;

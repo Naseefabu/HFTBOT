@@ -143,7 +143,7 @@ void binanceWS::on_close(beast::error_code ec)
     std::cout << beast::make_printable(buffer_.data()) << std::endl;
 }
 
-void binanceWS::aggtrades(const std::string& action,const std::string& symbol)
+void binanceWS::subscribe_aggtrades(const std::string& action,const std::string& symbol)
 {
     std::string stream = symbol+"@"+"aggTrade";
     json jv = {
@@ -154,7 +154,7 @@ void binanceWS::aggtrades(const std::string& action,const std::string& symbol)
     std::make_shared<binanceWS>(ioc,ctx)->run(host, port,jv, stream);
 }
 
-void binanceWS::trades(const std::string& action,const std::string& symbol)
+void binanceWS::subscribe_trades(const std::string& action,const std::string& symbol)
 {
     std::string stream = symbol+"@"+"trade";
     json jv = {
@@ -166,7 +166,7 @@ void binanceWS::trades(const std::string& action,const std::string& symbol)
 }
 
 /* stream candle stick every second */
-void binanceWS::candlestick(const std::string& action,const std::string& symbol,const std::string& interval)
+void binanceWS::subscribe_candlestick(const std::string& action,const std::string& symbol,const std::string& interval)
 {
     std::string stream = symbol+"@"+"kline_"+interval;
     json jv = {
@@ -177,7 +177,7 @@ void binanceWS::candlestick(const std::string& action,const std::string& symbol,
     std::make_shared<binanceWS>(ioc,ctx)->run(host, port,jv, stream);
 }
 
-void binanceWS::levelone(const std::string& action,const std::string& symbol)
+void binanceWS::subscribe_levelone(const std::string& action,const std::string& symbol)
 {
     std::string stream = symbol+"@"+"bookTicker";
     json jv = {
@@ -188,7 +188,7 @@ void binanceWS::levelone(const std::string& action,const std::string& symbol)
     std::make_shared<binanceWS>(ioc,ctx)->run(host, port,jv, stream);
 }
 
-void binanceWS::partial_deltas(const std::string action,const std::string symbol,short int depth_levels)
+void binanceWS::subscribe_partial_deltas(const std::string action,const std::string symbol,short int depth_levels)
 {
     std::string stream = symbol+"@"+"depth"+std::to_string(depth_levels);
     json jv = {
@@ -199,7 +199,7 @@ void binanceWS::partial_deltas(const std::string action,const std::string symbol
     std::make_shared<binanceWS>(ioc,ctx)->run(host, port,jv, stream);
 }
 
-void binanceWS::orderbook(const std::string& action,const std::string& symbol)
+void binanceWS::subscribe_orderbook(const std::string& action,const std::string& symbol)
 {
     std::string stream = symbol+"@"+"depth";
     json jv = {

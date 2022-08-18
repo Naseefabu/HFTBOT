@@ -3,13 +3,13 @@
 
 SPSCQueue::SPSCQueue(size_t capacity) : data_(capacity, 0) {}
 
-bool SPSCQueue::push(int val) {
+bool SPSCQueue::push(int val) { 
   auto const writeIdx = writeIdx_.load(std::memory_order_relaxed);
   auto nextWriteIdx = writeIdx + 1;
   if (nextWriteIdx == data_.size()) {
     nextWriteIdx = 0;
   }
-  if (nextWriteIdx == readIdxCached_) {
+  if (nextWriteIdx == readIdxCached_) { // full
     readIdxCached_ = readIdx_.load(std::memory_order_acquire);
     if (nextWriteIdx == readIdxCached_) {
       return false;

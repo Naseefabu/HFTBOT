@@ -54,7 +54,3 @@ cd HFTBOT/
 ./build.sh
 ./run.sh
 ```
-
-# Join our community
-
-Join us on discord : https://discord.gg/8ZWx58SfWQ

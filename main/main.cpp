@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <chrono> 
+#include <new>
 #include <boost/url/src.hpp> // can only include in one source file
 #include "binance-ws.hpp"
 #include "binance-http.hpp" 

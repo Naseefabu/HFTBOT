@@ -41,12 +41,13 @@ int main()
     // Database d;
 
     // SHOW_ORDERBOOK();
-    // auto binance = std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc);
-    //json payload1 = binance->place_order("BTCUSDT",29500,"BUY","GTC","10");
+    auto clientfact = ClientAPI("binance",ioc,ctx);
+    auto binance = clientfact.get_exchange_client();
+    json payload1 = binance->place_order("BTCUSDT",29500,"BUY","GTC","10");
     // json payload2 = binance->bidask("BTCUSDT");
     // json payload3 = binance->server_time();
 
-    //std::cout << "payload 1 : " << payload1 << std::endl;
+    std::cout << "payload 1 : " << payload1 << std::endl;
     // std::cout << "payload 2 : " << payload2 << std::endl;
     //std::cout << "payload 3 : " << payload3 << std::endl;
     

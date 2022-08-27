@@ -17,6 +17,16 @@ You need to price in information as much as possible in a very low latency manne
 
 ![Photo](https://user-images.githubusercontent.com/104965020/183235797-03f2f9d1-648e-4e12-a68b-62059a870f4d.png)
 
+## Components
+
+1) Book Builders
+2) Strategy
+3) OMS
+
+## Architectural Design
+
+Components are scheduled to execute on distinct CPU cores using thread affinity and CPU isolation, which helps in preventing a thread from wandering between CPUs and losing time on context switching. Component Threads are expected to busy poll and never be interrupted, as it reduces the number of context switches
+because context switches only happens at each time slice.
 
 ## Risk Management Tools
 

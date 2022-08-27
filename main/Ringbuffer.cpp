@@ -33,6 +33,6 @@ bool SPSCQueue::pop(int &val) {
   if (nextReadIdx == data_.size()) {
     nextReadIdx = 0;
   }
-  readIdx_.store(nextReadIdx, std::memory_order_release);
+  readIdx_.store(nextReadIdx, std::memory_order_release); // unlock
   return true;
 }

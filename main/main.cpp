@@ -3,17 +3,9 @@
 #include <chrono> 
 #include <new>
 #include <boost/url/src.hpp> // can only include in one source file
-#include "binance-ws.hpp"
-#include "binance-http.hpp" 
-#include "ftx-http.hpp"
-#include "ftx-ws.hpp"
-#include "coinbase-ws.hpp"
-#include "coinbase-http.hpp"
-#include "kraken-http.hpp"
-#include "kraken-ws.hpp"
 #include "TapeSpeedIndicator.hpp"
 #include <sstream>
-
+#include <Producer.hpp>
 int main()
 {
     net::io_context ioc;

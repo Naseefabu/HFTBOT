@@ -26,7 +26,7 @@ You need to price in information as much as possible in a very low latency manne
 
 ## Architectural Design
 
-![MM++ arch-Page-1 drawio](https://user-images.githubusercontent.com/104965020/187865740-ece639a7-922c-4d6f-a894-173f0b495e94.png)
+![MM++ arch-Page-1 drawio (2)](https://user-images.githubusercontent.com/104965020/187868845-71b04a29-1b10-4b3c-9a16-f2d42ed01210.png)
 
 Components are scheduled to execute on distinct CPU cores using thread affinity and CPU isolation, which helps in preventing a thread from wandering between CPUs and reducing context switching overheads. Component Threads are expected to busy poll and never be interrupted, as it reduces the number of context switches
 because context switches only happens at each time slice.

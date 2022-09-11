@@ -145,7 +145,7 @@ void ftxWS::on_close(beast::error_code ec)
 }
 
 // provides the latest best bid and offer market data
-void ftxWS::subscribe_levelone(const std::string& action,const std::string& symbol)
+void ftxWS::subscribe_ticker(const std::string& action,const std::string& symbol)
 {
     json jv = {
         { "op", action },
@@ -155,7 +155,7 @@ void ftxWS::subscribe_levelone(const std::string& action,const std::string& symb
     run(jv);
 }
 
-void ftxWS::subscribe_orderbook(const std::string& action,const std::string& symbol)
+void ftxWS::subscribe_orderbook_diffs(const std::string& action,const std::string& symbol)
 {
     json jv = {
         { "op", action },

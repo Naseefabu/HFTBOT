@@ -10,7 +10,7 @@ bool SPSCQueue::push(int val) {
     nextWriteIdx = 0;
   }
   if (nextWriteIdx == readIdxCached_) { // full
-    readIdxCached_ = readIdx_.load(std::memory_order_acquire);
+    readIdxCached_ = readIdx_.load(std::memory_order_acquire); // lock
     if (nextWriteIdx == readIdxCached_) {
       return false;
     }

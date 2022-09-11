@@ -68,7 +68,7 @@ class binanceWS : public std::enable_shared_from_this<binanceWS>
 
     void subscribe_levelone(const std::string& action,const std::string& symbol);
 
-    void subscribe_partial_deltas(const std::string action,const std::string symbol,short int depth_levels);
+    void subscribe_orderbook_diffs(const std::string action,const std::string symbol,short int depth_levels);
 
     void subscribe_orderbook(const std::string& action,const std::string& symbol);
 

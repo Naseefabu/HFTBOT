@@ -60,9 +60,9 @@ class ftxWS : public std::enable_shared_from_this<ftxWS>
     void on_close(beast::error_code ec);
 
     // provides the latest best bid and offer market data
-    void subscribe_levelone(const std::string& action,const std::string& symbol);
+    void subscribe_ticker(const std::string& action,const std::string& symbol);
 
-    void subscribe_orderbook(const std::string& action,const std::string& symbol);
+    void subscribe_orderbook_diffs(const std::string& action,const std::string& symbol);
 
     void subscribe_trades(const std::string& action,const std::string& symbol);
 

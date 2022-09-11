@@ -4,8 +4,9 @@
 #include <new>
 #include <boost/url/src.hpp> // can only include in one source file
 #include "TapeSpeedIndicator.hpp"
-#include <sstream>
 #include <Producer.hpp>
+
+
 int main()
 {
     net::io_context ioc;
@@ -21,9 +22,9 @@ int main()
     double volume = 500;
     feature.add(volume);
     int tapespeed = feature.get_tapespeed();
-
+    producer_main(ioc,ctx);
     std::cout << "Bot is still in construction, thankyou for your patience " << std::endl;
-    //auto coin = std::make_shared<coinbaseWS>(ioc,ctx);
+    // auto coin = std::make_shared<coinbaseWS>(ioc,ctx);
     // coin->subscribe("subscribe","BTC-USD","ticker");
     // std::cout << "coinbase response : " << response << std::endl;
 
@@ -33,13 +34,12 @@ int main()
     // Database d;
 
     // SHOW_ORDERBOOK();
-    auto clientfact = ClientAPI("binance",ioc,ctx);
-    auto binance = clientfact.get_exchange_client();
-    json payload1 = binance->place_order("BTCUSDT",29500,"BUY","GTC","10");
+
+    // json payload1 = binance->place_order("BTCUSDT",29500,"BUY","GTC","10");
     // json payload2 = binance->bidask("BTCUSDT");
     // json payload3 = binance->server_time();
 
-    std::cout << "payload 1 : " << payload1 << std::endl;
+    // std::cout << "payload 1 : " << payload1 << std::endl;
     // std::cout << "payload 2 : " << payload2 << std::endl;
     //std::cout << "payload 3 : " << payload3 << std::endl;
     

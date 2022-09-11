@@ -188,7 +188,7 @@ void binanceWS::subscribe_levelone(const std::string& action,const std::string& 
     std::make_shared<binanceWS>(ioc,ctx)->run(host, port,jv, stream);
 }
 
-void binanceWS::subscribe_partial_deltas(const std::string action,const std::string symbol,short int depth_levels)
+void binanceWS::subscribe_orderbook_diffs(const std::string action,const std::string symbol,short int depth_levels)
 {
     std::string stream = symbol+"@"+"depth"+std::to_string(depth_levels);
     json jv = {

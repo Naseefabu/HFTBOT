@@ -65,7 +65,7 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
 
     void subscribe_ticker(std::string action, std::string pair);
 
-    void subscribe_orderbook(std::string action, std::string pair, int levels);
+    void subscribe_orderbook_diffs(std::string action, std::string pair, int levels);
 
 
 };

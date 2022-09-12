@@ -13,7 +13,7 @@ void binance_producer_main(net::io_context& ioc, ssl::context& ctx,std::string &
 
 void ftx_producer_main(net::io_context& ioc, ssl::context& ctx, std::string &symbol);
 
-void kraken_producer_main(net::io_context& ioc, ssl::context& ctx, std::string &symbol);
+void kraken_producer_main(net::io_context& ioc, ssl::context& ctx, std::string &symbol, int &levels);
 
 void coinbase_producer_main(net::io_context& ioc, ssl::context& ctx, std::string &symbol);
 

@@ -22,7 +22,8 @@ int main()
     double volume = 500;
     feature.add(volume);
     int tapespeed = feature.get_tapespeed();
-    producer_main(ioc,ctx);
+    std::string temp_symbol = "naseef";
+    ftx_producer_main(ioc,ctx,temp_symbol);
     std::cout << "Bot is still in construction, thankyou for your patience " << std::endl;
     // auto coin = std::make_shared<coinbaseWS>(ioc,ctx);
     // coin->subscribe("subscribe","BTC-USD","ticker");

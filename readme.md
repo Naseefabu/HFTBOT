@@ -20,12 +20,8 @@ You need to price in information as much as possible in a very low latency manne
 ## Components
 
 1) Feedhandlers
-* Recieves market data from exchanges, and sends the data to bookbuilders to build the books for all secuirities.
 2) Book Builders
-* Build the orderbook snapshots to be consumed by strategy component.
 3) Strategy
-* Recieves orderbook snapshots from Book builders; generates signals as indicator values,predictions of stock prices
- facilitates communication with the order management system 
 4) OMS
 
 ## Architectural Design

@@ -8,6 +8,7 @@
 static constexpr int CACHELINE_SIZE = 64;
 
 // Single Producer Single Consumer Ringbuffer Queue
+
 struct SPSCQueue {
   std::vector<int> data_{};
   alignas(CACHELINE_SIZE) std::atomic<size_t> readIdx_{0};

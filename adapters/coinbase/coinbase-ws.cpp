@@ -146,3 +146,13 @@ void coinbaseWS::subscribe(std::string method, std::string market, std::string c
 
     run(payload);            
 }
+
+void coinbaseWS::subscribe_orderbook_diffs(std::string method, std::string market)
+{
+
+    json payload = {{"type", method},
+                {"product_ids", {market}},
+                {"channels", {"level2"}}};
+
+    run(payload);            
+}

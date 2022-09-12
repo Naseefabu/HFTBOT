@@ -156,7 +156,8 @@ void krakenWS::subscribe_ticker(std::string action, std::string pair)
 }
 
 // valid levels options : 10,25,100,500,1000
-void krakenWS::subscribe_orderbook(std::string action, std::string pair, int levels)
+// Initially snapshot then deltas
+void krakenWS::subscribe_orderbook_diffs(std::string action, std::string pair, int levels)
 {
 
     json payload = {{"event", action},

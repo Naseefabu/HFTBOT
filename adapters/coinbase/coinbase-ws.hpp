@@ -61,4 +61,6 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
 
     void subscribe(std::string method, std::string market, std::string channel);
 
+    void subscribe_orderbook_diffs(std::string method, std::string market);
+
 };

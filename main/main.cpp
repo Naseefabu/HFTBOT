@@ -9,6 +9,7 @@
 
 int main()
 {
+    std::cout << "Bot is still in construction, thankyou for your patience " << std::endl;
     net::io_context ioc;
     // The SSL context is required, and holds certificates
     ssl::context ctx{ssl::context::tlsv12_client};
@@ -22,9 +23,20 @@ int main()
     double volume = 500;
     feature.add(volume);
     int tapespeed = feature.get_tapespeed();
-    std::string temp_symbol = "naseef";
+    std::string temp_symbol = "BTC-PERP";
+    int level = 10;
+    
+    
+    // SPSCQueue<double> producer_queue(1000);
+    // double value = 56523;
+    // producer_queue.push(value);
+    // double res = producer_queue.pop();
+    // std::cout << "Printing Queue Value : " << res << std::endl;
+    
     ftx_producer_main(ioc,ctx,temp_symbol);
-    std::cout << "Bot is still in construction, thankyou for your patience " << std::endl;
+    //kraken_producer_main(ioc,ctx,temp_symbol,level);
+    
+
     // auto coin = std::make_shared<coinbaseWS>(ioc,ctx);
     // coin->subscribe("subscribe","BTC-USD","ticker");
     // std::cout << "coinbase response : " << response << std::endl;

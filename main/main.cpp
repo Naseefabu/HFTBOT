@@ -17,13 +17,13 @@ int main()
     ctx.set_verify_mode(ssl::verify_peer);
     ctx.set_default_verify_paths();
 
-    std::cout <<"Cross Exchange market making" << std::endl;
+    std::cout << "Crypto HFT Framework" << std::endl;
 
     TapeSpeedIndicator feature(60,50);
     double volume = 500;
     feature.add(volume);
     int tapespeed = feature.get_tapespeed();
-    std::string temp_symbol = "BTC-PERP";
+    std::string temp_symbol = "BTCUSDT";
     int level = 10;
     
     
@@ -32,8 +32,8 @@ int main()
     // producer_queue.push(value);
     // double res = producer_queue.pop();
     // std::cout << "Printing Queue Value : " << res << std::endl;
-    
-    ftx_producer_main(ioc,ctx,temp_symbol);
+    binance_producer_main(ioc,ctx,temp_symbol);
+    //ftx_producer_main(ioc,ctx,temp_symbol);
     //kraken_producer_main(ioc,ctx,temp_symbol,level);
     
 

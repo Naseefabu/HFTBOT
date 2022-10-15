@@ -167,17 +167,19 @@ class ftxWS : public std::enable_shared_from_this<ftxWS<D>>
           return fail_ws(ec, "read");
 
       json payload =  json::parse(beast::buffers_to_string(buffer_.cdata()));   
-      std::cout << "payload output : " << payload << std::endl;
+      // std::cout << "payload output : " << payload << std::endl;
 
       if(payload["channel"] == "orderbook" && payload["type"] == "update")
       {
-          std::cout << "innnerrrrr  " << std::endl;
-          double bid = payload["data"]["bids"].get<double>();
-          double bidsize = payload["data"]["bidSize"].get<float>();
-          double ask = payload["data"]["asks"].get<float>();
-          double asksize = payload["data"]["askSize"].get<float>();
-          bool istrue = diff_messages_queue.push(bid);
-          std::cout << "output : "<<istrue << std::endl;
+        json bids = payload["data"]["bids"];
+        json asks = payload["data"]["asks"];
+        std::cout << "Json Bids : " << bids << std::endl;
+        std::cout << "Json Asks : " << asks << std::endl;  
+        //   double bidsize = payload["data"]["bidSize"].get<float>();
+        //   double ask = payload["data"]["asks"].get<float>();
+        //   double asksize = payload["data"]["askSize"].get<float>();
+        //   bool istrue = diff_messages_queue.push(bid);
+        //   std::cout << "output : "<<istrue << std::endl;
       }    
 
       buffer_.clear();

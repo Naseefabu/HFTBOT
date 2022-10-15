@@ -27,8 +27,8 @@ using Stream = websocket::stream<beast::ssl_stream<beast::tcp_stream>>;
 using namespace std::chrono_literals;
 void fail_ws(beast::error_code ec, char const* what); 
 
-template<typename A>
-class binanceWS : public std::enable_shared_from_this<binanceWS<A>>
+//template<typename A>
+class binanceWS : public std::enable_shared_from_this<binanceWS>
 {
     tcp::resolver resolver_;
     Stream ws_;
@@ -40,17 +40,16 @@ class binanceWS : public std::enable_shared_from_this<binanceWS<A>>
     std::string streamName = "/ws/";
     char const* host = "stream.binance.com";
     char const* port = "9443";
-    SPSCQueue<A> &diff_messages_queue;
+    //SPSCQueue<A> &diff_messages_queue;
 
   public:
 
     
-    binanceWS(net::io_context& ioc, ssl::context& ctx, SPSCQueue<A> &q)
+    binanceWS(net::io_context& ioc, ssl::context& ctx)
         : resolver_(net::make_strand(ioc))
         , ws_(net::make_strand(ioc), ctx)
         , ioc(ioc)
         , ctx(ctx)
-        , diff_messages_queue(q)
     {
         
     }
@@ -66,13 +65,14 @@ class binanceWS : public std::enable_shared_from_this<binanceWS<A>>
 
         host_ = host;
         message_text_ = message.dump();
+        streamName += stream;
 
         resolver_.async_resolve(
             host,
             port,
             beast::bind_front_handler(
-                &binanceWS<A>::on_resolve,
-                this->shared_from_this()));
+                &binanceWS::on_resolve,
+                shared_from_this()));
     }
 
     
@@ -93,8 +93,8 @@ class binanceWS : public std::enable_shared_from_this<binanceWS<A>>
         beast::get_lowest_layer(ws_).async_connect(
             results,
             beast::bind_front_handler(
-                &binanceWS<A>::on_connect,
-                this->shared_from_this()));
+                &binanceWS::on_connect,
+                shared_from_this()));
     }
 
     
@@ -107,8 +107,8 @@ class binanceWS : public std::enable_shared_from_this<binanceWS<A>>
         // Perform the SSL handshake
         ws_.next_layer().async_handshake(
             ssl::stream_base::client,
-            beast::bind_front_handler(&binanceWS<A>::on_ssl_handshake,
-                                        this->shared_from_this()));
+            beast::bind_front_handler(&binanceWS::on_ssl_handshake,
+                                        shared_from_this()));
     }
 
     
@@ -133,10 +133,10 @@ class binanceWS : public std::enable_shared_from_this<binanceWS<A>>
             }));
 
         std::cout << "using host_: " << host_ << std::endl;
-        ws_.async_handshake(host_, "/ws/",
+        ws_.async_handshake(host, streamName,
             beast::bind_front_handler(
-                &binanceWS<A>::on_handshake,
-                this->shared_from_this()));
+                &binanceWS::on_handshake,
+                shared_from_this()));
     }
 
     
@@ -150,7 +150,7 @@ class binanceWS : public std::enable_shared_from_this<binanceWS<A>>
 
         ws_.async_write(
             net::buffer(message_text_),
-            beast::bind_front_handler(&binanceWS<A>::on_write, this->shared_from_this()));
+            beast::bind_front_handler(&binanceWS::on_write, shared_from_this()));
     }
 
     
@@ -160,7 +160,7 @@ class binanceWS : public std::enable_shared_from_this<binanceWS<A>>
         if(ec)
             return fail_ws(ec, "write");
         // pass the event handlers here 
-        ws_.async_read(buffer_,beast::bind_front_handler(&binanceWS<A>::on_message,this->shared_from_this()));
+        ws_.async_read(buffer_,beast::bind_front_handler(&binanceWS::on_message,shared_from_this()));
     }
 
     
@@ -171,18 +171,13 @@ class binanceWS : public std::enable_shared_from_this<binanceWS<A>>
         if(ec)
             return fail_ws(ec, "read");
 
-        json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));    
-        
-        double data = payload["bids"][0];
+        json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
+        std::cout << "Payload : " << payload << std::endl;
+        //std::cout << "bids : " << payload["bids"] << std::endl;
+        //std::cout << "asks : " << payload["asks"] << std::endl;
 
-        bool istrue = diff_messages_queue.push(data);
-        std::cout << istrue << std::endl;
-        // Signal generation and Quoting strategies on each tick events   
-        // Database d;
-        // d.ADDRECORD(123654765,payload["bids"][0],payload["bids"][1],payload["asks"][0],payload["asks"][1]);
-        // std::cout << "Received: " << beast::buffers_to_string(buffer_.cdata()) <<std::endl;
         buffer_.clear();
-        ws_.async_read(buffer_,beast::bind_front_handler(&binanceWS<A>::on_message, this->shared_from_this()));
+        ws_.async_read(buffer_,beast::bind_front_handler(&binanceWS::on_message, shared_from_this()));
     }
 
     
@@ -245,9 +240,9 @@ class binanceWS : public std::enable_shared_from_this<binanceWS<A>>
     }
 
     
-    void subscribe_orderbook_diffs(const std::string action,const std::string symbol,short int depth_levels)
+    void subscribe_orderbook_diffs(const std::string action,const std::string &symbol,short int depth_levels)
     {
-        std::string stream = symbol+"@"+"depth"+std::to_string(depth_levels);
+        std::string stream = symbol+"@"+"depth"+std::to_string(depth_levels)+"@100ms";
         json jv = {
             { "method", action },
             { "params", {stream} },
@@ -259,13 +254,14 @@ class binanceWS : public std::enable_shared_from_this<binanceWS<A>>
     
     void subscribe_orderbook(const std::string& action,const std::string& symbol)
     {
+        std::cout << "Symbol :: " << action << std::endl;
         std::string stream = symbol+"@"+"depth";
         json jv = {
             { "method", action },
             { "params", {stream} },
             { "id", 1 }
         };
-        run(host, port,jv, stream);
+        std::make_shared<binanceWS>(ioc,ctx)->run(host, port,jv, stream);
     }
 
 

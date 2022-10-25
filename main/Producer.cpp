@@ -7,9 +7,9 @@
 void binance_producer_main(net::io_context& ioc, ssl::context& ctx, std::string &symbol)
 {
     SPSCQueue<double> binance_producer_queue(1000);
-    auto binancews = std::make_shared<binanceWS>(ioc,ctx);  // Subscribe diff messages
+    auto binancews = std::make_shared<binanceWS<double>>(ioc,ctx,binance_producer_queue);  // Subscribe diff messages
     // binanceWS<double> binancews(ioc,ctx,binance_producer_queue);
-    binancews->subscribe_orderbook("SUBSCRIBE","btcusdt");
+    binancews->subscribe_orderbook("SUBSCRIBE","bnbbtc");
      
 }
 

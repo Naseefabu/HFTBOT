@@ -169,9 +169,11 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS<B>>
 
       if(ec)
           return fail_ws(ec, "read");
-      // Signal generation and Quoting strategies on each tick events   
 
-      std::cout << "Received: " << beast::buffers_to_string(buffer_.cdata()) << std::endl;
+      json payload =  json::parse(beast::buffers_to_string(buffer_.cdata()));   
+      //std::cout << "Payload : " << payload << std::endl;
+      std::cout << "Deltas : " << payload["changes"][0] << std::endl;
+
       
       buffer_.clear();
       ws_.async_read(buffer_,beast::bind_front_handler(&coinbaseWS<B>::on_message, this->shared_from_this()));

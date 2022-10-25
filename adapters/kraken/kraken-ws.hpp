@@ -174,15 +174,13 @@ class krakenWS : public std::enable_shared_from_this<krakenWS<E>>
           return fail_ws(ec, "read");
 
       json payload =  json::parse(beast::buffers_to_string(buffer_.cdata()));  
-      std::cout << "Printing Json : " << payload << std::endl;
-
+      // std::cout << "Payload : " << payload << std::endl;
 
       if(!payload.contains("event")){
-        json bids = payload["bs"];
-        json asks = payload["as"];
-        std::cout << "Json Bids : " << bids << std::endl;
-        std::cout << "Json Asks : " << asks << std::endl; 
-        std::cout << "Printing Filtered Json : " << payload << std::endl; 
+        json bids = payload[1]["b"];
+        json asks = payload[1]["a"];
+        std::cout << "Bids : " << bids << std::endl;
+        std::cout << "Asks : " << asks << std::endl;  
       }    
 
 

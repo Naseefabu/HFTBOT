@@ -4,6 +4,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include "types.hpp"
 
 
 static constexpr int CACHELINE_SIZE = 64;
@@ -18,7 +19,9 @@ struct SPSCQueue {
   alignas(CACHELINE_SIZE) std::atomic<size_t> writeIdx_{0};
   alignas(CACHELINE_SIZE) size_t readIdxCached_{0};
 
-  SPSCQueue(size_t capacity) : data_(capacity, 0) {}
+  SPSCQueue(size_t capacity){
+    data_.reserve(sizeof(struct price_level)*capacity);
+  }
 
   
   bool push(double &val) { 

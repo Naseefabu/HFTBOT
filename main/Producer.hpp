@@ -9,7 +9,7 @@
 #include <sstream>
 
 
-void binance_producer_main(net::io_context& ioc, ssl::context& ctx,std::string &symbol);
+void binance_producer_main(net::io_context& ioc, ssl::context& ctx,std::string &symbo, int &levels);
 
 void ftx_producer_main(net::io_context& ioc, ssl::context& ctx, std::string &symbol);
 

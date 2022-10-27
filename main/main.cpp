@@ -21,8 +21,8 @@ int main()
     std::string ftx_symbol = "BTC-PERP";
     std::string kraken_symbol = "XBT/USD";
     int levels = 10;
-    binance_producer_main(ioc,ctx,binance_symbol);
+    binance_producer_main(ioc,ctx,binance_symbol,levels);
 
 
-    ioc.run();
+    
 }

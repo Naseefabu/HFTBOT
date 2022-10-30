@@ -9,7 +9,6 @@
 
 int main()
 {
-    std::cout << "Bot is still in construction, thankyou for your patience " << std::endl;
     net::io_context ioc;
     ssl::context ctx{ssl::context::tlsv12_client};
 
@@ -21,8 +20,10 @@ int main()
     std::string ftx_symbol = "BTC-PERP";
     std::string kraken_symbol = "XBT/USD";
     int levels = 10;
-    binance_producer_main(ioc,ctx,binance_symbol,levels);
-
+    // coinbase_producer_main(ioc,ctx,coinbase_symbol);
+    // binance_producer_main(ioc,ctx,binance_symbol,levels);
+    // ftx_producer_main(ioc,ctx,ftx_symbol);
+    kraken_producer_main(ioc,ctx,kraken_symbol,levels);
 
     
 }

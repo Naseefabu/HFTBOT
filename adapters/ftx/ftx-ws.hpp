@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "Ringbuffer.hpp"
+#include "types.hpp"
 namespace beast     = boost::beast;    
 namespace http      = beast::http;     
 namespace websocket = beast::websocket; 
@@ -29,13 +30,11 @@ using Stream    = websocket::stream<SSLStream>;
 
 using namespace std::chrono_literals;
 void fail_ws(beast::error_code ec, char const* what); 
-#define FTX_HANDLER(d) beast::bind_front_handler(&ftxWS<D>::d, this->shared_from_this())
+#define FTX_HANDLER(d) beast::bind_front_handler(&ftxWS::d, this->shared_from_this())
 
 
 
-// channels : 
-template<typename D>
-class ftxWS : public std::enable_shared_from_this<ftxWS<D>>
+class ftxWS : public std::enable_shared_from_this<ftxWS>
 {
     tcp::resolver resolver_;
     Stream ws_;
@@ -44,12 +43,12 @@ class ftxWS : public std::enable_shared_from_this<ftxWS<D>>
     char const* host = "ftx.com";
     std::string wsTarget_ = "/ws/";
     std::string host_;
-    SPSCQueue<D> &diff_messages_queue;
+    SPSCQueue<price_level> &diff_messages_queue;
     std::function<void()> on_message_handler;
 
   public:
 
-    ftxWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<D>& q)
+    ftxWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<price_level>& q)
         : resolver_(ex)
         , ws_(ex, ctx)
         , diff_messages_queue(q) {}

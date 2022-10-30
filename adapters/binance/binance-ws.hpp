@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include "Ringbuffer.hpp"
 #include <system_error>
+#include "types.hpp"
 
 namespace beast     = boost::beast;    
 namespace http      = beast::http;     
@@ -31,11 +32,10 @@ using Stream    = websocket::stream<SSLStream>;
 
 using namespace std::chrono_literals;
 void fail_ws(beast::error_code ec, char const* what); 
-#define BINANCE_HANDLER(f) beast::bind_front_handler(&binanceWS<A>::f, this->shared_from_this())
+#define BINANCE_HANDLER(f) beast::bind_front_handler(&binanceWS::f, this->shared_from_this())
 
 
-template <typename A> 
-class binanceWS : public std::enable_shared_from_this<binanceWS<A>> {
+class binanceWS : public std::enable_shared_from_this<binanceWS> {
     tcp::resolver      resolver_;
     Stream             ws_;
     beast::flat_buffer buffer_;
@@ -45,12 +45,11 @@ class binanceWS : public std::enable_shared_from_this<binanceWS<A>> {
     std::string           wsTarget_ = "/ws/";
     char const*           host      = "stream.binance.com";
     char const*           port      = "9443";
-    SPSCQueue<A>&         diff_messages_queue;
+    SPSCQueue<price_level>&         diff_messages_queue;
     std::function<void()> on_message_handler;
-    // OnMessage on_message_cb;
 
   public:
-    binanceWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<A>& q)
+    binanceWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<price_level>& q)
         : resolver_(ex)
         , ws_(ex, ctx)
         , diff_messages_queue(q) {}
@@ -128,17 +127,11 @@ class binanceWS : public std::enable_shared_from_this<binanceWS<A>> {
     }
 
     void on_message(beast::error_code ec, size_t bytes_transferred) {
+
         boost::ignore_unused(bytes_transferred);
         if (ec)
             return fail_ws(ec, "read");
 
-        //json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
-        
-        // std::cout << "bids : " << payload["b"] << std::endl;
-        // std::cout << "asks : " << payload["a"] << std::endl;
-        //on_message_handler();
-
-        //std::cout << "Payload outside : "<<beast::buffers_to_string(buffer_.cdata()) << std::endl;
         buffer_.clear();
         ws_.async_read(buffer_, [this](beast::error_code ec, size_t n) {
             if (ec)
@@ -148,6 +141,7 @@ class binanceWS : public std::enable_shared_from_this<binanceWS<A>> {
             buffer_.clear();
             ws_.async_read(buffer_, BINANCE_HANDLER(on_message));
         });
+
     }
 
     void on_close(beast::error_code ec) {
@@ -216,10 +210,12 @@ class binanceWS : public std::enable_shared_from_this<binanceWS<A>> {
         on_message_handler = [this]() {
 
             std::cout << "Orderbook Levels Update" << std::endl;
-            //std::cout << "Payload Inside : "<<beast::buffers_to_string(buffer_.cdata()) << std::endl;
             json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
-            std::cout << payload << std::endl;
-             
+            //std::cout << "Payload : "<< payload << std::endl;
+            json bids = payload["bids"];
+            json asks = payload["asks"];
+            std::cout << "bids : " << bids[0] << std::endl;
+
         };
         
         json jv = {

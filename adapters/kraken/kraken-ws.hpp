@@ -15,6 +15,7 @@
 #include <thread>
 #include <chrono>
 #include "Ringbuffer.hpp"
+#include "types.hpp"
 
 namespace beast     = boost::beast;    
 namespace http      = beast::http;     
@@ -32,13 +33,10 @@ using Stream    = websocket::stream<SSLStream>;
 
 using namespace std::chrono_literals;
 void fail_ws(beast::error_code ec, char const* what); 
-#define KRAKEN_HANDLER(z) beast::bind_front_handler(&krakenWS<E>::z, this->shared_from_this())
+#define KRAKEN_HANDLER(z) beast::bind_front_handler(&krakenWS::z, this->shared_from_this())
 
 
-
-// channels : 
-template<typename E>
-class krakenWS : public std::enable_shared_from_this<krakenWS<E>>
+class krakenWS : public std::enable_shared_from_this<krakenWS>
 {
     tcp::resolver resolver_;
     Stream ws_;
@@ -47,12 +45,12 @@ class krakenWS : public std::enable_shared_from_this<krakenWS<E>>
     char const* host = "ws.kraken.com";
     std::string wsTarget_ = "/ws/";
     std::string host_;
-    SPSCQueue<E> &diff_messages_queue;
+    SPSCQueue<price_level> &diff_messages_queue;
     std::function<void()> on_message_handler;
 
   public:
 
-    krakenWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<E>& q)
+    krakenWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<price_level>& q)
         : resolver_(ex)
         , ws_(ex, ctx)
         , diff_messages_queue(q) {}

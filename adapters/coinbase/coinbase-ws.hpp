@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include "Ringbuffer.hpp"
 #include <system_error>
+#include "types.hpp"
 
 namespace beast     = boost::beast;    
 namespace http      = beast::http;     
@@ -30,13 +31,12 @@ using Stream    = websocket::stream<SSLStream>;
 
 using namespace std::chrono_literals;
 void fail_ws(beast::error_code ec, char const* what); 
-#define COINBASE_HANDLER(c) beast::bind_front_handler(&coinbaseWS<B>::c, this->shared_from_this())
+#define COINBASE_HANDLER(c) beast::bind_front_handler(&coinbaseWS::c, this->shared_from_this())
 
 
 
-// channels : 
-template<typename B>
-class coinbaseWS : public std::enable_shared_from_this<coinbaseWS<B>>
+
+class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
 {
     tcp::resolver resolver_;
     Stream ws_;
@@ -45,12 +45,12 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS<B>>
     char const* host = "ws-feed.exchange.coinbase.com";
     std::string wsTarget_ = "/ws/";
     std::string host_;
-    SPSCQueue<B> &diff_messages_queue;
+    SPSCQueue<price_level> &diff_messages_queue;
     std::function<void()> on_message_handler;
 
   public:
 
-    coinbaseWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<B>& q)
+    coinbaseWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<price_level>& q)
         : resolver_(ex)
         , ws_(ex, ctx)
         , diff_messages_queue(q) {}

@@ -209,7 +209,6 @@ class binanceWS : public std::enable_shared_from_this<binanceWS> {
         
         on_message_handler = [this]() {
 
-            std::cout << "Orderbook Levels Update" << std::endl;
             json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
 
             bool is;

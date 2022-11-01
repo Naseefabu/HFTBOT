@@ -20,8 +20,8 @@ int main()
     std::string ftx_symbol = "BTC-PERP";
     std::string kraken_symbol = "XBT/USD";
     int levels = 10;
-    //coinbase_producer_main(ioc,ctx,coinbase_symbol);
-    binance_producer_main(ioc,ctx,binance_symbol,levels);
+    coinbase_producer_main(ioc,ctx,coinbase_symbol);
+    //binance_producer_main(ioc,ctx,binance_symbol,levels);
     //ftx_producer_main(ioc,ctx,ftx_symbol);
     //kraken_producer_main(ioc,ctx,kraken_symbol,levels);
 

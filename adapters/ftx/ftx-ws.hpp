@@ -172,8 +172,29 @@ class ftxWS : public std::enable_shared_from_this<ftxWS>
       on_message_handler = [this](){
 
         json payload =  json::parse(beast::buffers_to_string(buffer_.cdata())); 
-        std::cout << "Payload : "<< payload << std::endl;
         
+        bool is;
+        if(payload["data"]["action"] == "update" && payload.contains(payload["data"]["sells"])){ // error 
+
+            for(auto x : payload["data"]["asks"]){
+                price_level level;
+                level.is_bid = false;
+                level.price = std::stod(x[0].get<std::string>());
+                level.quantity = std::stod(x[1].get<std::string>());
+                is = diff_messages_queue.push(level);
+            }
+        }
+
+        if(payload["data"]["action"] == "update" && payload.contains(payload["data"]["bids"])){
+            for(auto x : payload["data"]["bids"]){
+                price_level level;
+                level.is_bid = true;
+                level.price = std::stod(x[0].get<std::string>());
+                level.quantity = std::stod(x[1].get<std::string>());
+                is = diff_messages_queue.push(level);
+            }
+        }
+
       };
 
 

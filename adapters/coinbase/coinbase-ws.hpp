@@ -168,22 +168,21 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
       on_message_handler = [this](){
 
             json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
-            price_level bid_level;
-            price_level ask_level;
+            price_level level;
             bool is;
 
             if(payload["changes"][0][0] == "buy"){
-                bid_level.is_bid = true;
-                bid_level.price = std::stod(payload["changes"][0][1].get<std::string>());
-                bid_level.quantity = std::stod(payload["changes"][0][2].get<std::string>());
-                is = diff_messages_queue.push(bid_level);
+                level.is_bid = true;
+                level.price = std::stod(payload["changes"][0][1].get<std::string>());
+                level.quantity = std::stod(payload["changes"][0][2].get<std::string>());
+                is = diff_messages_queue.push(level);
             }
-            
+
             if(payload["changes"][0][0] == "sell"){
-                ask_level.is_bid = true;
-                ask_level.price = std::stod(payload["changes"][0][1].get<std::string>());
-                ask_level.quantity = std::stod(payload["changes"][0][2].get<std::string>());
-                is = diff_messages_queue.push(bid_level);
+                level.is_bid = false;
+                level.price = std::stod(payload["changes"][0][1].get<std::string>());
+                level.quantity = std::stod(payload["changes"][0][2].get<std::string>());
+                is = diff_messages_queue.push(level);
             }
 
         };

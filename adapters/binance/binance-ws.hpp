@@ -211,11 +211,24 @@ class binanceWS : public std::enable_shared_from_this<binanceWS> {
 
             std::cout << "Orderbook Levels Update" << std::endl;
             json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
-            //std::cout << "Payload : "<< payload << std::endl;
-            json bids = payload["bids"];
-            json asks = payload["asks"];
-            std::cout << "bids : " << bids[0] << std::endl;
 
+            bool is;
+
+            for(auto x : payload["bids"]){
+                price_level bid_level;
+                bid_level.is_bid = true;
+                bid_level.price = std::stod(x[0].get<std::string>());
+                bid_level.quantity = std::stod(x[1].get<std::string>());
+                is = diff_messages_queue.push(bid_level);
+            }     
+
+            for(auto x : payload["asks"]){
+                price_level ask_level;
+                ask_level.is_bid = false;
+                ask_level.price = std::stod(x[0].get<std::string>());
+                ask_level.quantity = std::stod(x[1].get<std::string>());
+                is = diff_messages_queue.push(ask_level);
+            }   
         };
         
         json jv = {

@@ -22,8 +22,8 @@ int main()
     int levels = 10;
     //coinbase_producer_main(ioc,ctx,coinbase_symbol);
     //binance_producer_main(ioc,ctx,binance_symbol,levels);
-    ftx_producer_main(ioc,ctx,ftx_symbol);
-    //kraken_producer_main(ioc,ctx,kraken_symbol,levels);
+    //ftx_producer_main(ioc,ctx,ftx_symbol);
+    kraken_producer_main(ioc,ctx,kraken_symbol,levels);
 
     
 }

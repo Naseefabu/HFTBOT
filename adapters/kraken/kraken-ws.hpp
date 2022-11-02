@@ -185,8 +185,9 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
         json payload =  json::parse(beast::buffers_to_string(buffer_.cdata()));
         price_level level;
         bool is;
-          
+
         if(payload.is_array()){
+            
             for(auto x: payload[1]["a"]){
                 level.is_bid = false;
                 level.price = std::stod(x[0].get<std::string>());
@@ -194,9 +195,7 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
                 is = diff_messages_queue.push(level);
                 std::cout << "result : " << is << std::endl;
             }
-        }
 
-        if(payload.is_array()){
             for(auto x: payload[1]["b"]){
                 level.is_bid = true;
                 level.price = std::stod(x[0].get<std::string>());
@@ -205,6 +204,7 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
                 std::cout << "result : " << is << std::endl;
             }
         }
+
       };
 
       payload["subscription"]["name"] = "book";

@@ -1,6 +1,6 @@
 #pragma once
 
-struct price_level
+struct OrderBookEntry
 {
     bool is_bid;
     double price;

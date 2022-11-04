@@ -43,12 +43,12 @@ class ftxWS : public std::enable_shared_from_this<ftxWS>
     char const* host = "ftx.com";
     std::string wsTarget_ = "/ws/";
     std::string host_;
-    SPSCQueue<price_level> &diff_messages_queue;
+    SPSCQueue<OrderBookEntry> &diff_messages_queue;
     std::function<void()> on_message_handler;
 
   public:
 
-    ftxWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<price_level>& q)
+    ftxWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<OrderBookEntry>& q)
         : resolver_(ex)
         , ws_(ex, ctx)
         , diff_messages_queue(q) {}
@@ -177,7 +177,7 @@ class ftxWS : public std::enable_shared_from_this<ftxWS>
         if(payload["data"]["action"] == "update" && payload.contains(payload["data"]["sells"])){ // error 
 
             for(auto x : payload["data"]["asks"]){
-                price_level level;
+                OrderBookEntry level;
                 level.is_bid = false;
                 level.price = std::stod(x[0].get<std::string>());
                 level.quantity = std::stod(x[1].get<std::string>());
@@ -187,7 +187,7 @@ class ftxWS : public std::enable_shared_from_this<ftxWS>
 
         if(payload["data"]["action"] == "update" && payload.contains(payload["data"]["bids"])){
             for(auto x : payload["data"]["bids"]){
-                price_level level;
+                OrderBookEntry level;
                 level.is_bid = true;
                 level.price = std::stod(x[0].get<std::string>());
                 level.quantity = std::stod(x[1].get<std::string>());

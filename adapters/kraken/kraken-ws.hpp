@@ -45,12 +45,12 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
     char const* host = "ws.kraken.com";
     std::string wsTarget_ = "/ws/";
     std::string host_;
-    SPSCQueue<price_level> &diff_messages_queue;
+    SPSCQueue<OrderBookEntry> &diff_messages_queue;
     std::function<void()> on_message_handler;
 
   public:
 
-    krakenWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<price_level>& q)
+    krakenWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<OrderBookEntry>& q)
         : resolver_(ex)
         , ws_(ex, ctx)
         , diff_messages_queue(q) {}
@@ -183,7 +183,7 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
       on_message_handler = [this](){
 
         json payload =  json::parse(beast::buffers_to_string(buffer_.cdata()));
-        price_level level;
+        OrderBookEntry level;
         bool is;
 
         if(payload.is_array()){

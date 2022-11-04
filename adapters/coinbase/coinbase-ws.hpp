@@ -45,12 +45,12 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
     char const* host = "ws-feed.exchange.coinbase.com";
     std::string wsTarget_ = "/ws/";
     std::string host_;
-    SPSCQueue<price_level> &diff_messages_queue;
+    SPSCQueue<OrderBookEntry> &diff_messages_queue;
     std::function<void()> on_message_handler;
 
   public:
 
-    coinbaseWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<price_level>& q)
+    coinbaseWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<OrderBookEntry>& q)
         : resolver_(ex)
         , ws_(ex, ctx)
         , diff_messages_queue(q) {}
@@ -168,7 +168,7 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
       on_message_handler = [this](){
 
             json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
-            price_level level;
+            OrderBookEntry level;
             bool is;
 
             if(payload["changes"][0][0] == "buy"){

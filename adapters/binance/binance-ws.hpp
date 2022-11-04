@@ -45,11 +45,11 @@ class binanceWS : public std::enable_shared_from_this<binanceWS> {
     std::string           wsTarget_ = "/ws/";
     char const*           host      = "stream.binance.com";
     char const*           port      = "9443";
-    SPSCQueue<price_level>&         diff_messages_queue;
+    SPSCQueue<OrderBookEntry>&         diff_messages_queue;
     std::function<void()> on_message_handler;
 
   public:
-    binanceWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<price_level>& q)
+    binanceWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<OrderBookEntry>& q)
         : resolver_(ex)
         , ws_(ex, ctx)
         , diff_messages_queue(q) {}
@@ -210,11 +210,11 @@ class binanceWS : public std::enable_shared_from_this<binanceWS> {
         on_message_handler = [this]() {
 
             json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
-
+            
             bool is;
 
             for(auto x : payload["bids"]){
-                price_level bid_level;
+                OrderBookEntry bid_level;
                 bid_level.is_bid = true;
                 bid_level.price = std::stod(x[0].get<std::string>());
                 bid_level.quantity = std::stod(x[1].get<std::string>());
@@ -222,7 +222,7 @@ class binanceWS : public std::enable_shared_from_this<binanceWS> {
             }     
 
             for(auto x : payload["asks"]){
-                price_level ask_level;
+                OrderBookEntry ask_level;
                 ask_level.is_bid = false;
                 ask_level.price = std::stod(x[0].get<std::string>());
                 ask_level.quantity = std::stod(x[1].get<std::string>());

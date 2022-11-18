@@ -152,7 +152,7 @@ json coinbaseAPI::cancel_order(int orderid)
     return json::parse(http_call(make_url(base_api,method),http::verb::delete_).body());
 }
 
-json coinbaseAPI::get_orderbook(std::string market, int level)
+json coinbaseAPI::get_snapshot(std::string market, int level)
 {
     boost::url method{"products/"+market+"/"+"book"};
     method.params().emplace_back("level",std::to_string(level));

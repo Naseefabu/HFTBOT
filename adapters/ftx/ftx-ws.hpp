@@ -43,12 +43,12 @@ class ftxWS : public std::enable_shared_from_this<ftxWS>
     char const* host = "ftx.com";
     std::string wsTarget_ = "/ws/";
     std::string host_;
-    SPSCQueue<OrderBookEntry> &diff_messages_queue;
+    SPSCQueue<OrderBookMessage> &diff_messages_queue;
     std::function<void()> on_message_handler;
 
   public:
 
-    ftxWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<OrderBookEntry>& q)
+    ftxWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<OrderBookMessage>& q)
         : resolver_(ex)
         , ws_(ex, ctx)
         , diff_messages_queue(q) {}
@@ -173,27 +173,27 @@ class ftxWS : public std::enable_shared_from_this<ftxWS>
 
         json payload =  json::parse(beast::buffers_to_string(buffer_.cdata())); 
         
-        bool is;
-        if(payload["data"]["action"] == "update" && payload.contains(payload["data"]["sells"])){ // error 
+        // bool is;
+        // if(payload["data"]["action"] == "update" && payload.contains(payload["data"]["sells"])){ // error 
 
-            for(auto x : payload["data"]["asks"]){
-                OrderBookEntry level;
-                level.is_bid = false;
-                level.price = std::stod(x[0].get<std::string>());
-                level.quantity = std::stod(x[1].get<std::string>());
-                is = diff_messages_queue.push(level);
-            }
-        }
+        //     for(auto x : payload["data"]["asks"]){
+        //         OrderBookMessage level;
+        //         level.is_bid = false;
+        //         level.price = std::stod(x[0].get<std::string>());
+        //         level.quantity = std::stod(x[1].get<std::string>());
+        //         is = diff_messages_queue.push(level);
+        //     }
+        // }
 
-        if(payload["data"]["action"] == "update" && payload.contains(payload["data"]["bids"])){
-            for(auto x : payload["data"]["bids"]){
-                OrderBookEntry level;
-                level.is_bid = true;
-                level.price = std::stod(x[0].get<std::string>());
-                level.quantity = std::stod(x[1].get<std::string>());
-                is = diff_messages_queue.push(level);
-            }
-        }
+        // if(payload["data"]["action"] == "update" && payload.contains(payload["data"]["bids"])){
+        //     for(auto x : payload["data"]["bids"]){
+        //         OrderBookMessage level;
+        //         level.is_bid = true;
+        //         level.price = std::stod(x[0].get<std::string>());
+        //         level.quantity = std::stod(x[1].get<std::string>());
+        //         is = diff_messages_queue.push(level);
+        //     }
+        // }
 
       };
 

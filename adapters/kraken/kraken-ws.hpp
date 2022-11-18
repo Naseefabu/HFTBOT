@@ -45,12 +45,12 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
     char const* host = "ws.kraken.com";
     std::string wsTarget_ = "/ws/";
     std::string host_;
-    SPSCQueue<OrderBookEntry> &diff_messages_queue;
-    std::function<void()> on_message_handler;
+    SPSCQueue<OrderBookMessage> &diff_messages_queue;
+    std::function<void()> on_orderbook_diffs;
 
   public:
 
-    krakenWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<OrderBookEntry>& q)
+    krakenWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<OrderBookMessage>& q)
         : resolver_(ex)
         , ws_(ex, ctx)
         , diff_messages_queue(q) {}
@@ -136,7 +136,7 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
         ws_.async_read(buffer_, [this](beast::error_code ec, size_t n) {
             if (ec)
                 return fail_ws(ec, "read");
-            on_message_handler();
+            on_orderbook_diffs();
             buffer_.clear();
             ws_.async_read(buffer_, KRAKEN_HANDLER(on_message));
         });
@@ -151,7 +151,7 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
     }
 
   
-  void subscribe_trades(std::string action, std::string pair)
+  void subscribe_trades(const std::string& action,const std::string& pair)
   {
       json payload = {{"event", action},
                   {"pair", {pair}}};
@@ -161,7 +161,7 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
   }
 
   
-  void subscribe_ticker(std::string action, std::string pair)
+  void subscribe_ticker(const std::string& action,const std::string& pair)
   {
 
       json payload = {{"event", action},
@@ -173,37 +173,37 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
 
   // valid levels options : 10,25,100,500,1000
   // Initially snapshot then deltas
-  
-  void subscribe_orderbook_diffs(std::string action, std::string pair, int levels)
+  // https://adamsstudymaterial.notion.site/f5c16a03897e4f55a424280065bb916d?v=36f5716823714d4597c052990ed6691e
+  void subscribe_orderbook_diffs(const std::string& action,const std::string& pair, int levels)
   {
 
       json payload = {{"event", action},
                   {"pair", {pair}}};
       
-      on_message_handler = [this](){
+      on_orderbook_diffs = [this](){
 
         json payload =  json::parse(beast::buffers_to_string(buffer_.cdata()));
-        OrderBookEntry level;
-        bool is;
+        // OrderBookMessage level;
+        // bool is;
 
-        if(payload.is_array()){
+        // if(payload.is_array()){
             
-            for(auto x: payload[1]["a"]){
-                level.is_bid = false;
-                level.price = std::stod(x[0].get<std::string>());
-                level.quantity = std::stod(x[1].get<std::string>());
-                is = diff_messages_queue.push(level);
-                std::cout << "result : " << is << std::endl;
-            }
+        //     for(auto x: payload[1]["a"]){
+        //         level.is_bid = false;
+        //         level.price = std::stod(x[0].get<std::string>());
+        //         level.quantity = std::stod(x[1].get<std::string>());
+        //         is = diff_messages_queue.push(level);
+        //         std::cout << "result : " << is << std::endl;
+        //     }
 
-            for(auto x: payload[1]["b"]){
-                level.is_bid = true;
-                level.price = std::stod(x[0].get<std::string>());
-                level.quantity = std::stod(x[1].get<std::string>());
-                is = diff_messages_queue.push(level);
-                std::cout << "result : " << is << std::endl;
-            }
-        }
+        //     for(auto x: payload[1]["b"]){
+        //         level.is_bid = true;
+        //         level.price = std::stod(x[0].get<std::string>());
+        //         level.quantity = std::stod(x[1].get<std::string>());
+        //         is = diff_messages_queue.push(level);
+        //         std::cout << "result : " << is << std::endl;
+        //     }
+        // }
 
       };
 

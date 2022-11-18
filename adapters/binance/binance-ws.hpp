@@ -36,20 +36,23 @@ void fail_ws(beast::error_code ec, char const* what);
 
 
 class binanceWS : public std::enable_shared_from_this<binanceWS> {
-    tcp::resolver      resolver_;
-    Stream             ws_;
+
+private:
+
+    tcp::resolver resolver_;
+    Stream ws_;
     beast::flat_buffer buffer_;
-    std::string        host_;
-    std::string        message_text_;
+    std::string host_;
+    std::string message_text_;
 
-    std::string           wsTarget_ = "/ws/";
-    char const*           host      = "stream.binance.com";
-    char const*           port      = "9443";
-    SPSCQueue<OrderBookEntry>&         diff_messages_queue;
-    std::function<void()> on_message_handler;
+    std::string wsTarget_ = "/ws/";
+    char const* host      = "stream.binance.com";
+    char const* port      = "9443";
+    SPSCQueue<OrderBookMessage>& diff_messages_queue;
+    std::function<void()> on_orderbook_diffs;
 
-  public:
-    binanceWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<OrderBookEntry>& q)
+public:
+    binanceWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<OrderBookMessage>& q)
         : resolver_(ex)
         , ws_(ex, ctx)
         , diff_messages_queue(q) {}
@@ -137,7 +140,7 @@ class binanceWS : public std::enable_shared_from_this<binanceWS> {
             if (ec)
                 return fail_ws(ec, "read");
 
-            on_message_handler();
+            on_orderbook_diffs();
             buffer_.clear();
             ws_.async_read(buffer_, BINANCE_HANDLER(on_message));
         });
@@ -202,32 +205,24 @@ class binanceWS : public std::enable_shared_from_this<binanceWS> {
     }
 
     
-    void subscribe_orderbook_diffs(const std::string action,const std::string symbol,short int depth_levels)
+    void subscribe_orderbook_diffs(const std::string& action,const std::string& symbol,short int depth_levels)
     {
-        std::string stream = symbol+"@"+"depth"+std::to_string(depth_levels);
+        std::string stream = symbol+"@"+"depth";
 
         
-        on_message_handler = [this]() {
+        on_orderbook_diffs = [this]() {
 
             json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
-            
+            // std::cout << "payload : " << payload << std::endl;
             bool is;
 
-            for(auto x : payload["bids"]){
-                OrderBookEntry bid_level;
-                bid_level.is_bid = true;
-                bid_level.price = std::stod(x[0].get<std::string>());
-                bid_level.quantity = std::stod(x[1].get<std::string>());
-                is = diff_messages_queue.push(bid_level);
-            }     
+            for(auto x : payload["bids"])
+                is = diff_messages_queue.push(OrderBookMessage(true,std::stod(x[0].get<std::string>()),std::stod(x[1].get<std::string>()),payload['u'])); // no update id
+                
 
-            for(auto x : payload["asks"]){
-                OrderBookEntry ask_level;
-                ask_level.is_bid = false;
-                ask_level.price = std::stod(x[0].get<std::string>());
-                ask_level.quantity = std::stod(x[1].get<std::string>());
-                is = diff_messages_queue.push(ask_level);
-            }   
+            for(auto x : payload["asks"])
+                is = diff_messages_queue.push(OrderBookMessage(false,std::stod(x[0].get<std::string>()),std::stod(x[1].get<std::string>()),payload["u"])); // no update id
+
         };
         
         json jv = {
@@ -249,8 +244,6 @@ class binanceWS : public std::enable_shared_from_this<binanceWS> {
         };
         run(host, port,jv, stream);
     }
-
-
 
 };
 

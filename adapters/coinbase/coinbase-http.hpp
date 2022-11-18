@@ -52,7 +52,7 @@ public:
 
     json open_orders();
 
-    json get_orderbook(std::string market, int level);
+    json get_snapshot(std::string market, int level);
 
     json cancel_order(int orderid);
 

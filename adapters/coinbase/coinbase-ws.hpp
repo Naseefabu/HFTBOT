@@ -45,12 +45,12 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
     char const* host = "ws-feed.exchange.coinbase.com";
     std::string wsTarget_ = "/ws/";
     std::string host_;
-    SPSCQueue<OrderBookEntry> &diff_messages_queue;
-    std::function<void()> on_message_handler;
+    SPSCQueue<OrderBookMessage> &diff_messages_queue;
+    std::function<void()> on_orderbook_diffs;
 
   public:
 
-    coinbaseWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<OrderBookEntry>& q)
+    coinbaseWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<OrderBookMessage>& q)
         : resolver_(ex)
         , ws_(ex, ctx)
         , diff_messages_queue(q) {}
@@ -134,7 +134,7 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
         ws_.async_read(buffer_, [this](beast::error_code ec, size_t n) {
             if (ec)
                 return fail_ws(ec, "read");
-            on_message_handler();
+            on_orderbook_diffs();
             buffer_.clear();
             ws_.async_read(buffer_, COINBASE_HANDLER(on_message));
         });
@@ -148,7 +148,7 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
     }
 
   
-  void subscribe(std::string method, std::string market, std::string channel)
+  void subscribe(const std::string& method, const std::string& market, const std::string& channel)
   {
 
       json payload = {{"type", method},
@@ -158,35 +158,123 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
       run(payload);            
   }
 
-  
-  void subscribe_orderbook_diffs(std::string method, std::string market)
+
+  // level 3 orderbook messages
+  void subscribe_orderbook_diffs(const std::string& method, const std::string& market)
   {
       json payload = {{"type", method},
                   {"product_ids", {market}},
-                  {"channels", {"level2"}}};
+                  {"channels", {"full"}}};
       
-      on_message_handler = [this](){
+      on_orderbook_diffs = [this](){
 
             json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
-            OrderBookEntry level;
-            bool is;
+            std::cout << "payload : " << payload << std::endl;
+            std::string msg_type = payload["type"];
+            std::string side = payload["side"];
+            std::string price_raw = payload["price"];
+            std::string order_id;
+            std::string remaining_size;
+            double price = std::stod(price_raw);
+            std::unordered_map<std::string,std::string> order_dict;
+            std::unordered_map<double,std::unordered_map<std::string,std::unordered_map<std::string,std::string>> active_bids;
+            std::unordered_map<double,std::unordered_map<std::string,std::unordered_map<std::string,std::string>>> active_asks;
+            double agg_size;
 
-            if(payload["changes"][0][0] == "buy"){
-                level.is_bid = true;
-                level.price = std::stod(payload["changes"][0][1].get<std::string>());
-                level.quantity = std::stod(payload["changes"][0][2].get<std::string>());
-                is = diff_messages_queue.push(level);
+            if(payload.contains(payload["order_id"]))
+                order_id = payload["order_id"];
+            else
+                order_id = payload["maker_order_id"];
+            
+            if(price_raw == "null")
+                return;
+
+            if(msg_type == "open"){
+                order_dict.insert({"remaining_size" : payload["remaining_size"]});
+                if(side == "buy"){
+                    if(active_bids.find(price) != active_bids.end())
+                        active_bids[price][order_id] = order_dict;
+                    else
+                        active_bids[price] = order_dict;    
+                    agg_size = get_agg_size(price); // aggregating by price
+                    is = diff_messages_queue.push(OrderBookMessage(true,price,agg_size,payload["sequence"]));
+                }
+
+                else{
+                    if(active_asks.find(price) != active_asks.end())
+                        active_asks[price][order_id] = order_dict;
+                    else
+                        active_asks[price] = order_dict;
+                    size_per_price = get_agg_size(price);
+                    is = diff_messages_queue.push(OrderBookMessage(false,price,agg_size,payload["sequence"]));
+                }
+
+            }
+            else if(msg_type == "change"){
+                if payload.contains(payload["new_size"])
+                    remaining_size = payload["remaining_size"];
+                else if(payload.contains(payload["new_funds"]))
+                    remaining_size = std::to_string(std::stod(payload["new_funds"] / price))
+                else
+                    std::cout << "invalid diff message" << std::endl;
+
+                if(side == "buy"){
+                    if((active_bids.find(price) != active_bids.end()) && (active_bids[price].find(active_bids[price][order_id]) != active_bids[price].end())){
+                        active_bids[price]["remaining_size"] = remaining_size; 
+                        agg_size = get_agg_size(price);
+                        is = diff_messages_queue.push(OrderBookMessage(true,price,agg_size,payload["sequence"]));
+                    }
+                    else
+                        std::cout << "empty update " << std::endl;
+
+                else{
+                    if((active_asks.find(price) != active_asks.end()) && (active_asks[price].find(active_asks[price][order_id]) != active_asks[price].end())){
+                        active_asks[price]["remaining_size"] = remaining_size; 
+                        agg_size = get_agg_size(price);
+                        is = diff_messages_queue.push(OrderBookMessage(false,price,agg_size,payload["sequence"]));
+                    }
+                    else
+                        std::cout << "empty update " << std::endl;
+                    }
+                }    
+            }
+            else if(msg_type == "match"){
+
+                if(side == "buy"){
+                    if((active_bids.find(price) != active_bids.end()) && (active_bids[price].find(active_bids[price][order_id]) != active_bids[price].end())){
+                        remaining_size = active_bids[price][order_id]["remaining_size"]; 
+                        active_bids[price][order_id]["remaining_size"] = std::to_string(std::stod(remaining_size) - std::stod(payload["size"]));
+                        agg_size = get_agg_size(price);
+                        is = diff_messages_queue.push(OrderBookMessage(true,price,agg_size,payload["sequence"])); 
+                    }
+                    else
+                        std::cout << "empty update " << std::endl;
+                }
+                else{
+                    if((active_asks.find(price) != active_asks.end()) && (active_asks[price].find(active_asks[price][order_id]) != active_asks[price].end())){
+                        remaining_size = active_asks[price][order_id]["remaining_size"];
+                        active_asks[price][order_id]["remaining_size"] = std::to_string(std::stod(remaining_size) - std::stod(payload["size"]));
+                        agg_size = get_agg_size(price);
+                        is = diff_messages_queue.push(OrderBookMessage(false,price,agg_size,payload["sequence"]));
+                    }
+                    else
+                        std::cout << "empty update" << std::endl;
+                }
+
+            }
+            else if(msg_type == "done"){
+                
+            }
+            else{
+                std::cout << "Invalid Message Type" << std::endl;
             }
 
-            if(payload["changes"][0][0] == "sell"){
-                level.is_bid = false;
-                level.price = std::stod(payload["changes"][0][1].get<std::string>());
-                level.quantity = std::stod(payload["changes"][0][2].get<std::string>());
-                is = diff_messages_queue.push(level);
-            }
 
-        };
+
+    };
 
       run(payload);            
   }
 };
+
+

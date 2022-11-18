@@ -1,10 +1,14 @@
 #include "book_builder.hpp"
 
 
-class OrderBook(){
-    std::set<OrderBookEntry> bid_book;
-    std::set<OrderBookEntry> ask_book;
-    double best_bid;
-    double best_ask;
+void OrderBook::apply_diffs(){
+
+}
+
+void OrderBook::apply_snapshot(){
+
+}
+
+void OrderBook::get_price(){
     
 }

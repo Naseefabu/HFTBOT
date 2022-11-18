@@ -9,7 +9,7 @@
 
 void binance_producer_main(net::io_context& ioc, ssl::context& ctx, std::string &symbol, int &levels)
 {
-    SPSCQueue<OrderBookEntry>binance_producer_queue(1000);
+    SPSCQueue<OrderBookMessage>binance_producer_queue(1000);
     //auto binancews = std::make_shared<binanceWS<price_level>>(ioc,ctx,binance_producer_queue);  // Subscribe diff messages
     auto binancews = std::make_shared<binanceWS>(boost::asio::make_strand(ioc),ctx,binance_producer_queue);
     // binanceWS<double> binancews(ioc,ctx,binance_producer_queue);
@@ -20,7 +20,7 @@ void binance_producer_main(net::io_context& ioc, ssl::context& ctx, std::string 
 
 void ftx_producer_main(net::io_context& ioc, ssl::context& ctx, std::string &symbol)
 {
-    SPSCQueue<OrderBookEntry>ftx_producer_queue(1000); 
+    SPSCQueue<OrderBookMessage>ftx_producer_queue(1000); 
     auto ftxws = std::make_shared<ftxWS>(boost::asio::make_strand(ioc),ctx,ftx_producer_queue);
     //ftxWS<double> ftxws(ioc,ctx,ftx_producer_queue);
     ftxws->subscribe_orderbook_diffs("subscribe",symbol);
@@ -31,7 +31,7 @@ void ftx_producer_main(net::io_context& ioc, ssl::context& ctx, std::string &sym
 
 void coinbase_producer_main(net::io_context& ioc, ssl::context& ctx, std::string &symbol)
 {
-    SPSCQueue<OrderBookEntry>coinbase_producer_queue(1000);
+    SPSCQueue<OrderBookMessage>coinbase_producer_queue(1000);
     auto coinbasews = std::make_shared<coinbaseWS>(boost::asio::make_strand(ioc),ctx,coinbase_producer_queue);
     //coinbaseWS<double> coinbasews(ioc,ctx,coinbase_producer_queue);
     coinbasews->subscribe_orderbook_diffs("subscribe",symbol);
@@ -41,7 +41,7 @@ void coinbase_producer_main(net::io_context& ioc, ssl::context& ctx, std::string
 
 void kraken_producer_main(net::io_context& ioc, ssl::context& ctx, std::string &symbol, int &levels)
 {
-    SPSCQueue<OrderBookEntry>kraken_producer_queue(1000); 
+    SPSCQueue<OrderBookMessage>kraken_producer_queue(1000); 
     auto krakenws = std::make_shared<krakenWS>(boost::asio::make_strand(ioc),ctx,kraken_producer_queue);
     //krakenWS<double> krakenws(ioc,ctx,kraken_producer_queue);
     krakenws->subscribe_orderbook_diffs("subscribe",symbol,30);

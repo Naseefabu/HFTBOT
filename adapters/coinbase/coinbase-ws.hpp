@@ -14,6 +14,7 @@
 #include "Ringbuffer.hpp"
 #include <system_error>
 #include "types.hpp"
+#include <unordered_map>
 
 namespace beast     = boost::beast;    
 namespace http      = beast::http;     
@@ -47,6 +48,8 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
     std::string host_;
     SPSCQueue<OrderBookMessage> &diff_messages_queue;
     std::function<void()> on_orderbook_diffs;
+    std::unordered_map<double,std::unordered_map<std::string,std::unordered_map<std::string,double>>> bids;
+    std::unordered_map<double,std::unordered_map<std::string,std::unordered_map<std::string,double>>> asks;
 
   public:
 
@@ -159,6 +162,22 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
   }
 
 
+    double get_agg_size_for_bids(const double& price){
+        double aggsize = 0;
+        for(auto x : bids[price]){
+            aggsize += x.second["remaining_size"];
+        }
+        return aggsize;
+    }
+
+    double get_agg_size_for_asks(const double& price){
+        double aggsize = 0;
+        for(auto x : asks[price]){
+            aggsize += x.second["remaining_size"];
+        }
+        return aggsize;
+    }
+
   // level 3 orderbook messages
   void subscribe_orderbook_diffs(const std::string& method, const std::string& market)
   {
@@ -169,17 +188,18 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
       on_orderbook_diffs = [this](){
 
             json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
-            std::cout << "payload : " << payload << std::endl;
-            std::string msg_type = payload["type"];
+            // std::cout << "payload : " << payload << std::endl;
+
             std::string side = payload["side"];
+            std::string msg_type = payload["type"];
             std::string price_raw = payload["price"];
-            std::string order_id;
-            std::string remaining_size;
+            std::unordered_map<std::string,double> order_dict;
             double price = std::stod(price_raw);
-            std::unordered_map<std::string,std::string> order_dict;
-            std::unordered_map<double,std::unordered_map<std::string,std::unordered_map<std::string,std::string>> active_bids;
-            std::unordered_map<double,std::unordered_map<std::string,std::unordered_map<std::string,std::string>>> active_asks;
+            double newfunds=0;
+            double remaining_size=0;
+            std::string order_id;
             double agg_size;
+            bool is;
 
             if(payload.contains(payload["order_id"]))
                 order_id = payload["order_id"];
@@ -187,74 +207,81 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
                 order_id = payload["maker_order_id"];
             
             if(price_raw == "null")
-                return;
+                std::cout << "null" << std::endl;
 
             if(msg_type == "open"){
-                order_dict.insert({"remaining_size" : payload["remaining_size"]});
+                remaining_size = std::stod(payload["remaining_size"].get<std::string>());
+                order_dict.insert({"remaining_size",remaining_size});
                 if(side == "buy"){
-                    if(active_bids.find(price) != active_bids.end())
-                        active_bids[price][order_id] = order_dict;
+                    if(bids.find(price) != bids.end())
+                        bids[price][order_id] = order_dict; // replacing yes
                     else
-                        active_bids[price] = order_dict;    
-                    agg_size = get_agg_size(price); // aggregating by price
+                        bids[price][order_id] = order_dict;    // add new if not existing
+                    agg_size = get_agg_size_for_bids(price); // aggregating by price
                     is = diff_messages_queue.push(OrderBookMessage(true,price,agg_size,payload["sequence"]));
                 }
 
                 else{
-                    if(active_asks.find(price) != active_asks.end())
-                        active_asks[price][order_id] = order_dict;
+                    if(asks.find(price) != asks.end())
+                        asks[price][order_id] = order_dict;
                     else
-                        active_asks[price] = order_dict;
-                    size_per_price = get_agg_size(price);
+                        asks[price][order_id] = order_dict;
+                    agg_size = get_agg_size_for_asks(price);
                     is = diff_messages_queue.push(OrderBookMessage(false,price,agg_size,payload["sequence"]));
                 }
 
-            }
+            }   
+
             else if(msg_type == "change"){
-                if payload.contains(payload["new_size"])
-                    remaining_size = payload["remaining_size"];
-                else if(payload.contains(payload["new_funds"]))
-                    remaining_size = std::to_string(std::stod(payload["new_funds"] / price))
+
+                if(payload.contains(payload["new_size"]))
+                    remaining_size = std::stod(payload["remaining_size"].get<std::string>());
+                else if(payload.contains(payload["new_funds"])){
+                    newfunds = std::stod(payload["new_funds"].get<std::string>());
+                    remaining_size = newfunds / price;
+                }
                 else
                     std::cout << "invalid diff message" << std::endl;
 
                 if(side == "buy"){
-                    if((active_bids.find(price) != active_bids.end()) && (active_bids[price].find(active_bids[price][order_id]) != active_bids[price].end())){
-                        active_bids[price]["remaining_size"] = remaining_size; 
-                        agg_size = get_agg_size(price);
+                    if((bids.find(price) != bids.end()) && (bids[price].find(order_id) != bids[price].end())){
+                        bids[price][order_id]["remaining_size"] = remaining_size; 
+                        agg_size = get_agg_size_for_bids(price);
                         is = diff_messages_queue.push(OrderBookMessage(true,price,agg_size,payload["sequence"]));
                     }
                     else
                         std::cout << "empty update " << std::endl;
+                }
 
                 else{
-                    if((active_asks.find(price) != active_asks.end()) && (active_asks[price].find(active_asks[price][order_id]) != active_asks[price].end())){
-                        active_asks[price]["remaining_size"] = remaining_size; 
-                        agg_size = get_agg_size(price);
+                    if((asks.find(price) != asks.end()) && (asks[price].find(order_id) != asks[price].end())){
+                        asks[price][order_id]["remaining_size"] = remaining_size; 
+                        agg_size = get_agg_size_for_asks(price);
                         is = diff_messages_queue.push(OrderBookMessage(false,price,agg_size,payload["sequence"]));
                     }
                     else
                         std::cout << "empty update " << std::endl;
-                    }
+                    
                 }    
-            }
+            } 
+
             else if(msg_type == "match"){
 
                 if(side == "buy"){
-                    if((active_bids.find(price) != active_bids.end()) && (active_bids[price].find(active_bids[price][order_id]) != active_bids[price].end())){
-                        remaining_size = active_bids[price][order_id]["remaining_size"]; 
-                        active_bids[price][order_id]["remaining_size"] = std::to_string(std::stod(remaining_size) - std::stod(payload["size"]));
-                        agg_size = get_agg_size(price);
+                      if((bids.find(price) != bids.end()) && (bids[price].find(order_id) != bids[price].end())){
+                        double size = bids[price][order_id]["remaining_size"]; 
+                        bids[price][order_id]["remaining_size"] = size - std::stod(payload["size"].get<std::string>());
+                        agg_size = get_agg_size_for_bids(price);
                         is = diff_messages_queue.push(OrderBookMessage(true,price,agg_size,payload["sequence"])); 
                     }
                     else
                         std::cout << "empty update " << std::endl;
                 }
                 else{
-                    if((active_asks.find(price) != active_asks.end()) && (active_asks[price].find(active_asks[price][order_id]) != active_asks[price].end())){
-                        remaining_size = active_asks[price][order_id]["remaining_size"];
-                        active_asks[price][order_id]["remaining_size"] = std::to_string(std::stod(remaining_size) - std::stod(payload["size"]));
-                        agg_size = get_agg_size(price);
+                    if((asks.find(price) != asks.end()) && (asks[price].find(order_id) != asks[price].end())){
+                        double size = asks[price][order_id]["remaining_size"];
+                        asks[price][order_id]["remaining_size"] = size - std::stod(payload["size"].get<std::string>());
+                        agg_size = get_agg_size_for_asks(price);
                         is = diff_messages_queue.push(OrderBookMessage(false,price,agg_size,payload["sequence"]));
                     }
                     else
@@ -262,18 +289,44 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
                 }
 
             }
+
             else if(msg_type == "done"){
+                if(side == "buy"){
+                     if((bids.find(price) != bids.end()) && (bids[price].find(order_id) != bids[price].end())){
+                        bids[price].erase(order_id);
+                        if(bids[price].size() < 1){ 
+                            bids.erase(price); 
+                            is = diff_messages_queue.push(OrderBookMessage(true,price,0.0,payload["sequence"]));
+                        }
+                        else{
+                            agg_size = get_agg_size_for_bids(price);
+                            is = diff_messages_queue.push(OrderBookMessage(true,price,agg_size,payload["sequence"]));
+                        }
+                    }
+                }
+                else{
+
+                   if((asks.find(price) != asks.end()) && (asks[price].find(order_id) != asks[price].end())){
+                        asks[price].erase(order_id);
+                        if(asks[price].size() < 1){ 
+                            asks.erase(price);
+                            is = diff_messages_queue.push(OrderBookMessage(false,price,0.0,payload["sequence"]));
+                        }
+                        else{
+                            agg_size = get_agg_size_for_asks(price);
+                            is = diff_messages_queue.push(OrderBookMessage(false,price,agg_size,payload["sequence"]));
+                        }
+                    }
+                }
                 
             }
             else{
                 std::cout << "Invalid Message Type" << std::endl;
             }
 
-
-
     };
 
-      run(payload);            
+    run(payload);            
   }
 };
 

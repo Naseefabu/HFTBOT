@@ -6,8 +6,10 @@
 class OrderBook(){
     std::set<OrderBookRow> bid_book;
     std::set<OrderBookRow> ask_book;
-    double best_bid;
-    double best_ask;
+    double bid;
+    double ask;
+    double bid_size;
+    double ask_size;
 
     OrderBook();
     void apply_diffs(std::vector<OrderBookRow> bids, std::vector<OrderBookRow> asks);

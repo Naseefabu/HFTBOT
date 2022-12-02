@@ -55,3 +55,17 @@ std::string decode64(const std::string &val) {
 }
 
 
+// there is also _mm_crc32_u32() available which is a function from the Intel® SSE4.2 instruction set that calculates the CRC-32 checksum of a 32-bit integer.
+// will check it later for more optimizations
+uint32_t crc32_table(const uint8_t *data, size_t len)
+{
+      uint32_t crc = 0xFFFFFFFF;
+
+      while (len--) {
+          crc = crc_32_table[((crc) ^ (*data++)) & 0xFF] ^ ((crc) >> 8);
+      }
+
+      return ~crc;
+}
+
+

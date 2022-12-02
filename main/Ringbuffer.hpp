@@ -21,8 +21,8 @@ template <typename T> struct SPSCQueue {
     SPSCQueue(size_t capacity) { data_.resize(capacity); }
 
     bool push(T&& val) {
-        auto const writeIdx = writeIdx_.load(std::memory_order_relaxed); // free to order anywhere
-        auto       nextWriteIdx = writeIdx + 1;
+        auto const writeIdx = writeIdx_.load(std::memory_order_relaxed); // free to order anywhere, cant because next instruction needs this value
+        auto nextWriteIdx = writeIdx + 1;
         if (nextWriteIdx == data_.size()) {
             nextWriteIdx = 0;
         }
@@ -45,8 +45,8 @@ template <typename T> struct SPSCQueue {
                 return false;
             }
         }
-        double val         = data_[readIdx];
-        auto   nextReadIdx = readIdx + 1;
+        double val = data_[readIdx];
+        auto nextReadIdx = readIdx + 1;
         if (nextReadIdx == data_.size()) {
             nextReadIdx = 0;
         }

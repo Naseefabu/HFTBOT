@@ -151,55 +151,58 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
     }
 
   
-  void subscribe_trades(const std::string& action,const std::string& pair)
-  {
-      json payload = {{"event", action},
-                  {"pair", {pair}}};
+    void subscribe_trades(const std::string& action,const std::string& pair)
+    {
+        json payload = {{"event", action},
+                    {"pair", {pair}}};
 
-      payload["subscription"]["name"] = "trade";
-      run(payload);            
-  }
+        payload["subscription"]["name"] = "trade";
+        run(payload);            
+    }
 
-  
-  void subscribe_ticker(const std::string& action,const std::string& pair)
-  {
+    
+    void subscribe_ticker(const std::string& action,const std::string& pair)
+    {
 
-      json payload = {{"event", action},
-                  {"pair", {pair}}};
+        json payload = {{"event", action},
+                    {"pair", {pair}}};
 
-      payload["subscription"]["name"] = "ticker";
-      run(payload);            
-  }
+        payload["subscription"]["name"] = "ticker";
+        run(payload);            
+    }
+    void kraken_checksum(){
 
-  // valid levels options : 10,25,100,500,1000
-  // https://adamsstudymaterial.notion.site/f5c16a03897e4f55a424280065bb916d?v=36f5716823714d4597c052990ed6691e
-  void subscribe_orderbook_diffs(const std::string& action,const std::string& pair, int levels)
-  {
+    }
 
-      json payload = {{"event", action},
-                  {"pair", {pair}}};
-      
-      on_orderbook_diffs = [this](){
+    // valid levels options : 10,25,100,500,1000
+    // https://adamsstudymaterial.notion.site/f5c16a03897e4f55a424280065bb916d?v=36f5716823714d4597c052990ed6691e
+    void subscribe_orderbook_diffs(const std::string& action,const std::string& pair, int levels)
+    {
 
-        json payload =  json::parse(beast::buffers_to_string(buffer_.cdata()));
-        bool is;
+        json payload = {{"event", action},
+                    {"pair", {pair}}};
+        
+        on_orderbook_diffs = [this](){
 
-        if(payload.is_array()){
-            
-            // for(auto x: payload[1]["a"])
-            //     //is = diff_messages_queue.push(OrderBookMessage(false,std::stod(x[0].get<std::string>()),std::stod(x[1].get<std::string>()),payload[''])); 
-            
+            json payload =  json::parse(beast::buffers_to_string(buffer_.cdata()));
+            bool is;
 
-            // for(auto x: payload[1]["b"])
-            //     //is = diff_messages_queue.push(OrderBookMessage(true,std::stod(x[0].get<std::string>()),std::stod(x[1].get<std::string>()),payload['']));
-            
-        }
+            if(payload.is_array()){
+                // No need update-id, reliability of the orderbook is checked using checksum
+                for(auto x: payload[1]["a"])
+                    is = diff_messages_queue.push(OrderBookMessage(false,std::stod(x[0].get<std::string>()),std::stod(x[1].get<std::string>()),0)); 
+                
 
-      };
+                for(auto x: payload[1]["b"])
+                    is = diff_messages_queue.push(OrderBookMessage(true,std::stod(x[0].get<std::string>()),std::stod(x[1].get<std::string>()),0));
+                
+            }
 
-      payload["subscription"]["name"] = "book";
-      payload["subscription"]["depth"] = 10;
-      run(payload);            
-  }
+        };
+
+        payload["subscription"]["name"] = "book";
+        payload["subscription"]["depth"] = 10;
+        run(payload);            
+    }
 
 };

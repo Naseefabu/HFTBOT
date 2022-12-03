@@ -55,17 +55,26 @@ std::string decode64(const std::string &val) {
 }
 
 
-// there is also _mm_crc32_u32() available which is a function from the Intel® SSE4.2 instruction set that calculates the CRC-32 checksum of a 32-bit integer.
-// will check it later for more optimizations
-uint32_t crc32_table(const uint8_t *data, size_t len)
-{
-      uint32_t crc = 0xFFFFFFFF;
+std::string removeDecimalAndLeadingZeros(std::string str) {
+  // Remove the decimal point
+  str.erase(std::remove(str.begin(), str.end(), '.'), str.end());
 
-      while (len--) {
-          crc = crc_32_table[((crc) ^ (*data++)) & 0xFF] ^ ((crc) >> 8);
-      }
+  // Remove leading zeros
+  while (str.length() > 1 && str[0] == '0') {
+    str.erase(0, 1);
+  }
 
-      return ~crc;
+  return str;
 }
 
+// there is compiler instrinsics for checksum32 calculation as part of SSE4 instruction set, will refer later for more optimizations
+uint32_t checksum32(const std::string &str){
+    boost::crc_32_type result;
+    result.process_bytes(str.data(), str.length());
+
+    // Cast the checksum to an unsigned 32-bit integer
+    uint32_t checksum = result.checksum();
+
+    return checksum;
+}
 

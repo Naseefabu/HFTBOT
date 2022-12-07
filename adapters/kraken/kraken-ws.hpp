@@ -175,7 +175,6 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
     }
 
     // valid levels options : 10,25,100,500,1000
-    // https://adamsstudymaterial.notion.site/f5c16a03897e4f55a424280065bb916d?v=36f5716823714d4597c052990ed6691e
     void subscribe_orderbook_diffs(const std::string& action,const std::string& pair, int levels)
     {
 

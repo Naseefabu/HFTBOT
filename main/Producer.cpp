@@ -47,3 +47,13 @@ void kraken_producer_main(net::io_context& ioc, ssl::context& ctx, std::string &
     krakenws->subscribe_orderbook_diffs("subscribe",symbol,30);
     ioc.run();
 }
+
+void bitfinex_producer_main(net::io_context& ioc, ssl::context& ctx, std::string &symbol, int &levels)
+{
+    SPSCQueue<OrderBookMessage>bitfinex_producer_queue(1000); 
+    auto bitfinexws = std::make_shared<krakenWS>(boost::asio::make_strand(ioc),ctx,bitfinex_producer_queue);
+    //krakenWS<double> krakenws(ioc,ctx,kraken_producer_queue);
+    bitfinexws->subscribe_orderbook_diffs("subscribe",symbol,30);
+    ioc.run();
+}
+

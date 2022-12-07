@@ -39,8 +39,8 @@ private:
     beast::flat_buffer buffer_;
     http::request<http::string_body>  req_;
     http::response<http::string_body> res_;
-    std::string api_key = "v6uhUtse5Ae1Gyz72eMSbUMGw7VUDdd5AnqobMOW1Llzi4snnfP4YCyY9V74PFJ4";
-    std::string secret_key = "FW8j4YobD26PVP6QLu0sv4Dv7OzrtfgQKzn8FoIMwGzMW9Y0VmX1DatbLIfXoCHV";
+    std::string api_key = "YRpmzFgOAeaYGCpHqsRAkRZTgtofziPRJsQ59IMey0z";
+    std::string secret_key = "0191uDe4OarxnxstnLVGInZGEqOY05culJMZGNWHEtk";
     net::io_context& ioc;
     ssl::context& ctx;
     

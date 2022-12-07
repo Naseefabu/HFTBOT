@@ -22,6 +22,7 @@ http::response<http::string_body> binanceAPI::http_call(boost::url url, http::ve
     req_.set("X-MBX-APIKEY", api_key);
 
     req_.prepare_payload();
+    std::cout << "request : " << req_ << std::endl;
 
     auto const results = resolver_.resolve(host, service);
     beast::get_lowest_layer(stream_).connect(results);

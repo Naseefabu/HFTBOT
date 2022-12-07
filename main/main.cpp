@@ -5,6 +5,7 @@
 #include <boost/url/src.hpp> // can only include in one source file
 #include "TapeSpeedIndicator.hpp"
 #include <Producer.hpp>
+#include "bitfinex-http.hpp"
 
 
 int main()
@@ -22,8 +23,17 @@ int main()
     int levels = 10;
 
     // coinbase_producer_main(ioc,ctx,coinbase_symbol);
-    binance_producer_main(ioc,ctx,binance_symbol,levels);
+    //binance_producer_main(ioc,ctx,binance_symbol,levels);
     //ftx_producer_main(ioc,ctx,ftx_symbol);
     //kraken_producer_main(ioc,ctx,kraken_symbol,levels);
 
+    // auto binanceapi = std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc);
+    // std::string l = "10";
+    // json out = binanceapi->orderbook(binance_symbol,l);
+    // std::cout << "json response binance : " << out << std::endl;
+    auto bitfinexapi = std::make_shared<bitfinexAPI>(ioc.get_executor(),ctx,ioc);
+    std::string l = "25";
+    json out = bitfinexapi->get_snapshot("tBTCUSD",l);
+    std::cout << "json bitfinex output : " << out << std::endl;
+    ioc.run();
 }

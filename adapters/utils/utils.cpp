@@ -78,3 +78,70 @@ uint32_t checksum32(const std::string &str){
     return checksum;
 }
 
+std::string coinbase_HmacSha256(const char* key, const char* data) 
+{
+    unsigned char *result;
+    static char res_hexstring[64];
+    int result_len = 32;
+    std::string signature;
+
+    result = HMAC(EVP_sha256(), key, strlen((char *)key), const_cast<unsigned char *>(reinterpret_cast<const unsigned char*>(data)), strlen((char *)data), NULL, NULL);
+    const char *preEncodeSignature_c = strdup(reinterpret_cast<const char *>(result));
+    std::string preEncodeSignature(preEncodeSignature_c);
+
+    std::string postEncodeSignature = encode64(preEncodeSignature);
+
+    return postEncodeSignature;
+}
+
+std::string getHmacSha256(const char* key, const char* data) 
+{
+    unsigned char *result;
+    static char res_hexstring[64];
+    int result_len = 32;
+    std::string signature;
+
+    result = HMAC(EVP_sha256(), key, strlen((char *)key), const_cast<unsigned char *>(reinterpret_cast<const unsigned char*>(data)), strlen((char *)data), NULL, NULL);
+    for (int i = 0; i < result_len; i++) {
+        sprintf(&(res_hexstring[i * 2]), "%02x", result[i]);
+    }
+
+    for (int i = 0; i < 64; i++) {
+        signature += res_hexstring[i];
+    }
+
+    return signature;
+}
+
+std::string getHmacSha384(std::string &key,std::string &content)
+{
+    unsigned char *result;
+    int result_len = 48;
+    std::string digest;
+
+    result = HMAC(EVP_sha384(), key.data(), key.size(),
+                  reinterpret_cast<const unsigned char *>(content.data()),
+                  content.size(), NULL, NULL);
+
+    digest.assign(reinterpret_cast<char *>(result), result_len);
+    std::transform(digest.cbegin(), digest.cend(), digest.begin(), ::tolower);
+
+    return digest;
+}
+
+
+std::string generate_nonce(){
+
+    auto tp = std::chrono::system_clock::now();
+
+    // Convert the time_point to a duration in milliseconds
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch());
+
+    // Convert the duration to a string using a stringstream
+    std::stringstream ss;
+    ss << ms.count();
+
+    // The nonce value is the string from the stringstream
+    std::string nonce = ss.str();
+    return nonce;
+}

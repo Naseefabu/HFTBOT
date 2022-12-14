@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <sstream>
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 #include <boost/beast/ssl.hpp>
@@ -51,6 +52,11 @@ std::string removeDecimalAndLeadingZeros(std::string str);
 
 uint32_t checksum32(const std::string &str);
 
+std::string getHmacSha256(const char* key, const char* data);
 
+std::string coinbase_HmacSha256(const char* key, const char* data);
 
+std::string generate_nonce();
+
+std::string getHmacSha384(std::string &key,std::string &content);
 

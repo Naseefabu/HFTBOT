@@ -22,7 +22,6 @@ http::response<http::string_body> binanceAPI::http_call(boost::url url, http::ve
     req_.set("X-MBX-APIKEY", api_key);
 
     req_.prepare_payload();
-    std::cout << "request : " << req_ << std::endl;
 
     auto const results = resolver_.resolve(host, service);
     beast::get_lowest_layer(stream_).connect(results);
@@ -37,24 +36,6 @@ http::response<http::string_body> binanceAPI::http_call(boost::url url, http::ve
     return res_;
 }
 
-std::string binanceAPI::authenticate(const char* key, const char* data) 
-{
-    unsigned char *result;
-    static char res_hexstring[64];
-    int result_len = 32;
-    std::string signature;
-
-    result = HMAC(EVP_sha256(), key, strlen((char *)key), const_cast<unsigned char *>(reinterpret_cast<const unsigned char*>(data)), strlen((char *)data), NULL, NULL);
-    for (int i = 0; i < result_len; i++) {
-        sprintf(&(res_hexstring[i * 2]), "%02x", result[i]);
-    }
-
-    for (int i = 0; i < 64; i++) {
-        signature += res_hexstring[i];
-    }
-
-    return signature;
-}
 
 void binanceAPI::configure(const std::string &api,const std::string &secret)
 {
@@ -139,7 +120,7 @@ json binanceAPI::open_orders( )
     boost::url method{"openOrders"};
     std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
     std::string query_params = "timestamp=" +server_timestamp;
-    method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str()));  // order matters
+    method.params().emplace_back("signature",getHmacSha256(this->secret_key.c_str(),query_params.c_str()));  // order matters
     method.params().emplace_back("timestamp",server_timestamp);
     return json::parse(std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
 }
@@ -161,7 +142,7 @@ json binanceAPI::place_order(const std::string &symbol,double price,std::string 
     method.params().emplace_back("price",std::to_string(price));
     method.params().emplace_back("recvWindow", "60000");
     method.params().emplace_back("timestamp",server_timestamp);
-    method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str())); 
+    method.params().emplace_back("signature",getHmacSha256(this->secret_key.c_str(),query_params.c_str())); 
 
     return json::parse(std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::post).body());;
 
@@ -181,7 +162,7 @@ json binanceAPI::place_order(const std::string &symbol,std::string side,const st
     method.params().emplace_back("quantity",quantity); 
     method.params().emplace_back("recvWindow", "60000");
     method.params().emplace_back("timestamp",server_timestamp);
-    method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str())); 
+    method.params().emplace_back("signature",getHmacSha256(this->secret_key.c_str(),query_params.c_str())); 
 
     return json::parse(std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::post).body());;
 
@@ -194,7 +175,7 @@ json binanceAPI::cancel_order(const std::string &symbol,int orderid )
     boost::url method{"order"};
     method.params().emplace_back("symbol",symbol);
     method.params().emplace_back("orderId",std::to_string(orderid));
-    method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str()));
+    method.params().emplace_back("signature",getHmacSha256(this->secret_key.c_str(),query_params.c_str()));
     method.params().emplace_back("timestamp",server_timestamp);
     return json::parse(std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::delete_).body());
 
@@ -206,7 +187,7 @@ json binanceAPI::cancel_all_orders(const std::string &symbol)
     std::string query_params = "symbol="+symbol+"&timestamp="+server_timestamp;
     boost::url method{"openOrders"};
     method.params().emplace_back("symbol",symbol);
-    method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str()));
+    method.params().emplace_back("signature",getHmacSha256(this->secret_key.c_str(),query_params.c_str()));
     method.params().emplace_back("timestamp",server_timestamp);
     return json::parse(std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::delete_).body());
 }
@@ -218,7 +199,7 @@ json binanceAPI::check_order_status(const std::string &symbol,int orderid )
     boost::url method{"order"};
     method.params().emplace_back("symbol",symbol);
     method.params().emplace_back("orderId",std::to_string(orderid));
-    method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str()));
+    method.params().emplace_back("signature",getHmacSha256(this->secret_key.c_str(),query_params.c_str()));
     method.params().emplace_back("timestamp",server_timestamp);
     return json::parse(std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
 
@@ -229,7 +210,7 @@ json binanceAPI::get_account_info()
     std::string server_timestamp = std::to_string(get_ms_timestamp(current_time()).count());
     std::string query_params = "timestamp="+server_timestamp;
     boost::url method{"account"};
-    method.params().emplace_back("signature",this->authenticate(this->secret_key.c_str(),query_params.c_str()));
+    method.params().emplace_back("signature",getHmacSha256(this->secret_key.c_str(),query_params.c_str()));
     method.params().emplace_back("timestamp",server_timestamp);
     return json::parse(std::make_shared<binanceAPI>(ioc.get_executor(),ctx,ioc)->http_call(make_url(base_api,method),http::verb::get).body());
 

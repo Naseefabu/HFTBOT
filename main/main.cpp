@@ -32,8 +32,13 @@ int main()
     // json out = binanceapi->orderbook(binance_symbol,l);
     // std::cout << "json response binance : " << out << std::endl;
     auto bitfinexapi = std::make_shared<bitfinexAPI>(ioc.get_executor(),ctx,ioc);
-    std::string l = "25";
-    json out = bitfinexapi->get_snapshot("tBTCUSD",l);
-    std::cout << "json bitfinex output : " << out << std::endl;
+    //std::string l = "25";
+    //json out = bitfinexapi->get_snapshot("tBTCUSD",l);
+    //std::cout << "json bitfinex output : " << out << std::endl;
+    
+    json out1 = bitfinexapi->place_market_buy("tBTCUSD","1");
+    std::cout << "market buy output : " << out1 << std::endl;
+    
+    
     ioc.run();
 }

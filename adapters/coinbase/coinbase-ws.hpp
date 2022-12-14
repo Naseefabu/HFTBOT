@@ -217,7 +217,7 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
                         bids[price][order_id] = order_dict; // replacing yes
                     else
                         bids[price][order_id] = order_dict;    // add new if not existing
-                    agg_size = get_agg_size_for_bids(price); // aggregating by price
+                    agg_size = get_agg_size_for_bids(price); // aggregating size by price
                     is = diff_messages_queue.push(OrderBookMessage(true,price,agg_size,payload["sequence"]));
                 }
 

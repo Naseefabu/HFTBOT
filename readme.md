@@ -68,6 +68,4 @@ cd HFTBOT/
 ./run.sh
 ```
 
-# Contacts
 
-If you all wanna chat ping me on discord : QuntCuant#9494

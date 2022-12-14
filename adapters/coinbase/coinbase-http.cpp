@@ -39,21 +39,6 @@ http::response<http::string_body> coinbaseAPI::http_call(boost::url url, http::v
     return res_;
 }
 
-std::string coinbaseAPI::authenticate(const char* key, const char* data) 
-{
-    unsigned char *result;
-    static char res_hexstring[64];
-    int result_len = 32;
-    std::string signature;
-
-    result = HMAC(EVP_sha256(), key, strlen((char *)key), const_cast<unsigned char *>(reinterpret_cast<const unsigned char*>(data)), strlen((char *)data), NULL, NULL);
-    const char *preEncodeSignature_c = strdup(reinterpret_cast<const char *>(result));
-    std::string preEncodeSignature(preEncodeSignature_c);
-
-    std::string postEncodeSignature = encode64(preEncodeSignature);
-
-    return postEncodeSignature;
-}
 
 void coinbaseAPI::configure(const std::string &api, const std::string &secret,const std::string &pass)
 {
@@ -67,7 +52,7 @@ json coinbaseAPI::open_orders()
     boost::url method{"orders"};
     std::string time = std::to_string(get_sec_timestamp(current_time()).count());
     std::string data = time + "GET" + "/orders";
-    sign = authenticate(PostDecodeString.c_str(),data.c_str());
+    sign = coinbase_HmacSha256(PostDecodeString.c_str(),data.c_str());
     req_.set("CB-ACCESS-SIGN",sign);
     req_.set("CB-ACCESS-TIMESTAMP", time);
     return json::parse(http_call(make_url(base_api,method),http::verb::get).body());
@@ -78,7 +63,7 @@ json coinbaseAPI::cancel_all()
     boost::url method{"orders"};
     std::string time = std::to_string(get_sec_timestamp(current_time()).count());
     std::string data = time + "DELETE" + "/orders";
-    sign = authenticate(PostDecodeString.c_str(),data.c_str());
+    sign = coinbase_HmacSha256(PostDecodeString.c_str(),data.c_str());
     req_.set("CB-ACCESS-SIGN",sign);
     req_.set("CB-ACCESS-TIMESTAMP", time);
     return json::parse(http_call(make_url(base_api,method),http::verb::delete_).body());
@@ -96,7 +81,7 @@ ordered_json coinbaseAPI::place_market_buy(std::string market,std::string size)
             {"funds", size}};
 
     std::string data = time + "POST" + "/orders" + payload.dump();
-    sign = authenticate(PostDecodeString.c_str(),data.c_str());
+    sign = coinbase_HmacSha256(PostDecodeString.c_str(),data.c_str());
     req_.set("CB-ACCESS-SIGN",sign);
     req_.set("CB-ACCESS-TIMESTAMP", time);
     req_.body() = payload.dump();
@@ -114,7 +99,7 @@ ordered_json coinbaseAPI::place_market_sell(std::string market,std::string size)
             {"size", size}};
 
     std::string data = time + "POST" + "/orders" + payload.dump();
-    sign = authenticate(PostDecodeString.c_str(),data.c_str());
+    sign = coinbase_HmacSha256(PostDecodeString.c_str(),data.c_str());
     req_.set("CB-ACCESS-SIGN",sign);
     req_.set("CB-ACCESS-TIMESTAMP", time);
     req_.body() = payload.dump();
@@ -134,7 +119,7 @@ ordered_json coinbaseAPI::place_limit_order(std::string market,int price,std::st
             {"post_only",true}};
 
     std::string data = time + "POST" + "/orders" + payload.dump();
-    sign = authenticate(PostDecodeString.c_str(),data.c_str());
+    sign = coinbase_HmacSha256(PostDecodeString.c_str(),data.c_str());
     req_.set("CB-ACCESS-SIGN",sign);
     req_.set("CB-ACCESS-TIMESTAMP", time);
     req_.body() = payload.dump();
@@ -146,7 +131,7 @@ json coinbaseAPI::cancel_order(int orderid)
     boost::url method{"orders/"+std::to_string(orderid)};
     std::string time = std::to_string(get_sec_timestamp(current_time()).count());
     std::string data = time + "DELETE" + "/orders/"+std::to_string(orderid);
-    sign = authenticate(PostDecodeString.c_str(),data.c_str());
+    sign = coinbase_HmacSha256(PostDecodeString.c_str(),data.c_str());
     req_.set("CB-ACCESS-SIGN",sign);
     req_.set("CB-ACCESS-TIMESTAMP", time);
     return json::parse(http_call(make_url(base_api,method),http::verb::delete_).body());

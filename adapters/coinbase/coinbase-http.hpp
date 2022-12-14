@@ -46,8 +46,6 @@ public:
 
     explicit coinbaseAPI(executor ex, ssl::context& ctx,net::io_context& ioc);
 
-    std::string authenticate(const char* key, const char* data); 
-
     http::response<http::string_body> http_call(boost::url url, http::verb action);
 
     json open_orders();

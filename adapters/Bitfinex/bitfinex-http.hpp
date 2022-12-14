@@ -43,6 +43,7 @@ private:
     std::string secret_key = "0191uDe4OarxnxstnLVGInZGEqOY05culJMZGNWHEtk";
     net::io_context& ioc;
     ssl::context& ctx;
+    std::string PostDecodeString;
     
 public:
 
@@ -51,5 +52,7 @@ public:
     http::response<http::string_body> http_call(boost::url url, http::verb action);
 
     json get_snapshot(const std::string &symbol,const std::string &levels);
+
+    json place_market_buy(std::string symbol,std::string amount);
 
 };

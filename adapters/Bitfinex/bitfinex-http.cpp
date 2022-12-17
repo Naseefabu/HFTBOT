@@ -56,6 +56,7 @@ json bitfinexAPI::get_snapshot(const std::string &symbol,const std::string &leve
 json bitfinexAPI::place_market_buy(std::string symbol,std::string amount)
 {
     boost::url method{ "auth/w/order/submit"};
+
     nlohmann::ordered_json payload = {{"type", "MARKET"},
         {"symbol", symbol},
         {"amount",amount}};
@@ -63,7 +64,10 @@ json bitfinexAPI::place_market_buy(std::string symbol,std::string amount)
     //std::string query_param = "type=MARKET&symbol="+symbol+"&amount="+amount;    
     const std::string NONCE = generate_nonce();
     std::string message = "/api/v2/auth/w/order/submit" + NONCE + payload.dump();
+    std::cout << "message : " << message << std::endl;
     std::string sign = getHmacSha384(message,secret_key);
+    std::cout << "signature : " << sign << std::endl;
+    req_.target("/v2/auth/w/order/submit");
     req_.set("bfx-nonce",NONCE);
     req_.set("bfx-signature",sign);
     req_.body() = payload.dump();

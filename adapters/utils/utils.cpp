@@ -113,22 +113,26 @@ std::string getHmacSha256(const char* key, const char* data)
     return signature;
 }
 
-std::string getHmacSha384(std::string &key,std::string &content)
+std::string getHmacSha384(std::string &key, std::string &content)
 {
     unsigned char *result;
     int result_len = 48;
     std::string digest;
+    std::string hex_digest;
 
     result = HMAC(EVP_sha384(), key.data(), key.size(),
                   reinterpret_cast<const unsigned char *>(content.data()),
                   content.size(), NULL, NULL);
 
-    digest.assign(reinterpret_cast<char *>(result), result_len);
-    std::transform(digest.cbegin(), digest.cend(), digest.begin(), ::tolower);
+    // Generate a string of hexadecimal digits from the MAC
+    std::stringstream ss;
+    for (int i = 0; i < result_len; i++) {
+        ss << std::hex << std::setw(2) << std::setfill('0') << (int)result[i];
+    }
+    hex_digest = ss.str();
 
-    return digest;
+    return hex_digest;
 }
-
 
 std::string generate_nonce(){
 

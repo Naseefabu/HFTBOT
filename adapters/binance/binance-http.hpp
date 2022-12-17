@@ -49,8 +49,6 @@ public:
 
     http::response<http::string_body> http_call(boost::url url, http::verb action);
 
-    std::string authenticate(const char* key, const char* data);
-
     json server_time();
 
     json latest_price(const std::string &symbol);

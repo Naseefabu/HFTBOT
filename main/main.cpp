@@ -36,7 +36,7 @@ int main()
     //std::string l = "25";
     //json out = bitfinexapi->get_snapshot("tBTCUSD",l);
     //std::cout << "json bitfinex output : " << out << std::endl;
-    json out1 = bitfinexapi->place_market_buy("tBTCUSD","1");
+    json out1 = bitfinexapi->place_market_sell("tBTCUSD","1");
     std::cout << "market buy output : " << out1 << std::endl;
     
     

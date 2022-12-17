@@ -55,4 +55,7 @@ public:
 
     json place_market_buy(std::string symbol,std::string amount);
 
+    json place_market_sell(std::string symbol,std::string amount);
+
+
 };

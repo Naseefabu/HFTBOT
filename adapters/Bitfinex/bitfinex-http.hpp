@@ -57,5 +57,9 @@ public:
 
     json place_market_sell(std::string symbol,std::string amount);
 
+    json cancel_order(int orderid);
+
+    json cancel_all_orders(); // including trading and derivatives
+
 
 };

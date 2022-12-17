@@ -36,8 +36,12 @@ int main()
     //std::string l = "25";
     //json out = bitfinexapi->get_snapshot("tBTCUSD",l);
     //std::cout << "json bitfinex output : " << out << std::endl;
-    json out1 = bitfinexapi->place_market_sell("tBTCUSD","1");
-    std::cout << "market buy output : " << out1 << std::endl;
+    //json out1 = bitfinexapi->place_market_sell("tBTCUSD","1");
+    //int id = 10;
+    //json out2 = bitfinexapi->cancel_order(id);
+    json out2 = bitfinexapi->cancel_all_orders();
+
+    std::cout << "cancel all output : " << out2 << std::endl;
     
     
     ioc.run();

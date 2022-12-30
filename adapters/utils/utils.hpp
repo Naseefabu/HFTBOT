@@ -56,7 +56,20 @@ std::string getHmacSha256(const char* key, const char* data);
 
 std::string coinbase_HmacSha256(const char* key, const char* data);
 
-std::string generate_nonce();
+long generate_nonce();
 
 std::string getHmacSha384(std::string &key,std::string &content);
 
+std::string encode_url(std::string input);
+
+
+#include <openssl/buffer.h>
+#include <openssl/sha.h>
+#include <openssl/hmac.h>
+#include <openssl/bio.h>
+
+std::vector<unsigned char> hmac_sha512(const std::vector<unsigned char>& data, const std::vector<unsigned char>& key);
+std::string b64_encode(const std::vector<unsigned char>& data); 
+std::vector<unsigned char> b64_decode(const std::string& data); 
+std::vector<unsigned char> sha256(const std::string& data);
+std::string krak_signature(std::string path, std::string nonce, std::string postdata, std::string secret);

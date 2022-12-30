@@ -29,14 +29,14 @@ private:
 
     void configure(const std::string &api, const std::string& secret);
     boost::url base_api{"https://api.kraken.com/0/"};
-    std::string secret_key = "NoLQ23Z/JgKRaVhH3D4yk+bF96wLb/UvTQzyhyP9yZRHCWKl65JSZEYoS5w+NXz+Ez05GG3JvvC/Q7x2n6xXgA==";
+    std::string secret_key = "81INfYCAqThM8STjYuAGWoSCM+XAVyYPi/VxmQW+KfHWu1UxVqG/MosX9X4zNRnkFh1z4B2zsJvdOmV08fTMHg==";
     std::string PostDecodeString;
     tcp::resolver resolver_;
     beast::ssl_stream<beast::tcp_stream> stream_;
     beast::flat_buffer buffer_;
-    http::request<http::string_body>  req_;
+    http::request<http::string_body> req_;
     http::response<http::string_body> res_;
-    std::string api_key = "KlArnozkEc1QqdjbmHM5Yb7/q2IiEN33OKWkiVCAhBR691OOgJN17qpa";
+    std::string api_key = "Skz2FPOvhvvYrOHi6qMEqmmzq4tj3XrrDE5Zwxs/5/tfhdWCM3VAuOXp";
     net::io_context& ioc;
     ssl::context& ctx;
     std::string sign;
@@ -53,6 +53,18 @@ public:
 
     // default = last 1000 trades
     json get_trades(std::string pair, std::string sinceTime);
+
+    json submit_limit_order(std::string action,std::string pair,double size,double price);
+    
+    json submit_market_order(std::string action,std::string pair,double size);
+
+    json cancel_order(int id);
+
+    json cancel_all_orders();
+
+    json get_account_balance();
+
+    json get_open_orders();
 
 
 };

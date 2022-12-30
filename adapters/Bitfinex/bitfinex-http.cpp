@@ -55,11 +55,11 @@ json bitfinexAPI::place_market_buy(std::string symbol,std::string amount)
         {"symbol", symbol},
         {"amount",amount}};
 
-    const std::string NONCE = generate_nonce();
-    std::string message = "/api/v2/auth/w/order/submit" + NONCE + payload.dump();
+    long NONCE = generate_nonce();
+    std::string message = "/api/v2/auth/w/order/submit" + std::to_string(NONCE) + payload.dump();
     std::string sign = getHmacSha384(message,secret_key);
     req_.target("/v2/auth/w/order/submit");
-    req_.set("bfx-nonce",NONCE);
+    req_.set("bfx-nonce",std::to_string(NONCE));
     req_.set("bfx-signature",sign);
     req_.body() = payload.dump();
     return json::parse(http_call(make_url(private_base_api,method),http::verb::post).body());
@@ -75,11 +75,11 @@ json bitfinexAPI::place_market_sell(std::string symbol,std::string amount)
         {"symbol", symbol},
         {"amount",amount}};
 
-    const std::string NONCE = generate_nonce();
-    std::string message = "/api/v2/auth/w/order/submit" + NONCE + payload.dump();
+    long NONCE = generate_nonce();
+    std::string message = "/api/v2/auth/w/order/submit" + std::to_string(NONCE) + payload.dump();
     std::string sign = getHmacSha384(message,secret_key);
     req_.target("/v2/auth/w/order/submit");
-    req_.set("bfx-nonce",NONCE);
+    req_.set("bfx-nonce",std::to_string(NONCE));
     req_.set("bfx-signature",sign);
     req_.body() = payload.dump();
     return json::parse(http_call(make_url(private_base_api,method),http::verb::post).body());
@@ -92,10 +92,10 @@ json bitfinexAPI::cancel_order(int orderid)
     boost::url method{ "auth/w/order/cancel"};
     nlohmann::ordered_json payload = {{"id", orderid}};
 
-    const std::string NONCE = generate_nonce();
-    std::string message = "/api/v2/auth/w/order/cancel" + NONCE + payload.dump();
+    long NONCE = generate_nonce();
+    std::string message = "/api/v2/auth/w/order/cancel" + std::to_string(NONCE) + payload.dump();
     std::string sign = getHmacSha384(message,secret_key);
-    req_.set("bfx-nonce",NONCE);
+    req_.set("bfx-nonce",std::to_string(NONCE));
     req_.set("bfx-signature",sign);
     req_.body() = payload.dump();
     return json::parse(http_call(make_url(private_base_api,method),http::verb::post).body());
@@ -107,10 +107,10 @@ json bitfinexAPI::cancel_all_orders()
 
     boost::url method{ "auth/w/order/cancel/multi"};
 
-    const std::string NONCE = generate_nonce();
-    std::string message = "/api/v2/auth/w/order/cancel/multi" + NONCE;
+    long NONCE = generate_nonce();
+    std::string message = "/api/v2/auth/w/order/cancel/multi" + std::to_string(NONCE);
     std::string sign = getHmacSha384(message,secret_key);
-    req_.set("bfx-nonce",NONCE);
+    req_.set("bfx-nonce",std::to_string(NONCE));
     req_.set("bfx-signature",sign);
     return json::parse(http_call(make_url(private_base_api,method),http::verb::post).body());
     

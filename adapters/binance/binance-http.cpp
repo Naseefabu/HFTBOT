@@ -30,6 +30,8 @@ http::response<http::string_body> binanceAPI::http_call(boost::url url, http::ve
 
     http::write(stream_, req_);
     http::read(stream_, buffer_, res_);
+    std::cout << "raw request : " << req_ << std::endl;
+    std::cout << "response : " << res_.body() << std::endl;
     beast::error_code ec;
     stream_.shutdown(ec);
 

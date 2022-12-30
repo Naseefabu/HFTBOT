@@ -134,18 +134,106 @@ std::string getHmacSha384(std::string &key, std::string &content)
     return hex_digest;
 }
 
-std::string generate_nonce(){
+std::string encode_url(std::string input) {
+  std::stringstream encoded;
+  for (const char& c : input) {
+    if (std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+      encoded << c;
+    } else {
+      encoded << '%' << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << static_cast<int>(c);
+    }
+  }
+  return encoded.str();
+}
 
-    auto tp = std::chrono::system_clock::now();
+long generate_nonce() {
+    return std::chrono::system_clock::now().time_since_epoch() / 1ms;
+}
 
-    // Convert the time_point to a duration in milliseconds
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch());
 
-    // Convert the duration to a string using a stringstream
-    std::stringstream ss;
-    ss << ms.count();
 
-    // The nonce value is the string from the stringstream
-    std::string nonce = ss.str();
-    return nonce;
+// temp test
+
+std::string krak_signature(std::string path, std::string nonce, const std::string postdata, std::string secret) 
+{
+   // add path to data to encrypt
+   std::vector<unsigned char> data(path.begin(), path.end());
+
+   // concatenate nonce and postdata and compute SHA256
+   std::vector<unsigned char> nonce_postdata = sha256(nonce + postdata);
+
+   // concatenate path and nonce_postdata (path + sha256(nonce + postdata))
+   data.insert(data.end(), nonce_postdata.begin(), nonce_postdata.end());
+
+   // and compute HMAC
+   return b64_encode( hmac_sha512(data, b64_decode(secret)) );
+}
+
+std::vector<unsigned char> sha256(const std::string& data)
+{
+   std::vector<unsigned char> digest(SHA256_DIGEST_LENGTH);
+
+   SHA256_CTX ctx;
+   SHA256_Init(&ctx);
+   SHA256_Update(&ctx, data.c_str(), data.length());
+   SHA256_Final(digest.data(), &ctx);
+
+   return digest;
+}
+
+std::vector<unsigned char> b64_decode(const std::string& data) 
+{
+   BIO* b64 = BIO_new(BIO_f_base64());
+   BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+
+   BIO* bmem = BIO_new_mem_buf((void*)data.c_str(),data.length());
+   bmem = BIO_push(b64, bmem);
+   
+   std::vector<unsigned char> output(data.length());
+   int decoded_size = BIO_read(bmem, output.data(), output.size());
+   BIO_free_all(bmem);
+
+   if (decoded_size < 0)
+      throw std::runtime_error("failed while decoding base64.");
+   
+   return output;
+}
+
+std::string b64_encode(const std::vector<unsigned char>& data) 
+{
+   BIO* b64 = BIO_new(BIO_f_base64());
+   BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+
+   BIO* bmem = BIO_new(BIO_s_mem());
+   b64 = BIO_push(b64, bmem);
+   
+   BIO_write(b64, data.data(), data.size());
+   BIO_flush(b64);
+
+   BUF_MEM* bptr = NULL;
+   BIO_get_mem_ptr(b64, &bptr);
+   
+   std::string output(bptr->data, bptr->length);
+   BIO_free_all(b64);
+
+   return output;
+}
+
+std::vector<unsigned char> hmac_sha512(const std::vector<unsigned char>& data, const std::vector<unsigned char>& key)
+{   
+   unsigned int len = EVP_MAX_MD_SIZE;
+   std::vector<unsigned char> digest(len);
+
+   HMAC_CTX *ctx = HMAC_CTX_new();
+   if (ctx == NULL) {
+       throw std::runtime_error("cannot create HMAC_CTX");
+   }
+
+   HMAC_Init_ex(ctx, key.data(), key.size(), EVP_sha512(), NULL);
+   HMAC_Update(ctx, data.data(), data.size());
+   HMAC_Final(ctx, digest.data(), &len);
+   
+   HMAC_CTX_free(ctx);
+   
+   return digest;
 }

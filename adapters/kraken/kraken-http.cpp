@@ -81,11 +81,9 @@ json KrakenAPI::submit_market_order(std::string action, std::string pair, double
     long nonce = generate_nonce();
     std::string postdata1 = "nonce=" + std::to_string(nonce) + "&ordertype=market&type=" + action +
                             "&volume=" + std::to_string(size) + "&pair=" + pair;
-    std::string encoded_data = encode_url(postdata1);
     std::string signature = krak_signature("/0/private/AddOrder", std::to_string(nonce), postdata1, secret_key);
     req_.set("API-Sign", signature);
     req_.body() = postdata1;
-    boost::url url = make_url(base_api, method);
     return json::parse(http_call(make_url(base_api, method), http::verb::post).body());
 }
 
@@ -95,11 +93,9 @@ json KrakenAPI::submit_limit_order(std::string action, std::string pair, double 
     long nonce = generate_nonce();
     std::string postdata1 = "nonce=" + std::to_string(nonce) + "&ordertype=limit&type=" + action +
                             "&volume=" + std::to_string(size) + "&pair=" + pair + "&price=" + std::to_string(price);
-    std::string encoded_data = encode_url(postdata1);
     std::string signature = krak_signature("/0/private/AddOrder", std::to_string(nonce), postdata1, secret_key);
     req_.set("API-Sign", signature);
     req_.body() = postdata1;
-    boost::url url = make_url(base_api, method);
     return json::parse(http_call(make_url(base_api, method), http::verb::post).body());
 }
 
@@ -108,11 +104,9 @@ json KrakenAPI::cancel_order(int id)
     boost::url method{"private/CancelOrder"};
     long nonce = generate_nonce();
     std::string postdata1 = "nonce=" + std::to_string(nonce) + "&txid=" + std::to_string(id);
-    std::string encoded_data = encode_url(postdata1);
     std::string signature = krak_signature("/0/private/CancelOrder", std::to_string(nonce), postdata1, secret_key);
     req_.set("API-Sign", signature);
     req_.body() = postdata1;
-    boost::url url = make_url(base_api, method);
     return json::parse(http_call(make_url(base_api, method), http::verb::post).body());
 }
 
@@ -121,11 +115,9 @@ json KrakenAPI::cancel_all_orders()
     boost::url method{"private/CancelOrder"};
     long nonce = generate_nonce();
     std::string postdata1 = "nonce=" + std::to_string(nonce);
-    std::string encoded_data = encode_url(postdata1);
     std::string signature = krak_signature("/0/private/CancelAll", std::to_string(nonce), postdata1, secret_key);
     req_.set("API-Sign", signature);
     req_.body() = postdata1;
-    boost::url url = make_url(base_api, method);
     return json::parse(http_call(make_url(base_api, method), http::verb::post).body());
 }
 
@@ -134,11 +126,9 @@ json KrakenAPI::get_account_balance()
     boost::url method{"private/Balance"};
     long nonce = generate_nonce();
     std::string postdata1 = "nonce=" + std::to_string(nonce);
-    std::string encoded_data = encode_url(postdata1);
     std::string signature = krak_signature("/0/private/Balance", std::to_string(nonce), postdata1, secret_key);
     req_.set("API-Sign", signature);
     req_.body() = postdata1;
-    boost::url url = make_url(base_api, method);
     return json::parse(http_call(make_url(base_api, method), http::verb::post).body());
 }
 
@@ -147,10 +137,8 @@ json KrakenAPI::get_open_orders()
     boost::url method{"private/OpenOrders"};
     long nonce = generate_nonce();
     std::string postdata1 = "nonce=" + std::to_string(nonce);
-    std::string encoded_data = encode_url(postdata1);
     std::string signature = krak_signature("/0/private/OpenOrders", std::to_string(nonce), postdata1, secret_key);
     req_.set("API-Sign", signature);
     req_.body() = postdata1;
-    boost::url url = make_url(base_api, method);
     return json::parse(http_call(make_url(base_api, method), http::verb::post).body());
 }

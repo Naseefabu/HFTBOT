@@ -47,7 +47,7 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
     std::string wsTarget_ = "/ws/";
     std::string host_;
     SPSCQueue<OrderBookMessage> &diff_messages_queue;
-    std::function<void()> on_orderbook_diffs;
+    std::function<void()> message_handler;
     std::unordered_map<double,std::unordered_map<std::string,std::unordered_map<std::string,double>>> bids;
     std::unordered_map<double,std::unordered_map<std::string,std::unordered_map<std::string,double>>> asks;
 
@@ -137,7 +137,7 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
         ws_.async_read(buffer_, [this](beast::error_code ec, size_t n) {
             if (ec)
                 return fail_ws(ec, "read");
-            on_orderbook_diffs();
+            message_handler();
             buffer_.clear();
             ws_.async_read(buffer_, COINBASE_HANDLER(on_message));
         });
@@ -185,7 +185,7 @@ class coinbaseWS : public std::enable_shared_from_this<coinbaseWS>
                   {"product_ids", {market}},
                   {"channels", {"full"}}};
       
-      on_orderbook_diffs = [this](){
+      message_handler = [this](){
 
             json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
             // std::cout << "payload : " << payload << std::endl;

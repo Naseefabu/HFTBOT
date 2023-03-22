@@ -49,7 +49,7 @@ private:
     char const* host      = "stream.binance.com";
     char const* port      = "9443";
     SPSCQueue<OrderBookMessage>& diff_messages_queue;
-    std::function<void()> on_orderbook_diffs;
+    std::function<void()> message_handler;
 
 public:
     binanceWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<OrderBookMessage>& q)
@@ -140,7 +140,7 @@ public:
             if (ec)
                 return fail_ws(ec, "read");
 
-            on_orderbook_diffs();
+            message_handler();
             buffer_.clear();
             ws_.async_read(buffer_, BINANCE_HANDLER(on_message));
         });
@@ -210,10 +210,9 @@ public:
         std::string stream = symbol+"@"+"depth";
 
         
-        on_orderbook_diffs = [this]() {
+        message_handler = [this]() {
 
             json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
-            // std::cout << "payload : " << payload << std::endl;
             bool is;
 
             for(auto x : payload["bids"])
@@ -244,6 +243,8 @@ public:
         };
         run(host, port,jv, stream);
     }
+
+
 
 };
 

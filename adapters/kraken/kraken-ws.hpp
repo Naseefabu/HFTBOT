@@ -46,7 +46,7 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
     std::string wsTarget_ = "/ws/";
     std::string host_;
     SPSCQueue<OrderBookMessage> &diff_messages_queue;
-    std::function<void()> on_orderbook_diffs;
+    std::function<void()> message_handler;
 
   public:
 
@@ -136,7 +136,7 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
         ws_.async_read(buffer_, [this](beast::error_code ec, size_t n) {
             if (ec)
                 return fail_ws(ec, "read");
-            on_orderbook_diffs();
+            message_handler();
             buffer_.clear();
             ws_.async_read(buffer_, KRAKEN_HANDLER(on_message));
         });
@@ -170,9 +170,6 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
         payload["subscription"]["name"] = "ticker";
         run(payload);            
     }
-    void kraken_checksum(){
-
-    }
 
     // valid levels options : 10,25,100,500,1000
     void subscribe_orderbook_diffs(const std::string& action,const std::string& pair, int levels)
@@ -180,10 +177,10 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
 
         json payload = {{"event", action},
                     {"pair", {pair}}};
-        
-        on_orderbook_diffs = [this](){
+        // add handling snapshot message first
+        message_handler = [this](){
 
-            json payload =  json::parse(beast::buffers_to_string(buffer_.cdata()));
+            json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
             bool is;
 
             if(payload.is_array()){

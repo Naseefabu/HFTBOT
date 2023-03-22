@@ -37,7 +37,7 @@ template <typename T> struct SPSCQueue {
         return true;
     }
 
-    T pop() {
+    bool pop() {
         auto const readIdx = readIdx_.load(std::memory_order_relaxed);
         if (readIdx == writeIdxCached_) {
             writeIdxCached_ = writeIdx_.load(std::memory_order_acquire); // this is acquire because it ensures that it sees the latest value of writeIdx_ written by push thread. because in multicore system it can be possible that latest value of writeidx_ is not flushed to memory from pop() thread cache so that means push() thread cannot see latest value, but std::memory_order_acquire ensures it is flushed to memory and updated in other thread as well
@@ -45,13 +45,13 @@ template <typename T> struct SPSCQueue {
                 return false;
             }
         }
-        double val = data_[readIdx];
+        // T val = data_[readIdx];
         auto nextReadIdx = readIdx + 1;
         if (nextReadIdx == data_.size()) {
             nextReadIdx = 0;
         }
         readIdx_.store(nextReadIdx, std::memory_order_release); // unlock
-        return val;
+        return true;
     }
 };
 

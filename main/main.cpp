@@ -1,4 +1,3 @@
-#include <MarketDataProducer.hpp>
 #include <boost/url/src.hpp> // can only include in one source file
 #include <chrono>
 #include <ctime>
@@ -6,7 +5,7 @@
 #include <new>
 
 #include "TapeSpeedIndicator.hpp"
-#include "bitfinex-http.hpp"
+#include "datafeeds.hpp"
 
 int main()
 {
@@ -49,6 +48,7 @@ int main()
     json out2 = krakenapi->get_account_balance();
     
     std::cout << "market order kraken output : " << out2 << std::endl;
+    CoinbaseOrderbookFeed cs;
 
     ioc.run();
 }

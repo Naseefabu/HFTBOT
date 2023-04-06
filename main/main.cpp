@@ -32,7 +32,7 @@ int main()
     // json out = binanceapi->orderbook(binance_symbol,l);
     // std::cout << "json response binance : " << out << std::endl;
 
-    auto krakenapi = std::make_shared<KrakenAPI>(ioc.get_executor(), ctx, ioc);
+    // auto krakenapi = std::make_shared<KrakenAPI>(ioc.get_executor(), ctx, ioc);
     // std::string l = "25";
     // json out = bitfinexapi->get_snapshot("tBTCUSD",l);
     // std::cout << "json bitfinex output : " << out << std::endl;
@@ -45,10 +45,13 @@ int main()
     //json out2 = krakenapi->submit_limit_order("sell", "XBTUSD", size, price);
     //json out2 = krakenapi->submit_market_order("sell", "XBTUSD", size);
     //json out2 = krakenapi->cancel_order(size);
-    json out2 = krakenapi->get_account_balance();
+    //json out2 = krakenapi->get_account_balance();
     
-    std::cout << "market order kraken output : " << out2 << std::endl;
-    CoinbaseOrderbookFeed cs;
-
+    //std::cout << "market order kraken output : " << out2 << std::endl;
+    //CoinbaseOrderbookFeed cs;
+    auto binancews = std::make_shared<binanceWS>(ioc.get_executor(),ctx);
+    //binancews->subscribe_levelone("SUBSCRIBE","btcusdt");    
+    binancews->subscribe_orderbook_diffs("SUBSCRIBE","btcusdt",10);    
+    
     ioc.run();
 }

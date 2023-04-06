@@ -48,14 +48,12 @@ private:
     std::string wsTarget_ = "/ws/";
     char const* host      = "stream.binance.com";
     char const* port      = "9443";
-    SPSCQueue<OrderBookMessage>& diff_messages_queue;
     std::function<void()> message_handler;
 
 public:
-    binanceWS(net::any_io_executor ex, ssl::context& ctx, SPSCQueue<OrderBookMessage>& q)
+    binanceWS(net::any_io_executor ex, ssl::context& ctx)
         : resolver_(ex)
-        , ws_(ex, ctx)
-        , diff_messages_queue(q) {}
+        , ws_(ex, ctx) {}
 
     void run(char const* host, char const* port, json message, const std::string& streamName) {
         if (!SSL_set_tlsext_host_name(ws_.next_layer().native_handle(), host)) {
@@ -125,6 +123,7 @@ public:
 
         if (ec)
             return fail_ws(ec, "write");
+        std::cout << "on_write : " << std::endl;
 
         ws_.async_read(buffer_, BINANCE_HANDLER(on_message));
     }
@@ -134,6 +133,9 @@ public:
         boost::ignore_unused(bytes_transferred);
         if (ec)
             return fail_ws(ec, "read");
+
+        //json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
+        // std::cout << "on_message : " << payload << std::endl;
 
         buffer_.clear();
         ws_.async_read(buffer_, [this](beast::error_code ec, size_t n) {
@@ -196,6 +198,20 @@ public:
     void subscribe_levelone(const std::string& action,const std::string& symbol)
     {
         std::string stream = symbol+"@"+"bookTicker";
+        message_handler = [this]() {
+
+            json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
+            bool is;
+
+            std::cout << "payload : " << payload << std::endl;
+            //for(auto x : payload["bids"])
+                //is = diff_messages_queue.push(OrderBookMessage(true,std::stod(x[0].get<std::string>()),std::stod(x[1].get<std::string>()),payload['u'])); // no update id
+                
+
+            //for(auto x : payload["asks"])
+                //is = diff_messages_queue.push(OrderBookMessage(false,std::stod(x[0].get<std::string>()),std::stod(x[1].get<std::string>()),payload["u"])); // no update id
+
+        };
         json jv = {
             { "method", action },
             { "params", {stream} },
@@ -205,9 +221,9 @@ public:
     }
 
     
-    void subscribe_orderbook_diffs(const std::string& action,const std::string& symbol,short int depth_levels)
+    void subscribe_orderbook_diffs(const std::string action,const std::string symbol,short int depth_levels)
     {
-        std::string stream = symbol+"@"+"depth";
+        std::string stream = symbol+"@"+"depth";//+"@"+std::to_string(depth_levels);
 
         
         message_handler = [this]() {
@@ -215,12 +231,15 @@ public:
             json payload = json::parse(beast::buffers_to_string(buffer_.cdata()));
             bool is;
 
-            for(auto x : payload["bids"])
-                is = diff_messages_queue.push(OrderBookMessage(true,std::stod(x[0].get<std::string>()),std::stod(x[1].get<std::string>()),payload['u'])); // no update id
+            std::cout << "First update ID : " << payload["U"] << "  ";
+            std::cout << "Last update ID : " << payload["u"] << std::endl;
+            
+            //for(auto x : payload["bids"])
+                //is = diff_messages_queue.push(OrderBookMessage(true,std::stod(x[0].get<std::string>()),std::stod(x[1].get<std::string>()),payload['u'])); // no update id
                 
 
-            for(auto x : payload["asks"])
-                is = diff_messages_queue.push(OrderBookMessage(false,std::stod(x[0].get<std::string>()),std::stod(x[1].get<std::string>()),payload["u"])); // no update id
+            //for(auto x : payload["asks"])
+                //is = diff_messages_queue.push(OrderBookMessage(false,std::stod(x[0].get<std::string>()),std::stod(x[1].get<std::string>()),payload["u"])); // no update id
 
         };
         

@@ -80,8 +80,7 @@ class krakenWS : public std::enable_shared_from_this<krakenWS>
         beast::get_lowest_layer(ws_).async_connect(results, KRAKEN_HANDLER(on_connect));
     }
 
-    void on_connect(beast::error_code                                           ec,
-                    [[maybe_unused]] tcp::resolver::results_type::endpoint_type ep) {
+    void on_connect(beast::error_code ec,[[maybe_unused]] tcp::resolver::results_type::endpoint_type ep) {
         if (ec)
             return fail_ws(ec, "connect");
 
